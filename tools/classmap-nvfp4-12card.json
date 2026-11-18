@@ -1,0 +1,30 @@
+{
+  "name": "classmap-nvfp4-12card-20261117b",
+  "note_b": "window t1 (2026-11-17): the Triton _linear (models/deepseek_v41/fp8_linear.py, used in models/deepseek_v41 only by dspark.py: the DSpark drafter, fp8) moved from dense to drafter; it ran 262 ms on the last stage in every 4,092-row chunk that stage skips.",
+  "source": "classmap-nvfp4-1113 (the eight-card build's kernel-trace tooling, READ FROM CODE 2026-11-13) plus the kernels left unclassified by it in the REAL NVFP4 traces of 2026-11-14 (L/stage/tp8-probe-1113/out/ktrace-20261114T021936/traces: v41k_diet expert kernels, the sampler and runner kernels, dense_mv, the prefill expert kernels). The twelve-card build runs the same engine family; kernels it has that these traces lack land in 'unclassified' and are reported by name.",
+  "anchor": "^_gather_attention|^_sparse_attention|^v41k::attn_split|(^|::)attn_split",
+  "dmv": "^v41k_dmvx::|^\\(anonymous namespace\\)::dense_mv<|^<unnamed>::dense_mv<",
+  "graph_launch": "^cudaGraphLaunch",
+  "phases": ["experts", "dense", "attention", "index", "coll_tp_sum", "coll_index", "coll_gather", "handoff",
+             "router", "hc_norm", "engram", "head", "sampling", "drafter", "bookkeeping", "memcpy", "other",
+             "unclassified"],
+  "classes": [
+    ["^ncclDevKernel_SendRecv|^ncclDevKernel_Send|^ncclDevKernel_Recv", "handoff"],
+    ["^ncclDevKernel_AllReduce_Sum_u32|^ncclDevKernel_AllReduce_Max", "coll_index"],
+    ["^ncclDevKernel_AllGather|^ncclDevKernel_Broadcast", "coll_gather"],
+    ["cross_device_reduce|_push<|_push$|push_allreduce|cube_allreduce|hierarchical_reduce|^ncclDevKernel_AllReduce|^ncclDevKernel_ReduceScatter|^v41k::peer_gather", "coll_tp_sum"],
+    ["^_gather_attention|^_sparse_attention|^_sink_softmax|attn_split|attn_combine|(^|::)qk_|(^|::)pv_|^_attn_prep|^_attn_post|^_rotate|^_qdq|^_insert|^_ring_insert|^_fill_selected|^_pool_c|^_compress|ds41_sparse_prefill|prefill_fused_attn", "attention"],
+    ["skinny_nvfp4|nvfp4_qpn|mxfp4_qpn|^_group_plan_kernel|^_swiglu_kernel|^v41k::gate_up_em|^v41k::down_rows|^v41k::q8_plan_kernel|^v41k::moe_plan|^v41k_diet::|^v41k_fast::|^_v41_prefill_|^_partition_tile|^_check_transcode|transcode_kernel|^<unnamed>::(gate_up|gate_up_grouped|down3|down_unroute|raw_down_unroute|raw_grouped_gate_up_kernel|quantize_q8|v41_swiglu_q8|v41_gate_reuse|v41_reuse_plan)\\b|^\\(anonymous namespace\\)::(gate_up|gate_up_grouped|down3|down_unroute|raw_down_unroute|raw_grouped_gate_up_kernel|quantize_q8|v41_swiglu_q8|v41_gate_reuse|v41_reuse_plan)\\b|^_iq_tail|dequantize_block_iq|mul_mat_vec_q", "experts"],
+    ["^v41k::index_|index_scores|^_index_|^_seg_|head_sum_kernel|^_unpack_index_keys|v41idx|v41pidx", "index"],
+    ["^_route|^_row_projection|route_topk|fp32_proj", "router"],
+    ["^_hc_|hc_parts|hc_finish|^_transition_|^_split_sinkhorn|^_collapse|^_expand|^_short_rms|^_mix", "hc_norm"],
+    ["^_engram|^_wait$|^_consume$", "engram"],
+    ["^_markov|^_hash_|^_history_|^_can_publish|^_publish|^_copy_request|^_lookup|^_draft|^_gather_draft|^_prepare_dflash_inputs|copy_and_expand_dflash|eagle_prepare|^_mtp_weighted_reduce|^_linear$|^_reduce_split_k", "drafter"],
+    ["^v41k::fp8_gemv|^v41k::fp8_reduce|turbomind::gemm", "dense_or_drafter"],
+    ["^_rejection|rejection_greedy|^_resample|^_compute_block_stats|^_get_num_sampled_and_rejected|^_gumbel_sample|ArgMaxOps|^_combine_sampled_and_draft_tokens|^_scatter_draft_tokens|^_sample", "sampling"],
+    ["^_post_update|^_gather_block_tables|^_prepare_pos_seq_lens|^_compute_slot_mapping|^_apply_write_kernel|^_prepare_inputs", "bookkeeping"],
+    ["^v41k_dmvx::|dense_mv<|gemm|cutlass::Kernel|gemmSN|splitKreduce|gemv2T|gemvNSP|v41_shared_swiglu|dmv_restore", "dense"],
+    ["^Memcpy|^Memset", "memcpy"],
+    ["^at::native::|^triton_|^memcpy32_post$|^memcpy_post$|^_begin$|^_commit_|^at_cuda_detail::|^\\(anonymous namespace\\)::elementwise_kernel_with_index|^dequantize_block_q", "other"]
+  ]
+}

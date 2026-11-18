@@ -1,0 +1,10 @@
+# engine 07a688b05d941fe574f953c05a66f9b4e051cba3
+# base f20d155db79edc980fcd97c8694b20048d256c5f
+# note three pipeline stages (PP3 x TP4, cuts 14 and 28) on top of the confidence cut kit of the eight-card build (f20d155); NOT booted on a card
+# base-kit f20d155db79edc980fcd97c8694b20048d256c5f (the eight-card build's draft-checking kit, a private working repository)
+# published copy: comment lines naming a private working repository were reworded in 1 file(s); their new sha256 is recomputed (code unchanged)
+models/deepseek_v41/contract.py	8789c78d948789feaa22b09702e3aea67252c9a69823f12baab1d95752626fa6	2d2fe09438092ed059aee91ccbbc5429fce262216ba0156289e779cad6783800
+models/deepseek_v41/model.py	f9d2b12f11d5fba8a02d46db65fd09979a390a500412c0bfcb0df3c952719cca	ffe1596c469b131bc2a7f84702fce5ee8de049461ccf27e831abb981207b40b2
+models/deepseek_v41/pp_commit.py	50dc0c74ad253d3adb984e3f636732b780ac40e456ef590981ebe4e43f047c02	5e7c5d5435713d08b9a62fe8db4cd1243b37301a72e0fc7a05753efff949e4f7
+v1/core/sched/v41_multi_seq.py	7e336cf5a454710547f1ef69de21e13da3c9a848dc3b65b4900000459c4f55c2	c1974ba1784592e7526f7d7c98e010f25130b9e5db176a5e23f9a5b1366a1fd3
+v1/worker/gpu/model_runner.py	9777f78b2958089df67ad933d03b6e7008a0589e77d5cc929e98014f5cec29c3	b2fc4df71b582c6747d260ebd6874e4d0c96c7c1bd8edcc18b4cb3f98b30d706
