@@ -12,7 +12,7 @@
 | [../documents/plans/KERNEL-AND-OPTIMIZATION-PLAN.md](../documents/plans/KERNEL-AND-OPTIMIZATION-PLAN.md) | the plan for custom kernels and optimizations: where the build stands, the method, the time budget, the items in tiers A to D, what was dropped, the order of work |
 | [../documents/reviews/UPSTREAM-REVIEW-20261117.md](../documents/reviews/UPSTREAM-REVIEW-20261117.md) | what the upstream projects did since the engine's base: 1Cat-vLLM #1482 (four stages on 16 cards), #1537 and others |
 | [../documents/reviews/CHUNK-BOUNDARY-READING.md](../documents/reviews/CHUNK-BOUNDARY-READING.md) | why a differently cut prompt read rounds differently: the reading that led to the four-card sum probe |
-| [../documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md](../documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md) | why the same layer-0 rows differ between tail chunks of 2,292 and 2,308 rows: the multiply library's split count |
+| the split-count report (not in this first release; its findings are in `ARCHITECTURE.md` section 6 and `measurements.md`) | why the same layer-0 rows differ between tail chunks of 2,292 and 2,308 rows: the multiply library's split count |
 | [../research/TWELVE-CARD-RESEARCH.md](../research/TWELVE-CARD-RESEARCH.md) | this build's own findings, and where each is written down |
 | [../research/TWELVE-CARD-TIME-BUDGET.md](../research/TWELVE-CARD-TIME-BUDGET.md) | where the time of a read, a turn and a decode round goes on three stages (window t1) |
 | [../engine/README.md](../engine/README.md) | every kit with its engine commit, what it is and its state |

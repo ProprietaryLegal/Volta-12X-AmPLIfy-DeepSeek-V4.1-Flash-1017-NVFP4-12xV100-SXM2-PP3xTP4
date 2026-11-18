@@ -72,10 +72,10 @@ from the credits of the eight-card builds (checked there on 2026-11-03 and 2026-
 ## Our earlier builds
 
 - **Volta Max uPLIft** (PLI Labs, Apache-2.0): the native NVFP4 expert path, the tier planner, the packs and the
-  routing tally this build reads, the launcher and serve scripts this build's own are derived from, the closeness
-  method, and the serving default this build is measured against.
-- **Volta Full NVFP4** (PLI Labs, Apache-2.0): every routed expert in NVFP4 on eight cards with the rest read from
-  host memory. The same kind of residency is this build's quality reference.
+  routing tally this build reads, the launcher and serve scripts this build's own are derived from, and the closeness
+  method.
+- **Volta Full NVFP4** (PLI Labs, Apache-2.0): the host-memory expert residency with which this build's all-native
+  reference is computed.
 - **Volta sPLIt** (PLI Labs, Apache-2.0): the PP2 x TP4 port and the engine underneath. Its credits (DeepSeek,
   ISTA-DASLab, 1CatAI and the authors of its patch series, vLLM, Phil Tompkins, TensorFold, sudoingX, Dennis
   Vertzyas) apply to everything this build runs on.

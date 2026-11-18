@@ -61,7 +61,7 @@ showed large four-card sums going through NCCL in half precision in an order tha
 ## 2026-11-17 07:55Z to 10:16Z: windows o1 and o2, three slots
 
 o1 closed three slots on a mis-scaled long-prompt limit; o2's corrected rule accepted three slots with 4,092-row
-chunks (288.0 tok/s in sum for three together against 198.2 for the eight-card build). Kit 7 closed.
+chunks (288.0 tok/s in sum for three together). Kit 7 closed.
 
 ## 2026-11-17 00:16Z to 07:12Z: windows w1 to w5
 

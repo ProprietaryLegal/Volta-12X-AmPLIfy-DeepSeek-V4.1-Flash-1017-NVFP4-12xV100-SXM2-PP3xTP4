@@ -276,9 +276,8 @@ def _medians(d, ref, arm):
 
 def nearer(d, ref, arm, other):
     """One machine line: is ARM nearer REF than OTHER is? HOLDS = ARM's median first divergence from REF is at least
-    twice OTHER's AND ARM's median mean |dlogprob| is at most half OTHER's; else NOT SHOWN. (What rule line 3 asks
-    of the all-NVFP4 build: nearer the all-native reference than the default; window w5: 208 tokens and 0.0090
-    against the default's 7 tokens and 0.0656.) INCONCLUSIVE: the receipts are incomplete (complete_pair)."""
+    twice OTHER's AND ARM's median mean |dlogprob| is at most half OTHER's; else NOT SHOWN. (Rule line 3 asked
+    this of the all-NVFP4 build against a quantized reference boot.) INCONCLUSIVE: the receipts are incomplete (complete_pair)."""
     if _inconclusive(f"NEARER {arm} than {other} to {ref}", [(d, ref, arm), (d, ref, other)]):
         return "INCONCLUSIVE"
     fa, da = _medians(d, ref, arm)

@@ -20,7 +20,7 @@ Added after a CPU study of the prompt pipeline and windows st3b, st4 and t1 (the
 - **Extends summary item 4 (large sums): a second source of cut-dependent rounding.** Besides the four-rank sums
   through NCCL in FP16, the dense multiply library picks a prompt-read multiply's split count from the chunk's row
   count, so a prompt's last chunk is read in the arithmetic its row count selects (MEASURED on one card, PLAN
-  Amendment 23; `documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md`). No upstream change for it was found; the
+  Amendment 23; the split-count report (not in this first release)). No upstream change for it was found; the
   library's own switch `TM_GEMM_TUNE=max_splits=1` exists in our engine and has no verdict on this build (arm G,
   Amendments 29 and 31).
 - **Unchanged:** #1537 (plan item D4) has not been run against our engine; long reads pass in every window,

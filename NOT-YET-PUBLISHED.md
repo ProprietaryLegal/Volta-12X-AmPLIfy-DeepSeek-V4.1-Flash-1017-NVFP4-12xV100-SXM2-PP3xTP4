@@ -18,7 +18,7 @@ later releases where they can be made public.
 - `tools/make_*profile*.py`, `tools/make_pp3_tier_map.py`: profile and tier-map makers; they read a private routing
   tally.
 - `tools/mem_rehearsal.py`, `tools/turn_probe.py`, `tools/pipe_probe.py`, `tools/long_capture.py`,
-  `tools/restore_pair.py`, `tools/gen_mtp_profile_lines.py` and their tests: the memory rehearsal, the turn probes
+  `tools/restore_pair.py`, `tools/gen_mtp_profile_lines.py`, `tools/cold_copy_probe.py`, `tools/rc_probe.py`, `tools/rc_cells_probe.py` and their tests: the memory rehearsal, the turn probes
   and the long-prompt capture; their constants and test cuts are not yet cleaned. `tools/closeness.py` still names
   `long_capture.py`'s seven long prompt sizes.
 - The tests that read real window receipts in place on the host (`test_arm_g`, `test_default42`,

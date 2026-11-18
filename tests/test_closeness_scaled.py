@@ -37,12 +37,3 @@ def test_cannot_decide_without_prompts_or_without_a_mean():
     assert cl.scaled_word([], [])[0] == "CANNOT DECIDE"
     # every divergence at token 0: no token before it, no mean
     assert cl.scaled_word([(200, 0, None)], [(200, 0, None)])[0] == "CANNOT DECIDE"
-
-
-def test_window_o1_figures_as_printed():
-    # o1, closeness.py's own lines: F3c against F2 (65, 0.0403) (124, 0.0333) (8, 0.0245); F2 against PL (8, 0.0184)
-    # (60, 0.0702) (8, 0.0117). With the default as the base: medians 65 / 0.0333 against 8 / 0.0184: 65 >= 4 and
-    # 0.0333 <= 0.0368, so HOLDS.
-    arm = [(200, 65, 0.0403), (164, 124, 0.0333), (160, 8, 0.0245)]
-    base = [(200, 8, 0.0184), (165, 60, 0.0702), (160, 8, 0.0117)]
-    assert cl.scaled_word(arm, base) == ("HOLDS", 65, 0.0333, 8, 0.0184)

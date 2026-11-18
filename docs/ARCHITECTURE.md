@@ -2,7 +2,7 @@
 
 How the twelve-card build is laid out and why. Sources: the build plan
 sections 2 to 7 and 9 (through Amendment 31), the kit `kit/PP3KIT6c-over-cut`, the launcher `run/swap_arm12.sh`,
-the window driver `window/run_window_pp3.sh` and `documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md`. The plan,
+the window driver `window/run_window_pp3.sh` and the split-count report (not in this first release). The plan,
 the launcher and the window driver are not in this first release ([NOT-YET-PUBLISHED.md](../NOT-YET-PUBLISHED.md));
 the names are kept so that the record reads as it was written.
 Labels: **READ** = read in code or a document named on the line; **ARITHMETIC** = computed from measured or read
@@ -319,8 +319,7 @@ Two more kits exist beside kit 6c and are not part of the standing configuration
 
 ## 12. Known limits of the design
 
-- One request alone gains nothing from the third board. Its round carries the same forty layers of work
-  (MEASURED, windows w3 and w5).
+- One request alone is not made faster by a third stage: its round carries the same forty layers of work.
 - A step carries one request. Requests beyond the three stages wait. Batched decode, as upstream 1Cat-vLLM #1482
   has it for four stages, is a different scheduling design and a study in the kernel and optimization plan (item
   B1); it is not in this engine.

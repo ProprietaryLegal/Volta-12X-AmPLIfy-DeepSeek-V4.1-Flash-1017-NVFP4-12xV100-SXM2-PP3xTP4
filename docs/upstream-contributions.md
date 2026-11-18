@@ -101,7 +101,7 @@ here and could be offered:
 - the card memory limit;
 - the finding that the dense multiply library picks its split count from a chunk's row count, so that a prompt's
   last chunk rounds by its size (PLAN Amendment 23, measured on one card), and the reading that a snapshot hit takes
-  the oldest page of a token hash rather than its own read's (`documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md`
+  the oldest page of a token hash rather than its own read's (the split-count report (not in this first release)
   section 6). Both are in the engine of every V100 build of this lineage; neither has a fix here yet (kernel plan
   items B4 and B5).
 

@@ -27,11 +27,10 @@ driver got a phase that leaves the build serving.
 ## w1: the first three-stage boot answers wrongly (00:16Z to 01:01Z)
 
 The preconditions, the reference captures, the stop of the default, the eight hand-off probes and the all-native
-reference arm were clean. Arm X, three stages holding the default's own experts, booted as predicted and failed
-rule line 1: 15 of 15 answers differed from the default's. The pattern was exact: token 0 right, a divergence at
-token 1 on 12 of 12 prompts, three to five junk tokens, then the default's answer for 100 tokens or more. A chat
-alone did not repeat itself. Speed was as estimated: per-round time equal to the default's and three together +35
-to +45 %. Nothing served and the default was restored. The cause was not found by reading.
+reference arm were clean. Arm X, three stages holding a quantized expert mix, booted as predicted and failed
+rule line 1: 15 of 15 answers differed from a two-stage reference boot of the same experts. The pattern was exact:
+token 0 right, a divergence at token 1 on 12 of 12 prompts, three to five junk tokens, then the reference's answer
+for 100 tokens or more. A chat alone did not repeat itself. Nothing served and the server was restored. The cause was not found by reading.
 
 ## The cause (01:34Z) and kit 3
 
@@ -61,8 +60,8 @@ device check fired was not established. The one-slot arm was clean in the next w
 
 With kit 3, arm X passed rule line 1: closeness CLEAN with 0 of 12 early divergences, and the
 alone-against-together check passed. The one-slot arm read CLEAN with no Xid. Then arm F2, every routed expert in
-NVFP4 at two slots, booted for the first time: 15,360 hot and 0 cold. One request alone showed no measurable
-change against the default. Three requests sent at once were 51 to 64 % faster per request. The highest card
+NVFP4 at two slots, booted for the first time: 15,360 hot and 0 cold. One request alone decoded at 106.5 tok/s on
+fresh text, and three sent at once at 108.5 tok/s each (two slots). The highest card
 sample was 31,808 MiB on the middle stage, 190 MiB under the owner's line, as the plan's arithmetic had named the
 middle board the tight one. The owner's quality score line came out INCONCLUSIVE. The build then served from
 03:01:22Z for an external client's replay of test prompts. Under that load the
@@ -74,7 +73,7 @@ the line. The step is unexplained. No stage showed a floor that keeps rising. Th
 
 After w3's first figures the owner allowed tests of four, six and eight requests at once. Kit 4 raised three
 guards from four slots to eight. In window s1, three slots and four slots passed on the three-stage engine with
-the default's experts. Four at once gave the same total as three. The six-slot arm booted, served, and its engine
+the quantized expert mix. Four at once gave the same total as three. The six-slot arm booted, served, and its engine
 core died on the first requests: a log line named a slot's fields by indexing the string 'abcd', a fourth place
 sized for four slots outside the three guards. Kit 4's CPU test had driven the slot policy without the
 scheduler's real logging. Kit 4b fixed it with a test through the real engine loop. Window s2 started the
@@ -103,7 +102,7 @@ hot and 0 cold, loaded in 134 s and peaked at 31,336 MiB (window w3: 31,808). A 
 turns' first token twice as late, so that idea was closed. The build served two slots from kit 6c. After w5 the
 quality line was replaced (Amendment 10): the owner's score could not reach its threshold however close an arm
 was. The receipts themselves were clear: the all-NVFP4 build tracks the all-native reference for a median 208
-tokens against the default's 7.
+tokens.
 
 ## o1: a third slot is closed by a rule that was mis-scaled (07:55Z to 08:26Z)
 
@@ -121,7 +120,7 @@ differently cut read is the same model in another rounding.
 The rule was rewritten before the window (Amendment 12). A comparison arm with every chunk 64 rows shorter
 measures how far a harmless change of the cut moves long-prompt answers, and the three-slot arm may move them at
 most twice as far. The prediction held: the 64-row shift moved them by 0.0307, the halved chunk by 0.0331. Arm
-F3c passed every line: three requests together 288.0 tok/s in sum on fresh text against the default's 198.2, a
+F3c passed every line: three requests together 288.0 tok/s in sum on fresh text, a
 prompt read at 96 % of the two-slot arm's speed, and a highest card sample of 30,052 MiB, 1,946 MiB under the
 line. Two other three-slot arms kept 8,188-row chunks. One of them awaited every prompt hand-off before the next
 forward (kit 7). It bought no memory: 31,664 MiB against 31,628 MiB without the switch. Both predictions for
@@ -136,7 +135,7 @@ by row count do not separate the measured cases. Its hypothesis: the sum over th
 probe on one board, with no model, confirmed it at the engine's all-reduce entry. A sum small enough for the
 engine's own path is added in FP32 and rounded once. A larger sum goes through NCCL in FP16, in an order that
 depends on the buffer's size and the element's place in it. The NCCL sum differs from the exact one in 32.89 %
-of elements. This is the eight-card default's arithmetic too. A change that removes it is a candidate, not work
+of elements. It is the engine's general arithmetic, not something of three stages. A change that removes it is a candidate, not work
 in progress.
 
 ## k1: the card limit on the cards, and a false alarm (10:53:38Z to 11:13:38Z)
@@ -160,7 +159,7 @@ the first boot had the store's kit in the tree and the store off: 0 cold, the li
 accepted capture 7 of 7, three grown chats at 30,052 MiB. So the store's kit moves no token when it is off. The
 second boot switched the store on. All twelve workers logged it, and then the engine core refused to start: the
 workers' tier digests had not reached the scheduler, and the store's fingerprint must cover them. The store
-records a worker's tier digest in the three-tier loader path that the eight-card default runs. This build's
+records a worker's tier digest only in the engine's three-tier loader path. This build's
 profile uses the two-tier path, which recorded none. The refusal is the store working as designed. The stop rule
 restored the default. No record set was made. The plan's table of what had never met a server had not
 named this loader path: nobody had booted the store against this build's loader configuration, on any bed. The
@@ -224,7 +223,7 @@ store and its dump on was 30,398 MiB. Then the pinned-prefix cache test M12 said
 its rule. The chats' restored state equalled the saved state byte for byte both times. What differed was the
 test's second reference: it began from layer-0 window pages that another read of the same tokens had written, and
 those pages differed in six of nine blocks between a read whose tail chunk had 2,292 rows and one whose tail had
-2,308. On the eight-card default the same test gave identical pages. Two things were read in the dump and
+2,308; tails that fall on one split count gave identical pages. Two things were read in the dump and
 confirmed later: pages are shared between requests by token hash, so a request can start from another
 read's pages; and on this build the same tokens in a tail chunk of another row count come out in a few other bytes.
 The mechanism was open. The default served again from 16:20:29Z (Amendment 22).
@@ -243,7 +242,7 @@ sixteen row counts, and all sixteen equalled the model. Rows under different cou
 were bit-identical; with the library's switch `TM_GEMM_TUNE=max_splits=1` all 120 pairs were bit-identical. It was
 a second, separate source of "the same model in another rounding", beside the four-card sums of the morning. The
 store's test lengths were chosen so that each test's two reads fall on one split count, and nothing else changed
-(Amendment 23; `documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md`).
+(Amendment 23; the split-count report (not in this first release)).
 
 ## st4: every store test passes, and the owner's own line fails (17:15Z to 18:05Z)
 

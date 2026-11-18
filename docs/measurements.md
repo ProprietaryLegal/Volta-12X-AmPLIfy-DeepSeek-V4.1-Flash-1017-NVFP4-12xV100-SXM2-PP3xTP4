@@ -18,7 +18,7 @@ estimate unless it says so.
 | Power and clock | 150 W and 1477 MHz per card, MEASURED 2026-11-16 23:06Z to 23:14Z, through window sv1 (2026-11-17 18:16Z). **200 W** and 1,477 MHz since 2026-11-17 18:58Z: the limits service's log showed all twelve V100s "power limit set to 200W" | PLAN section 2; Amendment 28 |
 | Layout | three stages of four cards, layers 0-13 / 14-27 / 28-39 | PLAN section 1 |
 | Dates | every window ran on 2026-11-17 (UTC) | PLAN section 9 |
-| The default | the eight-card build Volta Max uPLIft, two stages, three slots, 5,651 of 15,360 routed experts in NVFP4; measured in the same window with the same tool where a row compares. It was the serving default until 2026-11-17 about 18:14Z and is the fallback since; this page keeps the windows' word "the default" for it | PLAN section 1; Amendment 27 |
+| "The default" | in the window names below, the server that was restored at the end of a window before 2026-11-17 18:14Z; a window stopped it, ran its arms and restored it | PLAN section 9 |
 | The line | 31,998 MiB: the owner's limit for the highest sample on any card | PLAN section 9, line 6 |
 
 Every figure of a window up to and including sv1 was taken at 150 W (PLAN Amendment 28 says so of "every speed
@@ -28,15 +28,16 @@ clock cap of 1,477 MHz is recorded for 2026-11-16 and for 18:57Z on 2026-11-17; 
 inferred, not read.
 
 Terms. **Fresh text**: the requests F1, F2, F3 of the owner's cells and prompts made the same way. **Repeated
-text**: the copy tasks RA, RB, RC and prompts made the same way. **Arm X**: three stages with the default's own
-expert mix (5,651 hot), used to compare the three-stage engine with the default. **Arm F2**: every routed expert
+text**: the copy tasks RA, RB, RC and prompts made the same way. **Arm X**: three stages with a quantized expert mix
+(5,651 experts in NVFP4, the rest compressed), used to test the three-stage engine against a two-stage reference
+boot of the same experts. **Arm F2**: every routed expert
 NVFP4, two slots, 8,192-row prompt chunks. **Arm F3c**: every routed expert NVFP4, three slots, 4,096-row chunks:
 the configuration of windows o2 and k1. **Arm F4c**: the same with four slots: the standing configuration since
 window s4. **Arm G**: the standing configuration with the dense library's split switch `TM_GEMM_TUNE=max_splits=1`.
 **Arm T**: the standing configuration with the engine's timers and the torch profiler (the time budget). **Boots
 KA, KD1, KD2, KN, KN2**: the store windows' boots (store off; on with its dump on an empty root; the restart; on as
-it would serve; its restart). **Reference N2**: the all-native two-stage arm on eight cards (what does not fit a
-card is read from host memory). **Closeness**: `tools/closeness.py` on twelve short prompts; "first divergence" is
+it would serve; its restart). **Reference N2**: an all-native reference computed with experts fetched from host memory (two stages on eight
+cards; every expert native). **Closeness**: `tools/closeness.py` on twelve short prompts; "first divergence" is
 the first token where two captures differ; "mean |dlogprob|" is the mean absolute difference of log-probabilities.
 A first-run speed figure carries 2 to 3 ms of noise per round; the second pass is the reading (PLAN section 9,
 line 5).
@@ -66,8 +67,7 @@ follow it.
 | First token of a turn with four grown chats open | under 2,048 new tokens: median 4.12 s; larger turns 9.33 s (three chats in k1: 4.73 and 8.16 s) | s4 |
 | Short prompts against reference N2 | not run again at four slots; the three-slot figures below stand for the same engine and experts | o2 |
 
-Not measured at four slots: the default by the same tool in the same window (the three-slot comparison of o2 is
-the last one) and a serving run of hours under a rule. The boots since s4 with the store's kit in the trees and the
+Not measured at four slots: a serving run of hours under a rule. The boots since s4 with the store's kit in the trees and the
 store off (st3b KA, st4 KA, sv1) repeated the capture 7 of 7 and the four-chat peak within 34 MiB (30,364 to 30,398
 MiB).
 
@@ -95,7 +95,7 @@ Amendment 19 and is still served by `SERVE_CONFIG=F3c`.
 | Experts | 15,360 hot, 0 cold on every rank | o2 and every boot since |
 | Load, launch to ready | 134 to 135 s (about 37 s process start, 86 s model load, the rest graphs and warm-up) | o2, k1 |
 | One request | 129.5 tok/s fresh text, 177.3 repeated text | o2, arm F3c |
-| Three requests together, sum | 288.0 tok/s fresh, 444.6 repeated; the default by the same tool 198.2 and 299.8 (x1.45, x1.48) | o2, arm F3c |
+| Three requests together, sum | 288.0 tok/s fresh, 444.6 repeated | o2, arm F3c |
 | Prompt read, one 62,257-token prompt | 3,286 tok/s (96 % of the two-slot arm's 3,410 with 8,188-row chunks) | o2 |
 | First token, turn under 2,048 new tokens on a 130,000 to 150,000-token chat | median 1.52 s (arm F3c) and 1.28 s (serving boot) | o2 |
 | First token, turn of 4,313 or 5,622 new tokens on such a chat | 3.4 to 9.0 s | o2 |
@@ -108,21 +108,11 @@ Amendment 19 and is still served by `SERVE_CONFIG=F3c`.
 | Card limit 31,998 MiB | on 12 of 12 workers; allocator limits 31,131 / 31,117 / 31,133 MiB; headroom at the end of warm-up 3,463 / 3,331 / 4,745 MiB | k1 |
 | Room under the line, fullest (middle) stage | 1,946 MiB | o2, k1 |
 | Serving boot against the accepted long-prompt capture | identical 7 of 7, with the limit and without it; again in st1 with the store's kit in the tree and the store off | k1, st1 |
-| Short prompts against reference N2 | CLEAN; median first divergence 208 tokens, median mean \|dlogprob\| 0.0090. The default: 7 tokens, 0.0656 | o2 (also w3, w5, o1) |
+| Short prompts against reference N2 | CLEAN; median first divergence 208 tokens, median mean \|dlogprob\| 0.0090 | o2 (also w3, w5, o1) |
 | Each chat alone against three together | equal, six of six | o2 |
 | Same configuration, long prompts repeated | identical 3 of 3 inside one boot and 3 of 3 against another boot (two-slot build) | after o1 |
 
 ## By window
-
-### Baseline: the default on 2026-11-16 (PLAN sections 1, 2 and 7)
-
-| What | Figure |
-|---|---|
-| One request, fresh text | 87.5 to 129.4 tok/s (cells F1 129.4, F2 87.5, F3 125.5); copy tasks 159 to 187 |
-| Three requests together | 59 to 72 tok/s each on fresh text, 96 to 105 on copy tasks |
-| Prompt read | 20K tokens in 7.97 s, 90K in 32.05 s, 181K in 65.3 s |
-| Load | 183 s |
-| Boot lines, per card, stage 0 / stage 1 | free before experts 28.76 / 28.73 GiB; reserve 4.48 / 7.19; expert budget 23.95 / 21.20; NVFP4 experts 3,529 / 2,122; compressed 4,151 / 5,558; free after load 3.95 / 6.88 |
 
 ### w1: first three-stage boot (00:16Z to 01:01Z; first kit; arm X)
 
@@ -130,10 +120,9 @@ Amendment 19 and is still served by `SERVE_CONFIG=F3c`.
 |---|---|
 | Hand-off probes | eight pairs PASS |
 | Arm X boot | tier digests and 5,651 hot as predicted (2,423 / 1,886 / 1,342 by stage) |
-| Rule line 1 | FAIL: 15 of 15 answers differ from the default's |
-| Closeness, arm X against the default | first divergence at token 1 on 12 of 12 prompts, the default's gap 4.6 to 16.7 nat; token 0 right; three to five junk tokens, then the default's answer for 100 tokens or more |
-| Speed | per-round time equal to the default's; three together +35 to +45 % |
-| KV pool | 1,389,057 tokens at three stages against the default's 2,076,870 at the same 0.25 GiB |
+| Rule line 1 | FAIL: 15 of 15 answers differ from a two-stage reference boot of the same experts |
+| Closeness, arm X against that reference | first divergence at token 1 on 12 of 12 prompts (a gap of 4.6 to 16.7 nat); token 0 right; three to five junk tokens, then the reference's answer for 100 tokens or more |
+| KV pool | 1,389,057 tokens at three stages at 0.25 GiB |
 
 ### w2: diagnostic window (from 01:19:34Z; kit 2, the faulty cadence still in)
 
@@ -148,16 +137,8 @@ PREDICTED at 01:34Z, before the three-stage results: D0 CLEAN, D1, D2 and X1 JUN
 
 ### w3: kit 3, the scheduling fix (about 02:1xZ to 03:01Z; then served to 04:27:12Z)
 
-Arm X (three stages, the default's experts), pass 2, tok/s, against the default's pass 2 of the same window:
-
-| Cell | Arm X | The default |
-|---|---|---|
-| Alone, fresh (F1 / F2 / F3) | 115.5 / 86.3 / 122.6 | 130.4 / 87.8 / 126.7 |
-| Alone, repeated | 169.5 / 158.3 / 163.0 | 186.7 / 180.3 / 159.9 |
-| Three together, fresh | 97.0 / 77.1 / 105.6 | 69.6 / 56.8 / 74.0 |
-| Three together, repeated | 145.8 / 137.5 / 142.5 | 103.0 / 102.1 / 97.5 |
-
-Arm X: rule line 1 PASS (closeness CLEAN, 0 of 12 early divergences; alone-against-together check PASS); highest
+Arm X (three stages with the quantized expert mix of a two-stage reference boot): rule line 1 PASS against that
+reference (closeness CLEAN, 0 of 12 early divergences; alone-against-together check PASS); highest
 card sample 21,180 MiB. One-slot arm X1: CLEAN, no Xid.
 
 Arm F2 (every routed expert NVFP4, two slots, 8,192-row chunks):
@@ -166,11 +147,11 @@ Arm F2 (every routed expert NVFP4, two slots, 8,192-row chunks):
 |---|---|
 | Experts | 5,376 / 5,376 / 4,608 hot = 15,360; 0 cold on every rank |
 | Free after load | 4.45 / 4.33 / 7.91 GiB by stage |
-| One request alone | fresh 106.5 tok/s against the default's 109.3; repeated 170.8 against 172.5 ("no measurable change") |
-| Three sent at once (two slots) | fresh +64 % (108.5 against 66.1 tok/s per request); repeated +51 % (152.7 against 101.0); mixed +56 % |
+| One request alone | fresh 106.5 tok/s; repeated 170.8 |
+| Three sent at once (two slots) | 108.5 tok/s per request fresh; 152.7 repeated |
 | Long reads, 20k to 364k tokens | 2,265 to 3,327 tok/s |
 | Highest card sample | 31,808 MiB on the middle stage (31,010 / 31,808 / 30,018): 190 MiB under the line |
-| Closeness | CLEAN against the default's capture (1 of 12 early) and against N2 (0 of 12) |
+| Closeness | CLEAN against N2 (0 of 12 early) |
 | The owner's score line (rule line 3) | INCONCLUSIVE (see w5) |
 
 The serving arm P3w3-S (from 03:01:22Z, two slots):
@@ -184,13 +165,12 @@ The serving arm P3w3-S (from 03:01:22Z, two slots):
 
 The step to 31,988 MiB is unexplained. No stage showed a floor that keeps rising.
 
-### s1: slot counts on the quantized twelve-card mix (about 04:3xZ to 05:05:01Z; kit 4; arm X's experts)
+### s1: slot counts on the quantized expert mix (about 04:3xZ to 05:05:01Z; kit 4; arm X's experts)
 
 Tool: `tools/slots_cells.py`. Two passes each; tok/s.
 
 | Arm | Fresh text, sum | Repeated text, sum | Each request | Highest card sample |
 |---|---|---|---|---|
-| The default, three together | 198.1 / 198.4 | 300.3 / 298.9 | not in the source | not in the source |
 | Three slots | 276.3 / 281.5 | 425.7 / 424.0 | not in the source | 21,182 MiB |
 | Four slots | 281.7 / 281.9 | 425.8 / 427.6 | 60 to 76 fresh, 104 to 110 repeated; first token 0.4 to 1.0 s | 21,692 MiB |
 | Six slots | the engine core died on the first requests (exit 30, no Xid): a label table sized for four slots | | | |
@@ -221,14 +201,12 @@ Arm F2 (two slots, 8,192-row chunks):
 | Load | 134 s |
 | After warm-up, by stage | used 28,631 / 28,661 / 27,397 MiB; allocator reserved 27,792 / 27,806 / 26,556; outside the allocator 839 / 855 / 841 |
 | Long reads, 20,331 to 364,374 tokens | 2,269 to 3,373 tok/s |
-| One request alone against the default | -3.4 % / -1.2 % (inside the night's spread) |
-| Three sent at once against the default | +63 % / +51 % / +52 % |
 | Highest card sample | 31,336 MiB (30,478 / 31,336 / 30,046). PREDICTED about 31,560. Window w3: 31,808 |
 | Rehearsal of two grown chats (17 requests, largest prompt 153,658 tokens) | middle stage high 31,334 MiB: 664 MiB under the line; first-token medians 2.93 s and 5.18 s |
 | Arm F2e, cache release at 512 rows | same peak (31,334 against 31,334 MiB); larger turns' first token 10.9 s against 5.2 s |
 
 Closeness on w5's receipts (identical on w3's): arm F2 against N2: median first divergence 208 tokens, median mean
-|dlogprob| 0.0090. The default against N2: 7 tokens and 0.0656. The two reference captures N2 and N2B: identical on
+|dlogprob| 0.0090. The two reference captures N2 and N2B: identical on
 12 of 12. The owner's score line came out INCONCLUSIVE on both all-NVFP4 arms (index measure 12 for and 0 against;
 mean measure 7 for, 0 against, 5 undecided of 12, with 8 needed). PLAN Amendment 10 replaced it.
 
@@ -236,14 +214,12 @@ mean measure 7 for, 0 against, 5 undecided of 12, with 8 needed). PLAN Amendment
 
 | Arm | What | Figure |
 |---|---|---|
-| The default | three together, sum, by `slots_cells.py` | fresh 200.8 / 200.6 tok/s; repeated 301.8 / 300.7 |
 | F2 | load; one read of 62,255 tokens; rehearsal | 139 s; 3,453 tok/s; middle stage high 31,334, low 29,440 MiB |
-| F2 | closeness against N2; against the default | CLEAN; 208 / 0.0090 against the default's 7 / 0.0656 |
+| F2 | closeness against N2 | CLEAN; 208 / 0.0090 |
 | F3c | boot | 15,360 hot, 0 cold on the lowered reserve (3,686 MiB); load 135 s; after warm-up 28,535 / 28,667 / 27,253 MiB |
 | F3c | short prompts | CLEAN; 208 / 0.0090 |
 | F3c | long prompts against arm F2 (rule line c) | CLEAN, but median mean \|dlogprob\| 0.0333 against 0.0126 allowed: the arm ended there (exit 34) |
 | F3c against F2, per prompt | mean \|dlogprob\| | 0.0403 at 5,694 tokens; 0.0333 at 11,151; 0.0245 at 17,935 |
-| F2 against the default, per prompt | mean \|dlogprob\| | 0.0184 / 0.0702 / 0.0117 |
 | Serving boot P3o1-S (two slots) | rehearsal | highest card sample 31,422 MiB (30,474 / 31,422 / 30,038; 47 samples) |
 
 The same two-slot configuration gave 31,334 MiB in w5's serve phase and in o1's arm F2: boot to boot the peak
@@ -256,24 +232,23 @@ Measured by the owner on the serving build after o1 (08:26Z to 08:33Z):
 | Long prompts, same configuration | two captures of one boot identical 3 of 3; another boot identical 3 of 3: the noise floor is zero |
 | Short prompts, arm F3c against arm F2 | identical 12 of 12 |
 | Copy task RC, all-NVFP4 build | 1,500 tokens: 5,761 characters of reasoning and no answer, read-first and cold alike; 4,000 tokens: 534 of 534 words read-first, 536 of 534 cold (0.9981) |
-| Copy task RC, the default | 1,500 tokens read-first: 5,286 characters of reasoning, then 52 words (the cells' 0.9808); 4,000 tokens read-first: 0.9981; cold: no answer at 1,500 and none at 4,000 (13,075 characters of reasoning) |
 
 One request each for the copy task: an observation. The cells' RC score of 0.0000 for the all-NVFP4 arm in w3 and
 w5 compared "reasoning ended just inside 1,500 tokens" with "just outside". It is not a loss of the build.
 
 ### o2: second optimization window (09:09:05Z to 10:08:51Z; kit 7 with its switch at the default unless named)
 
-The default was down from about 09:18:45Z to 10:13:07Z: 54 minutes (ESTIMATED before: 49).
+The server was down from about 09:18:45Z to 10:13:07Z: 54 minutes (ESTIMATED before: 49).
 
 | Arm | What | Figure |
 |---|---|---|
-| F2 (reference) | closeness; load; one read of 62,258 tokens; rehearsal high | CLEAN against N2, 208 / 0.0090 against the default's 7 / 0.0656; 135 s; 3,410 tok/s; 30,476 / 31,336 / 30,020 MiB |
+| F2 (reference) | closeness; load; one read of 62,258 tokens; rehearsal high | CLEAN against N2, 208 / 0.0090; 135 s; 3,410 tok/s; 30,476 / 31,336 / 30,020 MiB |
 | F2s (chunks 64 rows shorter) against F2 | long set | the 5,694-token prompt identical; the six prompts over 8,188 tokens differ: median first divergence 50, median mean \|dlogprob\| 0.0307 (per prompt 0.0298, 0.0316, 0.0280, 0.0367, 0.0364, 0.0003). PREDICTED 0.02 to 0.05 |
 | F3c | boot | 15,360 hot, 0 cold |
 | F3c | short prompts | CLEAN; 208 / 0.0090 |
 | F3c | long prompts against F2 (rule line c2) | HOLDS: median first divergence 44 against 50; median mean \|dlogprob\| 0.0331 against 0.0307; no early wrong token; largest gap at a divergence 0.531 nat |
 | F3c | alone against together, three chats | PASS (six chats, each equal alone and together) |
-| F3c | three together, sum | 288.0 tok/s fresh, 444.6 repeated; the default 198.2 and 299.8 |
+| F3c | three together, sum | 288.0 tok/s fresh, 444.6 repeated |
 | F3c | one request alone | 129.5 tok/s fresh, 177.3 repeated |
 | F3c | prompt read | 3,286 tok/s (96 % of arm F2's) |
 | F3c | memory | no out-of-memory line; highest card sample 30,052 MiB (29,578 / 30,052 / 28,646); after warm-up 28,535 / 28,667 / 27,253; outside the allocator 867 / 881 / 865. PREDICTED about 30,600 (30,300 to 31,000) |
@@ -282,8 +257,7 @@ The default was down from about 09:18:45Z to 10:13:07Z: 54 minutes (ESTIMATED be
 | Serving boot P3o2-S (10:04:41Z) | rehearsal high | 29,540 / 30,048 / 28,610 MiB |
 
 Long chats, from the rehearsal's own lines: see the summary table. Cold copy set at 4,000 tokens, one request each:
-the build RA 584 of 584 words, RB 467 of 467, RC 536 of 534 (0.9981); the default RA and RB the same, RC no answer
-inside 4,000 tokens.
+the build RA 584 of 584 words, RB 467 of 467, RC 536 of 534 (0.9981).
 
 Not measured in o2: three long chats at once (measured in k1); arm F3c's speed and memory lines on kit 6c itself
 (they ran on kit 7 with the switch at its default; k1 showed kit 6c token for token equal on the long prompts).
@@ -370,7 +344,7 @@ the build failed (PLAN Amendment 21).
 | | S2 "before" at 130,000 tokens | as asked |
 | | highest card sample of the boot, store and dump on | 30,398 MiB |
 | | M12 | INCONCLUSIVE: the chats' restored state equal to the saved state in every piece on twelve workers, but the test's second reference differs from its first; the window stopped by its rule |
-| | the dump | layer 0's window pages of positions 25,616 to 25,759 on stage 0, all four ranks: a read with a tail chunk of 2,292 rows and one of 2,308 rows give nine pages of which six differ; on the eight-card default (tails 6,376 and 6,392) identical |
+| | the dump | layer 0's window pages of positions 25,616 to 25,759 on stage 0, all four ranks: a read with a tail chunk of 2,292 rows and one of 2,308 rows give nine pages of which six differ; on tails of 6,376 and 6,392 rows (one split count) identical |
 
 Not run: M1, M3, S6, boots KD2, KN and KN2 (PLAN Amendment 22).
 
@@ -469,7 +443,7 @@ three stages 282 / 282 / 22, 0 tracebacks, 0 out-of-memory lines; highest card s
 
 Arm G (line a as corrected in Amendment 29): line a PASS (fields `max_splits=1` in every logging process, 16
 library lines, no other value, twelve workers). Line b: against capture P CLEAN; against the all-native N2 CLEAN (0
-early wrong tokens of 12) and NEARER than P (first divergence 96 against 7; mean |dlogprob| 0.0079 against 0.0656),
+early wrong tokens of 12) and NEARER than capture P (first divergence 96; mean |dlogprob| 0.0079),
 but KEEPS: WORSE, the median first divergence 96 tokens where at least 104 are asked (half the standing build's
 208), with the mean |dlogprob| 0.0079 inside its bound of 0.018 (the standing build: 0.0090). WORSE without JUNK is
 INCONCLUSIVE as coded: exit 34; lines c to g did not run. The switch stays out (Amendment 31).

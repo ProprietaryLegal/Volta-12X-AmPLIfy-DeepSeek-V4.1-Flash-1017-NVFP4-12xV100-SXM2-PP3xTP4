@@ -12,7 +12,6 @@ tree, `MODELS_ROOT` for the model files).
 | `slots_cells.py` | N requests together: speed cells, the starvation judge, alone against together |
 | `speed_floor.py` | A speed line: each figure at least a share of a baseline's |
 | `opt2_decide.py` | Window o2's decision rule between two- and three-slot arms |
-| `cold_copy_probe.py`, `rc_probe.py`, `rc_cells_probe.py` | The cold copy tasks |
 | `serve_checked.py` | The record of a passed serving check, and whether it matches the installed bytes |
 | `store_line.py` | The conversation store's boot line judged |
 | `split_witness.py` | Evidence that a library switch reached the workers (their `/proc` environment is blank once titled) |

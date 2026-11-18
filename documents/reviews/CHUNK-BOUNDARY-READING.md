@@ -19,7 +19,7 @@ body below is left as delivered.
   now MEASURED at the entry; whether every hidden-size sum of a chunk takes that entry is still not shown.
 - **Confirmed and extended: the dense dispatch by row count** (row 3 above, "another split-K ... kernel", and the
   open item "Which TurboMind tile and split-K count the default dispatch picks"). It is a second, separate source of
-  cut-dependent rounding. MEASURED on one card (Amendment 23; `documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md`):
+  cut-dependent rounding. MEASURED on one card (Amendment 23; the split-count report (not in this first release)):
   layer 0's `wkv` projection takes 10 splits at 2,292 rows and 1 at 2,308, 5 at both 4,092 and 8,188; rows under
   different counts round differently, rows under one count are bit-identical, and `TM_GEMM_TUNE=max_splits=1` makes
   every compared pair identical. It explains window st3b's differing layer-0 window pages (tail chunks of 2,292

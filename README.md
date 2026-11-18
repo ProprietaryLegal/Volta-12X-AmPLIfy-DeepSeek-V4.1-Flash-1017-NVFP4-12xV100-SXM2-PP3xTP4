@@ -2,9 +2,7 @@
 
 DeepSeek-V4.1-Flash-1017 served on twelve Tesla V100-SXM2 32 GB cards from 2018, with every routed expert at
 NVIDIA's NVFP4 precision on the cards. The model runs as three pipeline stages of four tensor-parallel cards. All
-15,360 routed experts are held in card memory: none is compressed and none is read from host memory. Our eight-card
-build, [Volta Max uPLIft](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4),
-holds 5,651 of the 15,360 in NVFP4 and the rest compressed, because eight cards cannot hold them all.
+15,360 routed experts are held in card memory: none is compressed and none is read from host memory.
 
 This is the first public release of the build's record: the engine change as install kits, the measurements with
 their conditions, the architecture, the history of every test window, the kernel and optimization plan, the time
@@ -35,12 +33,13 @@ Every figure on this page is labelled. **MEASURED** means a log or probe on our 
   the head. That leaves one legal cut that fits: layers 0-13, 14-27 and 28-39 (ARITHMETIC). It is the layout of
   PLI Labs' 1Cat-vLLM pull request [#1031](https://github.com/1CatAI/1Cat-vLLM/pull/1031), which ran this model on
   twelve cards at about 3 tok/s on an eager engine (UPSTREAM).
-- **What had to be built.** The fast engine of our eight-card builds accepted two stages cut at layer 20 and nothing
+- **What had to be built.** The engine this build descends from accepted two stages cut at layer 20 and nothing
   else. The kit in this repository teaches it a third stage, fixes the scheduler for a pipeline of three, cuts the
   middle stage's memory and adds a card memory limit. The design is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-- **What it is not.** It is not a faster engine for one request: one request decodes at about the eight-card build's
-  speed. What twelve cards buy at full precision is fidelity to the all-native reference, three or four requests at
-  once at about 1.45 times the eight-card build's total, four chats kept warm, and a shorter load.
+- **What it does and does not do.** It serves every routed expert at NVFP4 precision from card memory, with up to
+  four conversations kept warm and a context of 524,288 tokens. One request decodes at about 128 to 130 tok/s; the
+  pipeline carries one request per step, so several requests at once add total throughput only up to three stages
+  (four together: 306.6 tok/s in sum at 150 W). It is not a batched-decode engine.
 - **What it is tuned for.** Long-context agent work: one request at a time, prompts of 60,000 to 200,000 tokens that
   grow by small turns. Since 2026-11-17 it is the owner's default DeepSeek server.
 
@@ -52,13 +51,13 @@ The standing configuration.
 |---|---|
 | Model | DeepSeek-V4.1-Flash-1017: 40 layers, 384 routed experts per layer, DSpark drafter |
 | Routed experts | 15,360 in NVFP4 on the cards: 5,376 / 5,376 / 4,608 by stage; 0 in host memory |
-| Non-expert tensors | the ISTA-DASLab GSQ-RCO GGUF, as in our eight-card builds |
+| Non-expert tensors | the ISTA-DASLab GSQ-RCO GGUF |
 | Layout | PP3 x TP4: three pipeline stages of four tensor-parallel cards, layers 0-13 / 14-27 / 28-39 |
 | Slots | four (accepted in window s4); three remain available |
 | Prompt chunks | 4,092 rows (`max-num-batched-tokens 4096`) |
 | Context | 524,288 tokens |
 | Card limit | 31,998 MiB on every stage (`VLLM_V41_CARD_LIMIT_MIB=31998`, a fuse at the owner's line) |
-| Engine | the engine of our eight-card build (commit `f20d155`) with kit 6c over it (engine `e7b2417`, 11 files): [`kit/PP3KIT6c-over-cut`](kit/PP3KIT6c-over-cut) |
+| Engine | 1Cat-vLLM's DeepSeek-V4.1 package as carried in PLI Labs' engine (commit `f20d155`) with kit 6c over it (engine `e7b2417`, 11 files): [`kit/PP3KIT6c-over-cut`](kit/PP3KIT6c-over-cut) |
 | Power and clock | 200 W per card since 2026-11-17 18:58Z (150 W before), clock cap 1,477 MHz |
 | Serving | every start check runs on a test port and is recorded; the serving boot on the public port sends no request and needs a record that matches the installed bytes ([docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), section 13) |
 
@@ -67,31 +66,30 @@ dense library's split switch (inconclusive), and kit 8 (see "In progress").
 
 ## Measured
 
-All MEASURED on 2026-11-17 and early 2026-11-18. "The eight-card build" is Volta Max uPLIft measured in the same
-window with the same tool.
+All MEASURED on 2026-11-17 and early 2026-11-18.
 
 ### Speed
 
-| What | This build | The eight-card build | Window |
-|---|---|---|---|
-| One request, fresh text, four slots, 150 W | 128.1 tok/s | not measured in this window | s4 |
-| One request, repeated text, four slots, 150 W | 176.6 tok/s | not measured in this window | s4 |
-| Four requests together, fresh text, sum, 150 W | 306.6 tok/s (60.5 to 85.5 each) | not measured in this window | s4 |
-| Four requests together, repeated text, sum, 150 W | 453.4 tok/s (110.9 to 117.8 each) | not measured in this window | s4 |
-| Prompt read, one 62,263-token prompt, 150 W | 3,284 tok/s | not measured in this window | s4 |
-| 200 W, one request, fresh / repeated (one run) | 129.7 / 179.2 tok/s | not measured | after g1 |
-| 200 W, four together, fresh / repeated, sum (one run) | 312.1 / 447.5 tok/s | not measured | after g1 |
-| 200 W, prompt read, one 62,263-token prompt (one run) | 3,733 tok/s | not measured | after g1 |
-| 200 W, reads of 60,706 / 93,025 / 247,953 / 425,777 tokens (one run) | 3,850 / 3,833 / 3,316 / 2,454 tok/s | not measured | p1 |
-| 200 W, one-request decode round (one run) | 25.1 ms | not measured | t1 |
-| Three requests together, fresh / repeated, sum, 150 W | 288.0 / 444.6 tok/s | 198.2 / 299.8 tok/s | o2 |
-| One request, fresh / repeated, three slots, 150 W | 129.5 / 177.3 tok/s | not in the source for this arm | o2 |
-| Load, launch to ready | 134 s | 183 s | s4; the eight-card build 2026-11-16 |
+| What | Figure | Window |
+|---|---|---|
+| One request, fresh text, four slots, 150 W | 128.1 tok/s | s4 |
+| One request, repeated text, four slots, 150 W | 176.6 tok/s | s4 |
+| Four requests together, fresh text, sum, 150 W | 306.6 tok/s (60.5 to 85.5 each) | s4 |
+| Four requests together, repeated text, sum, 150 W | 453.4 tok/s (110.9 to 117.8 each) | s4 |
+| Prompt read, one 62,263-token prompt, 150 W | 3,284 tok/s | s4 |
+| 200 W, one request, fresh / repeated (one run) | 129.7 / 179.2 tok/s | after g1 |
+| 200 W, four together, fresh / repeated, sum (one run) | 312.1 / 447.5 tok/s | after g1 |
+| 200 W, prompt read, one 62,263-token prompt (one run) | 3,733 tok/s | after g1 |
+| 200 W, reads of 60,706 / 93,025 / 247,953 / 425,777 tokens (one run) | 3,850 / 3,833 / 3,316 / 2,454 tok/s | p1 |
+| 200 W, one-request decode round (one run) | 25.1 ms | t1 |
+| Three requests together, fresh / repeated, sum, 150 W | 288.0 / 444.6 tok/s | o2 |
+| One request, fresh / repeated, three slots, 150 W | 129.5 / 177.3 tok/s | o2 |
+| Load, launch to ready | 134 s | s4 |
 
 A step of the pipeline carries one request, so a slot does not batch: four requests together gave 6 % more than
 three on fresh text (306.6 against 288.0 tok/s). These sums add each request's own rate; by wall clock four together
 gave 242.6 tok/s (an independent review's reading). At 200 W the prompt read rose 13.7 % and decode stayed within
-2 %. One request alone showed no measurable change against the eight-card build in windows w3 and w5.
+2 %.
 
 ### Long chats and turns
 
@@ -132,23 +130,24 @@ end costs about a third of a small turn's wait on a 128,000-token chat.
 
 ### Closeness to the reference
 
-The reference is an all-native two-stage arm on eight cards: every expert native, what does not fit a card read
-from host memory.
+The experts themselves are NVIDIA's NVFP4 pack, whose values equal the official MXFP4 experts (UPSTREAM: NVIDIA's
+model card; checked on sampled layers in our earlier work). The reference below is an all-native reference computed
+with experts fetched from host memory: every expert native, on two stages.
 
-| What | This build | The eight-card build | Window |
-|---|---|---|---|
-| Short prompts: median first divergence from the reference | 208 tokens | 7 tokens | w3, w5, o1, o2 |
-| Short prompts: median of the mean absolute log-probability difference | 0.0090 | 0.0656 | same |
-| Seven cold long prompts against the accepted capture | identical 7 of 7 on every boot that ran it since k1 (re-checked with the strict judge on s4 and st4) | not applicable | k1 to p1 |
-| Copy tasks, cold, 4,000 tokens, one request each | 584 of 584, 467 of 467, 536 of 534 words | 584, 467, and no answer on the third | o2 |
+| What | Figure | Window |
+|---|---|---|
+| Short prompts: median first divergence from the reference | 208 tokens | w3, w5, o1, o2 |
+| Short prompts: median of the mean absolute log-probability difference | 0.0090 | same |
+| Seven cold long prompts against the accepted capture | identical 7 of 7 on every boot that ran it since k1 (re-checked with the strict judge on s4 and st4) | k1 to p1 |
+| Copy tasks, cold, 4,000 tokens, one request each | 584 of 584, 467 of 467, 536 of 534 words | o2 |
 
 These figures say how closely the build tracks the all-native model. They do not by themselves say that its answers
 are better for a given kind of work.
 
 ## What worked
 
-- **A third pipeline stage on the fast engine.** With the eight-card build's own experts the three-stage engine
-  reads CLEAN against it (0 of 12 early divergences) and passes the alone-against-together check (window w3).
+- **A third pipeline stage on the fast engine.** With a quantized expert mix the three-stage engine reads CLEAN
+  against a two-stage reference boot of the same experts (0 of 12 early divergences) and passes the alone-against-together check (window w3).
 - **The scheduler's spacing rule.** Under synchronous scheduling a request's next decode step now waits one step per
   pipeline stage. Without it the first decode round after every prompt was computed on another request's tokens
   (window w1: 15 of 15 answers differed). Found by running the real engine loop on a CPU.
@@ -164,7 +163,7 @@ are better for a given kind of work.
   and an identical answer, 0 waits over 2,976 saves.
 - **The cause of a second rounding, found by reading and proven on one card in 25 seconds.** The dense multiply
   library picks its split count from a chunk's row count; a probe with no model confirmed it at all sixteen row counts
-  a CPU model had predicted ([documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md](documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md)).
+  a CPU model had predicted ([docs/measurements.md](docs/measurements.md), the split-count probe).
 - **Serving without checking on the public port.** The full checks run on a test port and write a record; the
   serving boot sends no request and needs a matching record. A move or a return takes about 3 minutes without a server.
 - **A release setting that reads faster.** `VLLM_V41_EMPTY_CACHE_TOKENS=8192` read fresh text 12.6 % faster at
@@ -193,7 +192,7 @@ are better for a given kind of work.
   3,200 edits, 0 sequences different from a full encode). It has not met the cards.
 - **A differently cut prompt read rounds differently, from two sources.** Large four-card sums go through NCCL in
   half precision in an order that depends on the buffer's size; and the dense library's split count depends on a
-  chunk's row count. Both are the eight-card build's arithmetic too; no token is shown wrong by either. The
+  chunk's row count. Both are the engine's general arithmetic; no token is shown wrong by either. The
   library's switch that fixes the split count (`TM_GEMM_TUNE=max_splits=1`) was tried as arm G and ended
   INCONCLUSIVE at its quality line (window t1). It stays out.
 - **A cached or restored turn is not token-identical to a cold read of the same text** (window st4). The rule line
@@ -205,7 +204,7 @@ are better for a given kind of work.
   awaiting each prompt hand-off (kit 7: no memory gained). Several predictions were wrong and are recorded as wrong.
 - **No serving run of hours under a rule** at four slots. At two slots the serving arm crept 58 MiB in half an hour.
 - **More requests at once than stages gain little.** A step carries one request.
-- **One request is no faster than on eight cards.**
+- **One request does not get faster from a third stage:** its round carries the same forty layers of work.
 - **Answer quality in use is not established** by these measurements.
 - **Six and eight slots:** no verdict.
 
@@ -247,7 +246,7 @@ operations page describes what they do so that the steps can be followed with yo
 | `NOT-YET-PUBLISHED.md` | what this first release leaves out, and why |
 | `docs/` | [architecture](docs/ARCHITECTURE.md), [operations](docs/OPERATIONS.md), [measurements](docs/measurements.md), [history](docs/history.md), [upstream contributions](docs/upstream-contributions.md); [index](docs/README.md) |
 | `documents/plans/` | the [kernel and optimization plan](documents/plans/KERNEL-AND-OPTIMIZATION-PLAN.md) |
-| `documents/reviews/` | the [upstream review](documents/reviews/UPSTREAM-REVIEW-20261117.md), the [chunk-boundary reading](documents/reviews/CHUNK-BOUNDARY-READING.md), the [split-count report](documents/reviews/CUT-DEPENDENCE-GEMM-SPLIT-20261117.md) |
+| `documents/reviews/` | the [upstream review](documents/reviews/UPSTREAM-REVIEW-20261117.md), the [chunk-boundary reading](documents/reviews/CHUNK-BOUNDARY-READING.md) |
 | `research/` | this build's own findings ([TWELVE-CARD-RESEARCH.md](research/TWELVE-CARD-RESEARCH.md)) and its [time budget](research/TWELVE-CARD-TIME-BUDGET.md) |
 | `engine/` | [README.md](engine/README.md): every kit with its engine commit, what it is and its state |
 | `kit/` | the engine change as install kits (`apply.sh`, `rollback.sh`, `MANIFEST`, `files/`). `PP3KIT6c-over-cut` is the serving kit |
@@ -263,14 +262,11 @@ repository.
 
 ## Related builds
 
-Same model. The eight-card builds share one engine lineage with this one.
+Other PLI Labs builds of DeepSeek-V4.1-Flash-1017 on V100 cards:
 
-| Build | Cards | Routed experts |
-|---|---|---|
-| Volta 12X AmPLIfy (this repository) | 12, PP3 x TP4 | every routed expert in NVFP4 on the cards |
-| [Volta Max uPLIft](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4) | 8, PP2 x TP4 | the most-used experts in NVFP4, the rest from compressed records, all on the cards |
-| [Volta Full NVFP4](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100) | 8, PP2 x TP4 | every routed expert in NVFP4, the most-used on the cards and the rest from host memory; this build's quality reference is of that kind |
-| [Volta sPLIt](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4) | 8, PP2 x TP4 | every routed expert from a compressed record; the engine the others descend from |
+- [Volta Max uPLIft](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4): eight cards, two stages.
+- [Volta Full NVFP4](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100): eight cards, two stages.
+- [Volta sPLIt](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4): eight cards, two stages; the engine lineage this build descends from.
 
 ## Work with PLI Labs
 

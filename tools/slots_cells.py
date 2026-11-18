@@ -32,7 +32,7 @@ INCONCLUSIVE. A record without its fields, a token count that is not a count, or
 positive number: MALFORMED (exit 5; it is never computed, so it can never crash into exit 1, which the driver reads as
 FAIL). A request that starved in a well-formed cell is FAIL even when another cell is missing.
 
-summary: one table over several runs (the default at three, the build at 3, 4, 6, 8): per run and kind of text the
+summary: one table over several runs (the build at 3, 4, 6, 8 slots): per run and kind of text the
 SUM and WALL tok/s (mean of the passes), the slowest and fastest request, and the time to first token (median and
 longest) of the together cells; each SUM also as a ratio to the first LABEL's and, when a LABEL "X3" is given, to
 X3's. The question it answers: does more than three at once buy anything, and what does a request wait.
