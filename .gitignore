@@ -12,6 +12,8 @@ logs/
 private/
 packs/
 models/
+# the kits' model-package files are part of the published engine change, not model weights
+!kit/*/files/models/
 state/
 cache/
 *.so

@@ -1,7 +1,7 @@
 # Measurements
 
 Every measured figure of the twelve-card build, with its window and conditions. The source of each figure is the
-window's result entry in the build's plan (section 9; "Amendment N" names an entry; the plan is not in this first
+window's result entry in the build's plan (section 9; "Amendment N" names an entry; the plan is not in this
 release) or the build's working log. The receipts are on the server under `<build>/logs/window/<TAG>/` and
 `run/state/`. They are not in this repository: they hold generated text.
 
@@ -15,15 +15,16 @@ estimate unless it says so.
 |---|---|---|
 | Host and cards | one host, twelve Tesla V100-SXM2 32 GB, 32,510 MiB per card | PLAN section 2 |
 | Boards | X and Y behind a PEX88096 switch, P behind a PLX 8749; order `xyp` in every window | `run/swap_arm12.sh`, PLAN section 5 |
-| Power and clock | 150 W and 1477 MHz per card, MEASURED 2026-11-16 23:06Z to 23:14Z, through window sv1 (2026-11-17 18:16Z). **200 W** and 1,477 MHz since 2026-11-17 18:58Z: the limits service's log showed all twelve V100s "power limit set to 200W" | PLAN section 2; Amendment 28 |
+| Power and clock | 150 W and 1,477 MHz per card, MEASURED 2026-11-16 23:06Z to 23:14Z, through window sv1 (2026-11-17 18:16Z). **200 W** and 1,477 MHz from 2026-11-17 18:58Z (the limits service's log showed all twelve V100s "power limit set to 200W") to 2026-11-18 11:15:48Z, when the host ended under four long chats with no shutdown sequence and no kernel line (read as a power trip). **150 W** from 11:45Z. **175 W and a 1,452 MHz clock ceiling** (cards at 1,447 MHz) since 2026-11-18 12:09:23Z: every figure of windows p4 to q1 and of the closing bench | PLAN section 2; Amendments 28, 58 and 62 |
 | Layout | three stages of four cards, layers 0-13 / 14-27 / 28-39 | PLAN section 1 |
-| Dates | every window ran on 2026-11-17 (UTC) | PLAN section 9 |
+| Dates | windows w1 to t1 ran on 2026-11-17 (UTC); p1 crossed midnight; p2s to q1 and the closing bench ran on 2026-11-18 | PLAN section 9 |
 | "The default" | in the window names below, the server that was restored at the end of a window before 2026-11-17 18:14Z; a window stopped it, ran its arms and restored it | PLAN section 9 |
 | The line | 31,998 MiB: the owner's limit for the highest sample on any card | PLAN section 9, line 6 |
 
 Every figure of a window up to and including sv1 was taken at 150 W (PLAN Amendment 28 says so of "every speed
 figure of this build before 18:58Z"). The 200 W figures are marked "200 W" on this page: the serving build's
-baseline after window g1, and windows mv1, g1, t1 and p1. TODO(owner of the repo): the
+baseline after window g1, windows mv1, g1, t1, p1, p2s, p2, p3, p3l, p3b and p3c. Windows p4 to q1 and the closing
+bench are 175 W figures; p3r's are 150 W. TODO(owner of the repo): the
 clock cap of 1,477 MHz is recorded for 2026-11-16 and for 18:57Z on 2026-11-17; that it held in between is
 inferred, not read.
 
@@ -47,7 +48,7 @@ line 5).
 Three stages, every routed expert NVFP4, four slots, 4,092-row prompt chunks (`max-num-batched-tokens 4096`), kit
 6c, card limit 31,998 MiB, profile `run/serve-nvfp4-pp3-full-c4096-a4.yaml` (PLAN Amendment 19). Since window st3
 the store's kit is in the trees with the store off; since 2026-11-17 18:14Z the configuration is the owner's default and
-serves on `:18042` (Amendment 27). The table below is window s4, arm F4c, one boot, at 150 W. The 200 W figures
+serves on the serving port (Amendment 27). The table below is window s4, arm F4c, one boot, at 150 W. The 200 W figures
 follow it.
 
 | What | Figure | Window |
@@ -83,6 +84,40 @@ MiB).
 
 Reading +13.7 %, decode within 2 % (ARITHMETIC). Amendment 28 records the reasoning before the data: a decode round
 keeps each card busy about a third of the time, a prompt read more.
+
+## Summary: the serving set since window p6b (kit 9N, nine switches; 175 W, 1,452 MHz ceiling)
+
+Three stages, every routed expert NVFP4, four slots, 4,092-row prompt chunks, card limit 31,998 MiB, kit
+`PP3KIT9N-over-cut`, no store kit, and the nine adopted lines of `run/state/ADOPTED.env`: `VLLM_V41_DRAFT_GEMV2=1
+VLLM_V41_EMPTY_CACHE_TOKENS=8192 VLLM_V41_INDEX_TC=1 VLLM_V41_MULTI_SEQ_PROMPT_END_HOLD=128
+VLLM_V41_PP_ANSWER_NO_SLEEP=1 VLLM_V41_PP_EMPTY_AHEAD=1 VLLM_V41_PP_MID_PREFILL_SKIP=1 VLLM_V41_PP_TURN_CHUNKS=3
+VLLM_V41_PREFIX_TOKEN_CACHE=1`; the accepted capture `accepted/quality-TC3.json` (window p5, turn chunks 3). Serves
+on the serving port as P3p6b-S since 2026-11-18 20:19:16Z and as P3q1-S since 20:48:45Z (record SERVE-CHECKED of
+20:16:46Z). Every figure below is MEASURED on 2026-11-18 at 175 W per card and the 1,452 MHz clock ceiling (cards
+at 1,447 MHz) unless the row says otherwise; the windows that measured each switch alone are in the section By window.
+The closing bench of Amendment 74 (code, legal, prose; one, two and three streams; 1K to 256K) ran on this set from
+21:01:56Z to 22:36:32Z; its tables are in "Closing bench, 2026-11-18" below (Amendment 77).
+
+| What | Figure | Window |
+|---|---|---|
+| Decode round at about 128K of context, one request (medians of the loop's own steady lines) | L1 (a one-step turn of 880 on a 128,585-token chat) 25.829 ms; LM (after a cold read of 127,663 tokens) 25.719 ms; the reference boot without the tensor-core scorer 26.633 / 26.677 | p6b |
+| Decode round on a short chat, one request | S1 24.375 ms (one-step read), SM 24.381 (many-step read) | p6b |
+| Per token at 128K, forced 1,000-token sequences (not an answer speed) | L1 7.528 ms, LM 6.862 ms (the reference boot 7.882 / 7.090; -4.50 % / -3.17 % repeat for repeat) | p6b |
+| Per token at 128K, the TC boot of p6 (same kit, the window that went back) | 6.88 ms after a cold read (145.4 tok/s), 7.63 after a one-step turn (131.1 tok/s); the reference 7.27 / 7.99 | p6 |
+| Prefill, one cold read of about 127,663 tokens | 4,587 tok/s (TC boot) against 4,582 (reference) | p6b |
+| Prefill, one cold read of 425,784 tokens on the serving port, the only request | first token 102.73 s, 4,145 tok/s; high 30,392 MiB on p4b's set (104.46 s, 4,076) | p5u, p4b |
+| Four requests together, fresh text, sum | 337.9 tok/s (reference boot 316.6); repeated text 451.6 (449.1); none starved | p6b |
+| A turn alone on a 128,000-token chat, first token (medians of two) with the turn chunks | +880 new tokens 1.131 s, +2,048 1.471 s, +4,200 2.319 s, +10,000 3.623 s (without the chunks 1.184 / 2.061 / 3.687 / 4.963) | p5 |
+| A turn of 880 tokens beside another chat's 248,000-token read, with the hold (medians of three) | the turn's first token 3.26 s, whole turn 5.12 s (11.99 without the hold); the read's first token 60.99 s (62.66) | p5 |
+| The front of a turn on a 128,000-token chat with the token cache (template, tokenizing, hashing) | 47.2 ms against 308.0 (median of 20 turns, cell for cell -256.8 ms) | p4b |
+| Two boots without the drafter, eight forced cells at 4.2K / 94K / 128K / 252K and after a turn, temperature zero | text equal 8 of 8 | q1 |
+| Highest card sample, four-chat rehearsal (30 requests, largest prompt about 153,600 tokens) | 30,814 MiB (p5t, p5u, p6b); the one-slot no-drafter boots 30,020 | p5u, p6b, q1 |
+| Load, launch to ready | 134 s | p5 |
+
+The 200 W figures of the day (windows p2, p3, p3b, p3c, before the power trip of 11:15:48Z) and the 150 W figures
+of p3r are in the section By window with their power. The decode switches were judged at 200 W; the scheduler switches, the
+token cache and the tensor-core scorer at 175 W.
+
 
 ## Summary: three slots (the configuration of windows o2 and k1)
 
@@ -387,16 +422,16 @@ was read cold from 0, so its answer is a cold read's; the restored turn read its
 A cached turn and a cold read of one text differ in rounding on this engine. The store's own S2, which compares a
 restored turn with turns started at the same position, is identical in state and answer.
 
-### sv1: the build serves as the default (18:05:01Z to 18:16:40Z; on `:18043`; 150 W)
+### sv1: the build serves as the default (18:05:01Z to 18:16:40Z; on the test port; 150 W)
 
 Arm P3sv1-S (`chain_serve.sh sv1`): 0 cold, the limit on 12 of 12, the accepted capture identical 7 of 7, four
 grown chats exit 0 with 30,364 MiB, first token 3.99 s and 10.67 s (PLAN Amendment 27).
 
-### mv1: the move to `:18042` (19:17:01Z to 19:20:34Z)
+### mv1: the move to the serving port (19:17:01Z to 19:20:34Z)
 
 `chain_move.sh mv1 sv1`: `stoparm S`, check, probes, `servestate` (the record matched), `servedefault` exit 0; no
 request was sent before the build was declared serving. 3 minutes without a server (ESTIMATED before: about 4).
-The first run on the cards of the two serving phases, the port copy and `stoparm S` on `:18042`. One gap:
+The first run on the cards of the two serving phases, the port copy and `stoparm S` on the serving port. One gap:
 `chain_split.sh` refused the window `chain_move.sh` made, which had no record of the fallback's digests; copied by
 hand; the chains now carry it forward (PLAN Amendment 29).
 
@@ -407,12 +442,12 @@ field in the log `max_splits=1` (API server, engine core, the four last-stage wo
 twelve titled workers, and the variable unset in `/proc/<pid>/environ` of all twelve: FAIL by the rule as written,
 exit 33; lines b to g did not run. The library's own line "max_splits 1" stood 16 times in the arm's log and 0 times
 in the logs of s4, sv1 and mv1, so the switch was delivered; a titled worker's environment is blank by
-construction. NO VERDICT on the switch (PLAN Amendment 29). The build served on `:18042` again from 19:27:13Z.
+construction. NO VERDICT on the switch (PLAN Amendment 29). The build served on the serving port again from 19:27:13Z.
 
 ### t1: the time budget and arm G's rerun (20:24:04Z to 20:43:34Z; 200 W)
 
 `chain_budget.sh t1 g1 G`: the build stopped (cards 0 MiB 20:24:23Z), check, probes, arm T 20:25:06Z to 20:36:31Z,
-arm G to 20:40:45Z, the build on `:18042` again at 20:43:34Z by `servedefault` on the matching record (PLAN
+arm G to 20:40:45Z, the build on the serving port again at 20:43:34Z by `servedefault` on the matching record (PLAN
 Amendment 31).
 
 Arm T, CAPTURED (T1: 120 trace files, 10 of 10 cycles, 0 profiler-failure lines, attention-timer lines from all
@@ -473,6 +508,383 @@ against this window's own `off` boot, with the strict equality judge (Amendments
 The `rel` gain fades at 250,000 tokens, where the index dominates. Nothing was adopted in p1: the build served again
 in its standing configuration (kit 6c with the store's kit) by the serving boot on the matching record.
 
+### p2s: the release setting serves (04:17:00Z to 04:29:52Z; 200 W; kit 8 + `rel`)
+
+The first `servecheck` on a card: the API server's environment holds 8192, the release line from 0 of 12 workers
+(12 of 12 in p1's boots without it), identical 7 of 7, the rehearsal high 30,394 MiB. 12 min 27 s without a server.
+The owner's cold read on the serving port: 425,782 tokens, first token 128.04 s, 3,325 tok/s, high 30,472 MiB (PLAN
+Amendment 44).
+
+### p2: the middle-stage skip (04:56:03Z to 05:57:17Z; 200 W; kit 8)
+
+| What | `off` | `mid` | `adopt` (`rel` + `mid`) |
+|---|---|---|---|
+| Accepted capture; the same read five times at 4,200 and 10,000 rows | 7 of 7; 5 of 5 identical ids | 7 of 7; 5 of 5 | 7 of 7; 5 of 5 |
+| Reads of 60,704 / 93,027 / 247,952 / 425,776 tokens | 3,810 / 3,696 / 3,284 / 2,757 tok/s | 4,206 / 4,322 / 4,301 / 4,125 (+10.4 / +16.9 / +31.0 / +49.6 %) | 4,562 / 4,515 / 4,405 / 4,223 (+19.7 / +22.1 / +34.1 / +53.2 %); first token 13.31 / 20.61 / 56.29 / 100.81 s (off 15.93 / 25.17 / 75.51 / 154.41) |
+| The turn beside a 250,000-token read | first token 3.61 s, whole turn 12.75 s; the read's first token 86.96 s | 3.01 s, 10.43 s; 61.86 s | |
+| Turns alone (+880 / +2,048 / +4,200 / +10,000) | reference | within 1 % but +10,000 -5.2 % | 0.750 s (0.749); -7.4 %; -3.0 %; -7.1 % |
+| Published figures, one request alone, about 128,000 tokens of public text (report lines) | prefill 3,893 tok/s (127,679 tokens in 32.80 s); decode after the cold read 128.4 tok/s (7.79 ms a token, 529 out); after a one-step turn 103.7 tok/s (9.64 ms, 158 out) | | prefill 4,426 tok/s (28.85 s); 124.3 tok/s (8.04 ms, 398 out); 112.0 tok/s (8.93 ms, 209 out). Different lengths and text: not a pair |
+| Highest card sample | 30,446 MiB | 30,410 | 30,394 (rehearsal) |
+
+PREDICTED for `mid` +3 to +8 % at 94,000 tokens: wrong, low by half and more. Adopted; 61 minutes without a server
+(Amendment 47).
+
+### p3: decode first, stopped at `base` (06:30:04Z to 06:46:52Z; 200 W; kit 9L; the loop statistics at 64)
+
+`base` (the receive-buffer wait 0) passed every measuring line and was failed by the witness (Amendment 50).
+
+| What | Figure |
+|---|---|
+| Accepted capture | identical 7 of 7 (kit 9L's bytes with every switch off) |
+| The loop's own counts after a ONE-step read (S1: 24 steady lines; L1: 7) | no empty step in 0 of 64 answers, 128 sleeps, 64 blocking draft takes, 2.83 ms from the answer to the next step's submission |
+| After a MANY-step read (SM: 21 lines; LM: 11) | 64 of 64, 64 sleeps, 0 takes, 1.41 ms |
+| Ms a token, forced 1,000-token sequences (medians; repeats differ with the text by up to 26 %) | S1 9.53, SM 8.20, L1 6.35, LM 7.47 |
+| Prefill, median of 4 cold reads of about 127,663 tokens | 4,570 tok/s (27.9 s each) |
+| Four together, two passes | 316.6 and 323.6 tok/s in sum on fresh text (247.1 / 253.0 by wall clock), one alone 130.5 / 131.0; repeated text 476.5 / 480.7, alone 179.9 / 179.1 |
+
+### p3l: line discovery and the index capture (07:54:01Z to 08:04:43Z; 200 W; kit 9M; nothing judged)
+
+One boot with `ahead`, `nosleep`, `gemv2` and the statistics at 64, four short requests: every line in a known form;
+the wait's line (middle stage) and the drafter kernel's line (last stage) print at boot. The round's first printing
+by a server, short prompts: medians 23.976, 24.183, 24.160, 24.237 ms; answer to submission 0.552 ms. The capture
+boot: one cold read of 127,677 tokens, index operands written on 12 of 12 workers, 20 files, 133 MiB; high 30,476
+MiB. 10 min 22 s without a server (Amendment 52).
+
+### p3b: the decode window, stopped at `off` by a two-sided no-harm line (08:58:04Z to 09:25:29Z; 200 W; kit 9M)
+
+| Cell | `base` round (ms) | `off` round | `off` against `base` (round / paired ms a token) |
+|---|---|---|---|
+| S1 (one-step read, short chat) | 25.457 | 25.335 | -0.48 % / -0.69 % |
+| SM (many-step read, short) | 24.307 | 24.264 | -0.18 % / -0.14 % |
+| L1 (one-step turn of 880 on 128,585 tokens) | 28.231 | 28.066 | -0.58 % / -2.02 % |
+| LM (cold read of 127,663 tokens) | 26.309 | 26.302 | -0.03 % / -1.25 % |
+
+The judge's "within 2 %" failed L1 for being faster by 2.02 %: INCONCLUSIVE, the list stopped (Amendment 54). What
+it measured: two boots of this engine repeat the decode round within 0.6 % and the paired ms a token within about
+2 %. One-step against many-step: 1.15 ms a round on the short chat, 1.92 ms at 128K. Prefill 4,580 tok/s at
+127,663 tokens. 27 minutes without a server.
+
+### p3c and p3r: five decode boots PASS; the power trip; the adopted set serves at 150 W (10:00:04Z to 11:58:19Z; kit 9M)
+
+All five boots at 200 W (Amendment 58):
+
+| Cell | `off` round (ms) | `ahead` | `ahead` against `off` | `ang` against `off` |
+|---|---|---|---|---|
+| S1 | 25.392 | 24.235 | -1.157 ms (-4.55 %); paired ms a token -4.25 % | -1.279 ms (-5.04 %) |
+| L1 | 28.164 | 26.985 | -1.179 ms (-4.19 %); -4.00 % | -1.338 ms (-4.75 %) |
+| SM | 24.311 | | +0.33 % (round), +0.20 % (ms a token) | |
+| LM | 26.180 | | +0.61 %, -0.30 % | |
+
+`base` against `off` (the wait): S1 25.239 / 25.392, SM 24.284 / 24.311, L1 28.144 / 28.164, LM 26.240 / 26.180 ms
+(+0.32, -0.43, +0.04, +0.05 % paired): the wait costs nothing measurable. `ahead`'s counts on the one-step cells 64
+of 64, 64 sleeps, 0 takes, answer to submission 1.40 ms (was 2.84). `an` and `ang`: no loss against the boot
+before. `ang` at 128K on forced 1,000-token sequences: 5.88 ms a token after a one-step turn (170.0 tok/s), 137.9
+tok/s after a cold read; prefill 4,564 tok/s at 127,663 tokens (median of 4). Highs 30,394 and 30,714 MiB.
+PREDICTED for `ahead` 1.14 to 1.27 ms: met.
+
+THE POWER TRIP: the host ended at 11:15:48Z during the adopted set's servecheck rehearsal (four long chats) with no
+shutdown sequence and no kernel line; back at 11:18:37Z with twelve cards, 0 Xid. Caps to 150 W at 11:45Z (the owner's rule of
+2026-11-17). p3r: servecheck PASS 11:55:49Z (7 of 7; 30 requests, largest prompt 153,624 tokens, high
+30,714 MiB), servedefault 11:58:19Z: P3p3r-S with rel, mid, ahead, nosleep, gemv2 at 150 W. The owner's read:
+425,781 tokens, first token 152.03 s (2,801 tok/s), high 30,356 MiB (at 200 W in p2: 100.8 s, 4,223 tok/s).
+
+### p4: stopped at its first boot by the probe's option parser (13:30:03Z to 13:37:06Z; 175 W, 1,452 MHz ceiling; kit 9M)
+
+`verify` passed its witness and 7 of 7; `tok_probe.py run ... --warm 0` exited 9 on its own usage line; nothing
+about the cache measured; 7 minutes without a server (Amendment 60). The first window at the caps the owner set at
+12:05Z (175 W; clock ceiling 1,452 MHz, cards at 1,447), in force since 12:09:23Z.
+
+### p5: the prompt-end hold and the turn chunks (13:37:27Z to 14:32:24Z; 175 W; kit 9M, five adopted lines)
+
+| What | `off` | `hold` (`VLLM_V41_MULTI_SEQ_PROMPT_END_HOLD=128`) | `turn` (`VLLM_V41_PP_TURN_CHUNKS=3`) |
+|---|---|---|---|
+| Accepted capture | 7 of 7 | 7 of 7 | its own capture, kept as the TC3 candidate (another rounding) |
+| Turns alone on a 128,000-token chat, first token (medians of 2): +880 / +2,048 / +4,200 / +10,000 | 1.184 / 2.061 / 3.687 / 4.963 s | | 1.131 / 1.471 / 2.319 / 3.623 s (the line: +4,200 at most 75 %: 63 %; +880 at most 103 %) |
+| A turn of 880 (205 out) beside a 248,000-token read (medians of 3) | first token 3.33 s, whole turn 11.99 s; the read's first token 62.66 s | 3.26 s, 5.12 s (-57 %; the line asked -50 %); 60.99 s | |
+| The same cold read five times | 5 of 5 at 4,200 and 10,000 | | 5 of 5 |
+| Highest card sample | 30,386 MiB | 30,714 | 30,874 |
+
+The gate boot (both switches on) met its readers first: each lone request's turn line is the rule's cut (head, then
+1,024 + 1,024 + 1,024); the turn beside the read holds one read, 128 of 128 opening steps left; high 30,360 MiB.
+Adopted: the hold; servecheck high 30,714 MiB; 54 min 37 s without a server (Amendment 62).
+
+### p4b: the token cache (14:32:55Z to 15:06:52Z; 175 W; kit 9M, six adopted lines)
+
+| What | Figure |
+|---|---|
+| `verify`: verify lines / answered chat-route requests | 32 / 32, every one "identical"; 20 of 20 turns hits reusing 127,659 to 135,958 ids of about 137,000 compared; the three edits (E1 inside an earlier message, E2 and E3 at a delimiter) hits with 135,127 reused, identical; exit summary hits 23, misses 9, ids reused 3,041,989, tokenized 373,353, evictions 4, different 0 |
+| `one` against `off`, 27 cells of 27 | prompt tokens equal 27 of 27; the reply's text digest and tokens out equal 27 of 27 (the pieces' digest equal 27 of 27 too) |
+| The turns' front (first token less queue less prefill), cell for cell over 20 turns | -256.8 ms at the median (-375.1 to -204.2); `off` 308.0 ms, `one` 47.2 ms; 0 of 20 not faster (the line: 150 ms, at most two slower). PREDICTED about 250 ms: met |
+| The misses' front, 4 cold reads | -49.8 ms at the median (-90.9 to +18.5); the line allowed +30 |
+| Line S at the 100th call | hits 23, misses 77, ids reused 3,041,989, different 0: exact |
+| Highest card sample | 30,680 MiB (all three boots); servecheck 30,714 |
+
+Adopted; 33 min 37 s without a server (Amendment 62). The owner's read on the set: 425,780 tokens, first token
+104.46 s, 4,076 tok/s, high 30,392 MiB (the p3r set at the same caps: 103.24 s, 4,124).
+
+### p5t and p5u: the turn chunks serve (15:46:51Z to 15:58:27Z; 16:40:00Z to 16:51:49Z; 175 W; kit 9M)
+
+p5t: servecheck P3p5t-C passed 0 cold, the card limit, the turn chunks at boot, identical 7 of 7 against
+`accepted/quality-TC3.json` (the hold and the token cache on), the rehearsal high 30,814 MiB; REFUSED by the
+after-requests witness of `VLLM_V41_PP_EMPTY_AHEAD` (its first-use line needs a lone one-step request, which the
+four-chat rehearsal reaches by chance only); went back to the seven lines (Amendment 64). p5u, with the lone
+requests after the rehearsal (Amendment 64's rule): identical 7 of 7 against TC3 (median first divergence 200, mean
+|dlogprob| 0.0000), rehearsal high 30,814 MiB (4 chats, 30 requests, largest prompt 153,627 tokens), the lone
+334-token request printed the line in the same second; servedefault 16:51:49Z with EIGHT lines; 11 min 29 s without
+the serving port. Reported from the lone requests (one repeat each): 8.157 ms a token after a one-step read (S1) against
+9.505 after a many-step read (SM); L1 8.386 against LM 9.342. The owner's read: 425,784 tokens, first token
+102.73 s, 4,145 tok/s (Amendment 65).
+
+### p6: the tensor-core index scorer, went back on a wrong line (18:25:00Z to 18:57:54Z; 175 W; kit 9N)
+
+| What | `ref` (the serving scorer) | `tc` (`VLLM_V41_INDEX_TC=1`) |
+|---|---|---|
+| Accepted capture | 7 of 7 | 7 of 7 |
+| Prefill, about 127,663 tokens | 4,593 tok/s | 4,575 |
+| Decode, forced 1,000-token sequences at 128K: after a cold read / after a one-step turn | 137.6 tok/s (7.27 ms a token) / 125.2 (7.99) | 145.4 (6.88) / 131.1 (7.63) |
+| Round (medians of steady lines): S1 / SM / L1 / LM | 24.638 / 24.741 / 27.033 / 26.823 ms | 24.359 / 24.344 / 25.784 / 25.597 (read from the log by an independent reviewer; L1 -1.250 ms, LM -1.226) |
+| Highest card sample | 30,814 MiB | 30,780 |
+
+The lines boot's gate: 6 decode steps between two readings on every worker, 2 calls a step on stage 0 and 3 on
+stages 1 and 2; high 29,204 MiB. Line C as written failed the TC boot (6,637 scorer steps against a floor of 6,848
+from 108 statistics lines); the rule was wrong (Amendment 69): the counters count full-width verification steps of
+the drafter, the statistics count every token-bearing batch, prompt chunks included. The corrected line: 6,637 =
+6,637 on twelve workers (29 SpecDecoding reports, 33,185 drafted tokens at five a verification). 32 min 34 s
+without the serving port (Amendment 67).
+
+### p6b: the tensor-core index scorer adopted (19:35:00Z to 20:19:16Z; 175 W; kit 9N, nine lines after)
+
+| What | `ref` | `tc` | Line |
+|---|---|---|---|
+| Accepted capture; the same cold read repeated | 7 of 7; same ids | 7 of 7; same ids | PASS |
+| Line C (corrected) | gate 3 = 3 | 6,641 scorer steps on every worker = 6,641 verification steps | PASS |
+| Round S1 / SM / L1 / LM (ms) | 24.445 / 24.437 / 26.633 / 26.677 | 24.375 / 24.381 / 25.829 / 25.719 (-0.070 / -0.056 / -0.804 / -0.958 ms; L1 -3.02 %, LM -3.59 %) | PASS (L1, LM at least 0.3 ms shorter, apart) |
+| Per token (reported), L1 / LM / S1 / SM | 7.882 / 7.090 / 7.904 / 8.005 ms | 7.528 / 6.862 / 7.881 / 7.864 (-4.50 % / -3.17 % repeat for repeat) | reported |
+| Streamed text equal to the reference's | | 22 of 22 repeats | reported |
+| Prefill, the 128K cold read | 4,582 tok/s | 4,587 (+0.1 %) | PASS (at least 97 %) |
+| Four together, fresh / repeated, sum | 316.6 / 449.1 tok/s | 337.9 (+6.7 %) / 451.6; none starved | PASS |
+| Cells over the first look's limit; heads recomputed | | 15,796 of 47,575,695,264 (1 in 3,011,882); 8,544 | reported |
+| Highest card sample | | 30,814 MiB; lines boot 29,204 | PASS (ceiling 31,800) |
+
+Adopted: servecheck P3p6b-C (identical 7 of 7, the rehearsal, the lone requests), record 20:16:46Z, servedefault
+P3p6b-S 20:19:16Z. 44 min 16 s without the serving port. The reference boots of p6 and p6b differ by about 0.4 ms a round
+(27.033 / 26.823 against 26.633 / 26.677) while the TC boots agree within 0.05 to 0.12 ms: the gain stands at
+ESTIMATE 0.8 to 1.2 ms a round at about 128K, MEASURED twice (Amendment 72).
+
+### q1: the quality window (20:31:01Z to 20:48:45Z; 175 W; kit 9N, the nine lines; two one-slot boots without the drafter)
+
+| What | Qa | Qb |
+|---|---|---|
+| speculative_config=None; out-of-memory and traceback lines; cold experts; the card limit | yes; 0; 0 on 12 of 12; on 12 of 12 | the same |
+| Memory samples; highest card | 51; 30,020 MiB | 48; 30,020 MiB |
+| The eight forced cells {4200, 94000, 128000, 252000} x {read, turn}, 205 tokens each, temperature zero | complete | complete |
+
+Judge: QUALITY PASS, 8 of 8 equal text digests between the two boots. The Engram precision item: INCONCLUSIVE by
+construction (no extracted reference). Way back by servestate on the matching record, servedefault P3q1-S
+20:48:45Z; 17 min 44 s without the serving port (Amendment 75).
+
+
+### The closing bench (21:01:56Z to 22:36:32Z; P3q1-S; 175 W; kit 9N, the nine lines; Amendments 74 and 77)
+
+108 groups, 216 measured requests, judge PASS completeness (token digest matched the same prompt alone 198 of 198);
+94 min 36 s on the serving port with no other traffic (ESTIMATE was 47 to 111 minutes). The tables are the section
+"Closing bench, 2026-11-18" below.
+
+## Closing bench, 2026-11-18 (window q1 serving set)
+
+MEASURED on 2026-11-18, 21:01:56Z to 22:36:32Z, on the serving set of window q1 (kit `PP3KIT9N-over-cut`, the nine adopted lines, four
+slots), 175 W per card and the 1,452 MHz clock ceiling: code, legal and prose prompts of 1,024 / 8,192 / 32,768 / 65,536 / 131,072 /
+262,144 tokens, read cold, one, two and three streams released together, two repeats each (108 groups, 216 measured requests; greedy,
+1,024 tokens out, thinking off). "Prefill tok/s" is the prompt's tokens over the time to its first token. The two aggregate columns:
+**Total decode tok/s** is all streams' output tokens over the joint window, from the first request's start to the last request's end;
+the prompts are read one after another, so with long prompts it stays near one stream's rate. **Sum of decode rates** adds each
+stream's own decode rate while all of them stream: the decode throughput once every prompt is in.
+
+### Code
+
+MEASURED | 175 W per card | 1452 MHz clock cap | four slots | cold, thinking off, 1,024 out. Mean [min–max], two runs.
+
+| Prompt | Streams | TTFT s by stream | Prefill tok/s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates |
+|---|---:|---|---|---|---:|---:|
+| 1K | 1 | 0.69 [0.64–0.74] | 1491 [1386–1597] | 178.4 [178.4–178.5] | 178.4 [178.4–178.5] | 178.4 [178.4–178.5] |
+| 1K | 2 | 1.02 [0.66–1.38] / 0.82 [0.66–0.98] | 1142 [743–1540] / 1300 [1044–1555] | 165.9 [162.0–169.7] / 161.3 [152.5–170.1] | 313.3 [303.3–323.3] | 327.1 [322.2–332.1] |
+| 1K | 3 | 0.94 [0.66–1.22] / 0.95 [0.94–0.95] / 0.95 [0.67–1.23] | 1193 [837–1549] / 1083 [1079–1087] / 1187 [836–1539] | 144.0 [138.4–149.6] / 143.8 [143.7–144.0] / 144.0 [138.6–149.4] | 414.5 [414.1–414.8] | 431.8 [431.5–432.2] |
+| 8K | 1 | 2.61 [2.50–2.71] | 3147 [3023–3270] | 170.3 [167.7–173.0] | 170.3 [167.7–173.0] | 170.3 [167.7–173.0] |
+| 8K | 2 | 8.05 [8.05–8.05] / 2.53 [2.53–2.53] | 1018 [1018–1018] / 3237 [3236–3239] | 168.5 [168.3–168.8] / 121.4 [121.3–121.4] | 176.6 [176.5–176.7] | 289.9 [289.6–290.2] |
+| 8K | 3 | 8.83 [8.83–8.83] / 2.52 [2.52–2.53] / 13.62 [13.61–13.62] | 928 [928–928] / 3247 [3238–3255] / 602 [601–602] | 132.9 [132.8–132.9] / 111.1 [111.1–111.1] / 168.9 [168.6–169.1] | 178.9 [178.8–179.0] | 412.8 [412.5–413.1] |
+| 32K | 1 | 7.85 [7.55–8.16] | 4178 [4015–4341] | 172.8 [169.6–176.0] | 172.8 [169.6–176.0] | 172.8 [169.6–176.0] |
+| 32K | 2 | 15.77 [12.49–19.06] / 15.77 [12.47–19.08] | 2171 [1719–2623] / 2173 [1718–2628] | 144.2 [115.8–172.6] / 144.2 [115.9–172.5] | 163.5 [163.5–163.5] | 288.4 [288.3–288.5] |
+| 32K | 3 | 28.68 [26.28–31.08] / 16.58 [16.58–16.59] / 28.68 [26.27–31.09] | 1151 [1054–1247] / 1976 [1975–1977] / 1151 [1054–1247] | 153.0 [134.9–171.1] / 92.0 [92.0–92.0] / 153.2 [134.7–171.6] | 149.9 [149.8–149.9] | 398.2 [397.9–398.5] |
+| 64K | 1 | 14.86 [14.46–15.25] | 4414 [4296–4532] | 166.1 [164.1–168.1] | 166.1 [164.1–168.1] | 166.1 [164.1–168.1] |
+| 64K | 2 | 32.95 [32.91–32.99] / 26.21 [26.17–26.24] | 1989 [1987–1992] / 2501 [2497–2504] | 164.2 [163.7–164.8] / 110.6 [110.5–110.8] | 157.7 [157.5–157.9] | 274.9 [274.2–275.6] |
+| 64K | 3 | 44.51 [37.04–51.97] / 44.51 [37.08–51.94] / 47.03 [47.02–47.04] | 1515 [1261–1769] / 1514 [1262–1767] / 1394 [1393–1394] | 125.6 [88.0–163.2] / 125.7 [88.0–163.3] / 128.1 [128.1–128.1] | 144.9 [144.9–145.0] | 379.4 [379.3–379.4] |
+| 128K | 1 | 29.50 [29.04–29.96] | 4444 [4375–4513] | 161.1 [159.4–162.8] | 161.1 [159.4–162.8] | 161.1 [159.4–162.8] |
+| 128K | 2 | 55.12 [55.08–55.15] / 62.21 [62.18–62.23] | 2378 [2377–2380] / 2107 [2106–2108] | 105.5 [105.3–105.6] / 158.4 [158.4–158.5] | 151.2 [151.1–151.3] | 263.9 [263.8–264.0] |
+| 128K | 3 | 88.11 [80.26–95.96] / 93.38 [90.79–95.97] / 85.53 [80.29–90.78] | 1499 [1366–1633] / 1405 [1366–1444] / 1538 [1444–1633] | 120.9 [83.6–158.2] / 140.1 [122.9–157.4] / 103.1 [83.8–122.4] | 138.6 [138.4–138.8] | 364.2 [363.4–364.9] |
+| 256K | 1 | 63.30 [60.05–66.56] | 4152 [3938–4366] | 168.2 [166.2–170.1] | 168.2 [166.2–170.1] | 168.2 [166.2–170.1] |
+| 256K | 2 | 116.64 [116.62–116.67] / 124.35 [124.29–124.41] | 2247 [2247–2248] / 2108 [2107–2109] | 104.1 [104.0–104.2] / 166.4 [165.9–166.8] | 147.7 [147.5–148.0] | 270.5 [270.0–271.0] |
+| 256K | 3 | 186.58 [183.82–189.35] / 172.37 [172.33–172.41] / 186.55 [183.73–189.37] | 1405 [1384–1426] / 1521 [1520–1521] / 1406 [1384–1427] | 144.1 [123.3–164.9] / 80.8 [80.7–81.0] / 143.6 [122.5–164.7] | 132.0 [131.9–132.1] | 368.5 [368.2–368.9] |
+
+### Legal
+
+MEASURED | 175 W per card | 1452 MHz clock cap | four slots | cold, thinking off, 1,024 out. Mean [min–max], two runs.
+
+| Prompt | Streams | TTFT s by stream | Prefill tok/s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates |
+|---|---:|---|---|---|---:|---:|
+| 1K | 1 | 0.75 [0.65–0.85] | 1383 [1202–1564] | 98.7 [97.3–100.1] | 98.7 [97.3–100.1] | 98.7 [97.3–100.1] |
+| 1K | 2 | 0.81 [0.67–0.96] / 0.82 [0.68–0.95] | 1303 [1071–1535] / 1292 [1076–1508] | 94.4 [93.4–95.3] / 94.4 [93.0–95.8] | 186.2 [185.8–186.6] | 188.8 [188.3–189.2] |
+| 1K | 3 | 0.96 [0.68–1.24] / 0.96 [0.68–1.25] / 0.97 [0.96–0.97] | 1168 [824–1512] / 1166 [818–1513] / 1060 [1054–1067] | 82.5 [80.7–84.3] / 82.5 [80.6–84.4] / 82.5 [82.4–82.5] | 241.6 [241.6–241.7] | 247.5 [247.4–247.6] |
+| 8K | 1 | 2.83 [2.56–3.11] | 2920 [2638–3203] | 102.3 [93.7–110.8] | 102.3 [93.7–110.8] | 102.3 [93.7–110.8] |
+| 8K | 2 | 5.35 [2.57–8.12] / 5.35 [2.58–8.11] | 2096 [1009–3182] / 2093 [1010–3175] | 96.3 [85.6–106.9] / 96.4 [85.4–107.3] | 135.6 [135.4–135.7] | 192.6 [192.4–192.9] |
+| 8K | 3 | 8.96 [8.95–8.97] / 13.78 [13.77–13.79] / 2.59 [2.59–2.59] | 914 [913–915] / 595 [594–595] / 3167 [3166–3168] | 87.4 [87.3–87.5] / 102.3 [102.1–102.6] / 69.2 [69.1–69.2] | 144.8 [144.7–144.9] | 258.9 [258.6–259.2] |
+| 32K | 1 | 12.29 [7.75–16.83] | 3086 [1947–4226] | 89.4 [88.3–90.4] | 89.4 [88.3–90.4] | 89.4 [88.3–90.4] |
+| 32K | 2 | 16.14 [12.85–19.43] / 16.17 [12.86–19.49] | 2118 [1686–2550] / 2115 [1681–2549] | 78.5 [69.4–87.5] / 78.4 [69.9–87.0] | 111.6 [111.2–112.0] | 156.9 [156.4–157.4] |
+| 32K | 3 | 29.30 [26.87–31.74] / 24.44 [17.11–31.77] / 21.98 [17.10–26.85] | 1126 [1032–1220] / 1473 [1031–1915] / 1568 [1220–1916] | 77.9 [72.8–82.9] / 68.4 [53.5–83.3] / 63.0 [53.4–72.7] | 113.8 [113.8–113.8] | 209.3 [209.1–209.5] |
+| 64K | 1 | 18.06 [14.87–21.26] | 3746 [3083–4409] | 94.2 [93.5–95.0] | 94.2 [93.5–95.0] | 94.2 [93.5–95.0] |
+| 64K | 2 | 30.32 [26.90–33.74] / 30.32 [26.95–33.69] | 2189 [1942–2436] / 2189 [1945–2432] | 81.7 [71.9–91.5] / 81.7 [71.6–91.9] | 114.0 [113.8–114.2] | 163.4 [163.1–163.8] |
+| 64K | 3 | 43.16 [38.15–48.18] / 45.71 [38.19–53.23] / 50.70 [48.18–53.22] | 1539 [1360–1718] / 1474 [1231–1716] / 1296 [1231–1360] | 65.1 [54.4–75.8] / 71.2 [54.5–87.8] / 81.7 [75.7–87.7] | 114.9 [114.9–115.0] | 218.0 [217.9–218.1] |
+| 128K | 1 | 35.42 [29.85–40.99] | 3794 [3197–4391] | 86.9 [83.6–90.3] | 86.9 [83.6–90.3] | 86.9 [83.6–90.3] |
+| 128K | 2 | 60.18 [56.72–63.65] / 60.20 [56.57–63.82] | 2185 [2059–2311] / 2185 [2054–2317] | 77.2 [67.7–86.7] / 77.2 [67.7–86.6] | 108.3 [108.3–108.4] | 154.4 [154.3–154.5] |
+| 128K | 3 | 95.81 [93.20–98.42] / 87.91 [82.65–93.18] / 90.55 [82.60–98.50] | 1369 [1332–1406] / 1496 [1407–1586] / 1459 [1331–1587] | 76.8 [71.0–82.5] / 61.0 [50.9–71.1] / 66.8 [50.9–82.6] | 108.7 [108.6–108.7] | 204.6 [204.6–204.6] |
+| 256K | 1 | 64.44 [61.60–67.28] | 4076 [3897–4256] | 94.4 [94.2–94.5] | 94.4 [94.2–94.5] | 94.4 [94.2–94.5] |
+| 256K | 2 | 119.81 [119.75–119.87] / 127.47 [127.40–127.53] | 2188 [2187–2189] / 2057 [2056–2058] | 68.2 [68.1–68.3] / 90.2 [90.0–90.3] | 107.8 [107.7–107.9] | 158.3 [158.1–158.5] |
+| 256K | 3 | 176.53 [176.42–176.64] / 190.80 [187.73–193.88] / 190.76 [188.03–193.49] | 1485 [1484–1486] / 1374 [1352–1396] / 1374 [1355–1394] | 50.2 [49.9–50.5] / 79.5 [72.7–86.2] / 79.2 [71.8–86.6] | 105.9 [105.4–106.4] | 208.9 [207.9–209.9] |
+
+### Prose
+
+MEASURED | 175 W per card | 1452 MHz clock cap | four slots | cold, thinking off, 1,024 out. Mean [min–max], two runs.
+
+| Prompt | Streams | TTFT s by stream | Prefill tok/s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates |
+|---|---:|---|---|---|---:|---:|
+| 1K | 1 | 0.66 [0.64–0.67] | 1559 [1520–1598] | 84.3 [83.0–85.7] | 84.3 [83.0–85.7] | 84.3 [83.0–85.7] |
+| 1K | 2 | 0.80 [0.65–0.94] / 0.80 [0.66–0.93] | 1331 [1091–1571] / 1324 [1106–1541] | 80.7 [79.9–81.5] / 80.7 [79.8–81.6] | 159.6 [159.4–159.7] | 161.4 [161.2–161.5] |
+| 1K | 3 | 1.08 [0.95–1.21] / 0.66 [0.66–0.66] / 1.08 [0.94–1.23] | 962 [843–1080] / 1554 [1549–1558] / 962 [836–1088] | 71.7 [71.2–72.3] / 69.7 [69.6–69.9] / 71.8 [70.9–72.6] | 209.0 [208.6–209.4] | 213.3 [212.8–213.7] |
+| 8K | 1 | 2.80 [2.53–3.07] | 2953 [2665–3242] | 94.1 [92.9–95.4] | 94.1 [92.9–95.4] | 94.1 [92.9–95.4] |
+| 8K | 2 | 2.53 [2.52–2.54] / 8.04 [8.03–8.06] | 3239 [3231–3247] / 1018 [1016–1021] | 75.6 [75.5–75.6] / 91.9 [91.9–92.0] | 123.0 [122.9–123.0] | 167.5 [167.5–167.5] |
+| 8K | 3 | 2.53 [2.53–2.53] / 13.69 [13.69–13.69] / 8.86 [8.86–8.87] | 3237 [3235–3239] / 598 [598–598] / 924 [924–924] | 62.0 [62.0–62.0] / 87.4 [87.3–87.6] / 76.2 [76.1–76.3] | 134.3 [134.1–134.4] | 225.7 [225.4–225.9] |
+| 32K | 1 | 8.92 [7.64–10.20] | 3751 [3213–4288] | 90.1 [89.1–91.1] | 90.1 [89.1–91.1] | 90.1 [89.1–91.1] |
+| 32K | 2 | 15.92 [12.64–19.20] / 15.92 [12.61–19.23] | 2150 [1707–2593] / 2151 [1704–2598] | 79.1 [70.2–87.9] / 79.1 [70.2–88.0] | 112.3 [112.3–112.3] | 158.2 [158.1–158.2] |
+| 32K | 3 | 21.65 [16.78–26.52] / 21.67 [16.79–26.56] / 31.45 [31.44–31.46] | 1594 [1235–1953] / 1593 [1234–1951] / 1042 [1041–1042] | 63.6 [53.8–73.5] / 63.7 [53.9–73.5] / 84.2 [84.2–84.2] | 114.4 [114.3–114.5] | 211.5 [211.5–211.6] |
+| 64K | 1 | 18.73 [14.69–22.76] | 3670 [2879–4461] | 84.6 [80.9–88.4] | 84.6 [80.9–88.4] | 84.6 [80.9–88.4] |
+| 64K | 2 | 29.95 [26.60–33.31] / 29.95 [26.56–33.34] | 2216 [1967–2464] / 2216 [1966–2467] | 76.8 [68.1–85.6] / 76.8 [68.1–85.5] | 109.4 [109.3–109.4] | 153.6 [153.6–153.7] |
+| 64K | 3 | 45.05 [37.59–52.52] / 42.56 [37.54–47.57] / 50.06 [47.53–52.59] | 1496 [1248–1743] / 1562 [1378–1746] / 1313 [1246–1379] | 66.9 [52.2–81.6] / 61.6 [52.2–71.1] / 76.4 [71.3–81.5] | 111.4 [111.4–111.5] | 205.0 [204.8–205.1] |
+| 128K | 1 | 32.82 [29.59–36.05] | 4033 [3636–4430] | 87.3 [86.6–87.9] | 87.3 [86.6–87.9] | 87.3 [86.6–87.9] |
+| 128K | 2 | 56.18 [56.17–56.19] / 63.30 [63.28–63.33] | 2333 [2332–2333] / 2071 [2070–2071] | 66.4 [66.4–66.4] / 84.6 [84.6–84.7] | 106.5 [106.5–106.6] | 151.0 [151.0–151.1] |
+| 128K | 3 | 89.74 [81.78–97.69] / 87.10 [81.82–92.37] / 95.00 [92.40–97.60] | 1472 [1342–1603] / 1510 [1419–1602] / 1381 [1343–1419] | 65.4 [50.4–80.5] / 59.9 [50.1–69.7] / 75.0 [69.4–80.5] | 107.5 [107.3–107.7] | 200.3 [200.0–200.7] |
+| 256K | 1 | 63.10 [61.13–65.07] | 4159 [4029–4288] | 78.8 [77.5–80.0] | 78.8 [77.5–80.0] | 78.8 [77.5–80.0] |
+| 256K | 2 | 122.51 [118.68–126.34] / 122.56 [118.66–126.46] | 2142 [2075–2209] / 2141 [2073–2209] | 67.9 [59.2–76.6] / 67.8 [59.8–75.8] | 96.7 [96.3–97.2] | 135.7 [135.0–136.5] |
+| 256K | 3 | 186.63 [186.59–186.67] / 175.15 [175.12–175.18] / 192.41 [192.39–192.43] | 1405 [1404–1405] / 1497 [1496–1497] / 1362 [1362–1363] | 61.8 [61.8–61.8] / 44.7 [44.6–44.8] / 71.7 [71.6–71.8] | 97.3 [97.2–97.5] | 178.2 [178.1–178.3] |
+
+**With prefix sharing: the same bench with the document already in the cache.** For each length and kind one cold
+"warm read" put the document in the prefix cache; then one, two and three streams on that document, released together,
+two repeats (126 groups, 216 measured requests; MEASURED 2026-11-18 22:38Z to 23:22Z on the same serving set, 175 W, the
+1,452 MHz ceiling). A hit is a first token under a quarter of the warm read's (the server reports no cached-token count).
+Hits 150 of 216: the 36 requests at 1K are not hits by that rule (first token 0.19 to 0.61 s against a 0.64 to 0.67 s
+read: the fixed cost of a request, not a read), and 30 requests re-read the document: in every two- and three-stream
+cell at 8K and longer, one stream of the first repeat read the whole document again (its first token 1.2 to 2.5 times a
+lone cold read's, the cards shared with the other streams' decode), after which every stream hit. The document was read
+once more the first time a second stream shared it and once more the first time a third did, never after (hypothesis:
+the cache is kept per slot; not established by this measure). Mean [min–max] mixes the repeat with the re-read and the
+repeat without; the upper figure of the two aggregate columns is the all-hit repeat. No group serialized. On a hit the
+first token at 128K came in 0.40 to 0.47 s and at 256K in 0.66 s; three streams on one cached 128K document, all hits
+(one run): code 395 tok/s summed and 390 over the joint window, legal 255 and 254, prose 230 and 228. The tokens of a hit
+differ from a cold read's: 0 of 150 hits reproduced the warm read's token digest while all 30 re-reads did; a cached read
+is another rounding of the same arithmetic, and the quality of answers on hits is not judged by this measure.
+
+### Code, with prefix sharing
+
+MEASURED | 175 W per card | 1452 MHz clock cap | four slots | document in the prefix cache, thinking off, 1,024 out. Mean [min–max], two runs; the warm read is the one cold read that put the document in the cache.
+
+| Prompt | Streams | TTFT s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates | Hits | Overlap |
+|---|---:|---|---|---:|---:|---|---|
+| 1K | warm read | 0.67 (1,532 tok/s) | 178.9 | - | - | - | - |
+| 1K | 1 | 0.21 [0.18–0.23] | 179.6 [177.4–181.8] | 179.6 [177.4–181.8] | 179.6 [177.4–181.8] | 0/2 | together |
+| 1K | 2 | 0.49 [0.27–0.72] / 0.20 [0.19–0.21] | 171.3 [169.8–172.8] / 163.9 [156.5–171.4] | 327.1 [312.3–342.0] | 335.2 [326.3–344.2] | 0/4 | together |
+| 1K | 3 | 0.55 [0.29–0.82] / 0.25 [0.21–0.30] / 0.30 [0.25–0.35] | 149.9 [149.6–150.2] / 143.9 [139.3–148.6] / 144.8 [138.5–151.2] | 429.3 [414.1–444.4] | 438.7 [427.3–450.0] | 0/6 | together |
+| 8K | warm read | 2.55 (3,217 tok/s) | 172.7 | - | - | - | - |
+| 8K | 1 | 0.21 [0.20–0.22] | 183.5 [181.2–185.9] | 183.5 [181.2–185.9] | 183.5 [181.2–185.9] | 2/2 | together |
+| 8K | 2 | 0.25 [0.22–0.28] / 3.19 [0.22–6.17] | 149.8 [120.9–178.8] / 173.0 [169.0–177.1] | 262.0 [170.5–353.5] | 322.9 [289.9–355.9] | 3/4 | together |
+| 8K | 3 | 3.40 [0.40–6.40] / 0.30 [0.26–0.34] / 0.29 [0.26–0.31] | 155.0 [151.6–158.5] / 131.7 [113.2–150.3] / 131.3 [113.8–148.8] | 344.3 [243.6–445.1] | 418.1 [385.5–450.7] | 5/6 | together |
+| 32K | warm read | 7.61 (4,304 tok/s) | 176.4 | - | - | - | - |
+| 32K | 1 | 0.25 [0.25–0.25] | 178.9 [176.6–181.2] | 178.9 [176.6–181.2] | 178.9 [176.6–181.2] | 2/2 | together |
+| 32K | 2 | 0.28 [0.28–0.29] / 7.98 [0.35–15.61] | 118.0 [65.9–170.1] / 173.5 [171.6–175.4] | 218.1 [96.6–339.6] | 291.5 [241.3–341.6] | 3/4 | together |
+| 32K | 3 | 8.23 [0.32–16.15] / 0.40 [0.32–0.47] / 0.39 [0.38–0.41] | 160.5 [146.2–174.7] / 106.5 [63.8–149.2] / 105.9 [64.1–147.8] | 289.4 [141.5–437.3] | 372.9 [302.6–443.2] | 5/6 | together |
+| 64K | warm read | 14.49 (4,524 tok/s) | 168.9 | - | - | - | - |
+| 64K | 1 | 0.31 [0.29–0.33] | 166.8 [164.8–168.7] | 166.8 [164.8–168.7] | 166.8 [164.8–168.7] | 2/2 | together |
+| 64K | 2 | 0.32 [0.32–0.32] / 12.24 [0.44–24.05] | 108.9 [61.1–156.8] / 163.5 [159.2–167.8] | 190.9 [68.6–313.1] | 272.5 [228.9–316.0] | 3/4 | together |
+| 64K | 3 | 0.41 [0.38–0.43] / 12.69 [0.65–24.73] / 0.39 [0.33–0.45] | 97.1 [59.0–135.3] / 153.6 [139.7–167.5] / 97.4 [58.7–136.1] | 252.2 [100.6–403.9] | 348.2 [285.2–411.1] | 5/6 | together |
+| 128K | warm read | 29.12 (4,502 tok/s) | 162.7 | - | - | - | - |
+| 128K | 1 | 0.42 [0.39–0.45] | 159.0 [157.3–160.7] | 159.0 [157.3–160.7] | 159.0 [157.3–160.7] | 2/2 | together |
+| 128K | 2 | 0.50 [0.49–0.50] / 19.80 [0.58–39.03] | 105.2 [60.1–150.3] / 157.6 [152.1–163.1] | 173.0 [45.6–300.4] | 262.8 [223.1–302.5] | 3/4 | together |
+| 128K | 3 | 20.21 [0.72–39.71] / 0.57 [0.53–0.60] / 0.58 [0.52–0.64] | 147.8 [132.7–162.9] / 94.3 [58.3–130.3] / 94.8 [58.1–131.6] | 228.7 [67.5–389.9] | 336.9 [279.2–394.6] | 5/6 | together |
+| 256K | warm read | 60.29 (4,348 tok/s) | 170.5 | - | - | - | - |
+| 256K | 1 | 0.66 [0.65–0.67] | 164.0 [162.2–165.7] | 164.0 [162.2–165.7] | 164.0 [162.2–165.7] | 2/2 | together |
+| 256K | 2 | 35.34 [0.66–70.01] / 0.80 [0.78–0.82] | 162.4 [153.2–171.6] / 108.1 [61.0–155.2] | 166.5 [27.2–305.9] | 270.5 [232.5–308.4] | 3/4 | together |
+| 256K | 3 | 0.97 [0.79–1.16] / 0.93 [0.71–1.15] / 36.14 [1.25–71.03] | 94.0 [59.0–129.1] / 95.6 [57.8–133.3] / 153.1 [135.2–171.1] | 212.0 [40.2–383.7] | 342.7 [287.9–397.5] | 5/6 | together |
+
+### Legal, with prefix sharing
+
+MEASURED | 175 W per card | 1452 MHz clock cap | four slots | document in the prefix cache, thinking off, 1,024 out. Mean [min–max], two runs; the warm read is the one cold read that put the document in the cache.
+
+| Prompt | Streams | TTFT s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates | Hits | Overlap |
+|---|---:|---|---|---:|---:|---|---|
+| 1K | warm read | 0.66 (1,553 tok/s) | 100.5 | - | - | - | - |
+| 1K | 1 | 0.19 [0.19–0.19] | 102.7 [102.6–102.7] | 102.7 [102.6–102.7] | 102.7 [102.6–102.7] | 0/2 | together |
+| 1K | 2 | 0.51 [0.29–0.73] / 0.20 [0.19–0.22] | 96.4 [95.1–97.6] / 94.7 [92.4–97.1] | 187.6 [181.2–193.9] | 191.1 [187.5–194.7] | 0/4 | together |
+| 1K | 3 | 0.21 [0.20–0.22] / 0.37 [0.33–0.40] / 0.61 [0.28–0.94] | 83.1 [80.9–85.3] / 84.0 [82.0–86.0] / 84.9 [84.1–85.7] | 246.8 [238.0–255.6] | 252.0 [247.0–257.1] | 0/6 | together |
+| 8K | warm read | 2.59 (3,159 tok/s) | 110.9 | - | - | - | - |
+| 8K | 1 | 0.22 [0.21–0.22] | 98.1 [97.7–98.5] | 98.1 [97.7–98.5] | 98.1 [97.7–98.5] | 2/2 | together |
+| 8K | 2 | 0.27 [0.23–0.31] / 3.20 [0.24–6.17] | 84.0 [74.7–93.2] / 99.5 [92.7–106.2] | 158.3 [131.4–185.3] | 183.5 [181.0–186.0] | 3/4 | together |
+| 8K | 3 | 0.28 [0.25–0.30] / 3.41 [0.36–6.46] / 0.28 [0.24–0.32] | 71.3 [65.7–76.9] / 84.0 [77.1–90.8] / 71.3 [65.9–76.6] | 202.6 [175.7–229.5] | 226.5 [222.4–230.6] | 5/6 | together |
+| 32K | warm read | 7.81 (4,195 tok/s) | 90.4 | - | - | - | - |
+| 32K | 1 | 0.26 [0.25–0.26] | 98.2 [97.9–98.5] | 98.2 [97.9–98.5] | 98.2 [97.9–98.5] | 2/2 | together |
+| 32K | 2 | 0.31 [0.28–0.35] / 8.02 [0.27–15.77] | 71.1 [49.2–93.1] / 90.2 [88.0–92.5] | 130.1 [75.4–184.8] | 161.4 [137.2–185.5] | 3/4 | together |
+| 32K | 3 | 0.33 [0.30–0.37] / 0.33 [0.31–0.35] / 8.32 [0.42–16.23] | 63.9 [46.8–81.0] / 64.0 [46.7–81.4] / 82.3 [81.7–83.0] | 175.7 [108.6–242.7] | 210.2 [176.4–244.1] | 5/6 | together |
+| 64K | warm read | 14.87 (4,407 tok/s) | 95.3 | - | - | - | - |
+| 64K | 1 | 0.31 [0.30–0.32] | 101.7 [101.3–102.1] | 101.7 [101.3–102.1] | 101.7 [101.3–102.1] | 2/2 | together |
+| 64K | 2 | 0.36 [0.35–0.37] / 14.64 [0.43–28.86] | 65.0 [34.1–96.0] / 95.6 [94.5–96.6] | 121.9 [52.1–191.8] | 160.6 [128.6–192.5] | 3/4 | together |
+| 64K | 3 | 0.43 [0.40–0.46] / 0.47 [0.41–0.54] / 15.09 [0.49–29.68] | 58.4 [33.1–83.6] / 58.7 [33.0–84.5] / 88.4 [84.1–92.8] | 163.3 [76.1–250.5] | 205.5 [158.8–252.2] | 5/6 | together |
+| 128K | warm read | 29.90 (4,383 tok/s) | 89.5 | - | - | - | - |
+| 128K | 1 | 0.47 [0.45–0.48] | 102.9 [102.4–103.3] | 102.9 [102.4–103.3] | 102.9 [102.4–103.3] | 2/2 | together |
+| 128K | 2 | 0.50 [0.48–0.51] / 23.81 [0.58–47.03] | 63.7 [30.8–96.7] / 93.6 [89.8–97.3] | 114.3 [35.3–193.2] | 157.3 [120.6–194.0] | 3/4 | together |
+| 128K | 3 | 24.18 [0.53–47.84] / 0.66 [0.61–0.71] / 0.56 [0.52–0.61] | 87.2 [84.7–89.7] / 57.9 [30.1–85.6] / 57.6 [30.0–85.1] | 153.0 [52.3–253.7] | 202.7 [149.9–255.4] | 5/6 | together |
+| 256K | warm read | 61.63 (4,254 tok/s) | 94.4 | - | - | - | - |
+| 256K | 1 | 0.66 [0.64–0.69] | 87.9 [84.3–91.5] | 87.9 [84.3–91.5] | 87.9 [84.3–91.5] | 2/2 | together |
+| 256K | 2 | 0.80 [0.72–0.88] / 40.77 [0.81–80.72] | 56.9 [27.7–86.1] / 90.1 [85.4–94.7] | 96.6 [22.5–170.7] | 147.0 [122.4–171.5] | 3/4 | together |
+| 256K | 3 | 1.06 [0.98–1.15] / 41.55 [0.87–82.22] / 1.10 [0.90–1.31] | 50.7 [27.0–74.5] / 83.8 [73.0–94.5] / 51.0 [26.9–75.1] | 125.7 [33.3–218.0] | 185.5 [148.3–222.7] | 5/6 | together |
+
+### Prose, with prefix sharing
+
+MEASURED | 175 W per card | 1452 MHz clock cap | four slots | document in the prefix cache, thinking off, 1,024 out. Mean [min–max], two runs; the warm read is the one cold read that put the document in the cache.
+
+| Prompt | Streams | TTFT s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates | Hits | Overlap |
+|---|---:|---|---|---:|---:|---|---|
+| 1K | warm read | 0.64 (1,591 tok/s) | 86.3 | - | - | - | - |
+| 1K | 1 | 0.19 [0.19–0.19] | 87.7 [87.5–87.8] | 87.7 [87.5–87.8] | 87.7 [87.5–87.8] | 0/2 | together |
+| 1K | 2 | 0.20 [0.19–0.20] / 0.61 [0.39–0.83] | 80.3 [78.6–82.0] / 82.3 [81.6–83.0] | 159.4 [155.3–163.5] | 162.6 [160.2–165.0] | 0/4 | together |
+| 1K | 3 | 0.27 [0.27–0.27] / 0.21 [0.21–0.21] / 0.56 [0.33–0.78] | 70.1 [70.0–70.2] / 69.8 [69.7–69.9] / 71.1 [70.2–72.1] | 208.3 [207.7–208.9] | 211.0 [209.9–212.1] | 0/6 | together |
+| 8K | warm read | 2.55 (3,208 tok/s) | 95.2 | - | - | - | - |
+| 8K | 1 | 0.22 [0.20–0.23] | 94.7 [94.3–95.2] | 94.7 [94.3–95.2] | 94.7 [94.3–95.2] | 2/2 | together |
+| 8K | 2 | 3.19 [0.24–6.13] / 0.26 [0.23–0.30] | 90.7 [89.6–91.8] / 81.4 [72.8–90.0] | 149.6 [120.0–179.1] | 172.1 [164.6–179.6] | 3/4 | together |
+| 8K | 3 | 0.27 [0.23–0.30] / 3.40 [0.38–6.42] / 0.28 [0.24–0.32] | 69.3 [65.2–73.3] / 77.7 [74.0–81.4] / 69.3 [65.0–73.7] | 191.7 [163.7–219.7] | 216.3 [211.5–221.0] | 5/6 | together |
+| 32K | warm read | 7.68 (4,268 tok/s) | 91.3 | - | - | - | - |
+| 32K | 1 | 0.26 [0.26–0.26] | 88.3 [88.1–88.6] | 88.3 [88.1–88.6] | 88.3 [88.1–88.6] | 2/2 | together |
+| 32K | 2 | 0.32 [0.31–0.33] / 7.99 [0.28–15.70] | 65.3 [46.8–83.7] / 85.7 [83.4–88.0] | 121.2 [75.8–166.7] | 151.0 [134.8–167.2] | 3/4 | together |
+| 32K | 3 | 0.38 [0.37–0.39] / 8.25 [0.31–16.19] / 0.38 [0.33–0.43] | 58.9 [44.3–73.4] / 77.8 [73.2–82.4] / 59.0 [44.2–73.7] | 163.9 [108.5–219.2] | 195.6 [170.9–220.3] | 5/6 | together |
+| 64K | warm read | 14.70 (4,457 tok/s) | 88.9 | - | - | - | - |
+| 64K | 1 | 0.33 [0.33–0.33] | 86.2 [85.8–86.5] | 86.2 [85.8–86.5] | 86.2 [85.8–86.5] | 2/2 | together |
+| 64K | 2 | 14.55 [0.34–28.76] / 0.40 [0.38–0.42] | 83.7 [79.8–87.5] / 56.2 [32.2–80.1] | 105.3 [51.1–159.5] | 139.9 [119.8–160.0] | 3/4 | together |
+| 64K | 3 | 14.95 [0.36–29.55] / 0.42 [0.41–0.44] / 0.49 [0.48–0.50] | 77.9 [71.3–84.5] / 51.3 [31.1–71.6] / 51.5 [31.1–71.9] | 144.0 [74.4–213.6] | 180.7 [146.7–214.8] | 5/6 | together |
+| 128K | warm read | 29.66 (4,419 tok/s) | 87.9 | - | - | - | - |
+| 128K | 1 | 0.40 [0.40–0.41] | 92.4 [92.0–92.8] | 92.4 [92.0–92.8] | 92.4 [92.0–92.8] | 2/2 | together |
+| 128K | 2 | 24.44 [0.47–48.41] / 0.53 [0.50–0.56] | 87.7 [87.2–88.1] / 57.8 [28.0–87.6] | 104.3 [34.4–174.2] | 145.4 [116.1–174.8] | 3/4 | together |
+| 128K | 3 | 0.70 [0.65–0.75] / 25.02 [0.52–49.51] / 0.60 [0.57–0.63] | 52.2 [27.3–77.0] / 82.0 [76.1–87.9] / 51.9 [27.2–76.5] | 139.2 [50.7–227.7] | 186.0 [142.4–229.6] | 5/6 | together |
+| 256K | warm read | 61.07 (4,293 tok/s) | 79.6 | - | - | - | - |
+| 256K | 1 | 0.67 [0.63–0.71] | 88.2 [88.2–88.2] | 88.2 [88.2–88.2] | 88.2 [88.2–88.2] | 2/2 | together |
+| 256K | 2 | 40.71 [0.82–80.60] / 0.92 [0.89–0.95] | 81.2 [79.7–82.6] / 55.4 [27.6–83.2] | 93.5 [22.1–165.0] | 136.5 [107.3–165.7] | 3/4 | together |
+| 256K | 3 | 1.02 [1.00–1.05] / 0.85 [0.85–0.85] / 41.43 [0.97–81.89] | 49.7 [26.8–72.6] / 49.2 [26.8–71.6] / 75.9 [72.0–79.8] | 123.6 [32.7–214.4] | 174.8 [133.4–216.2] | 5/6 | together |
+
+
 ## Predictions against results
 
 | Prediction (where written) | Predicted | Measured | Window |
@@ -508,3 +920,27 @@ in its standing configuration (kit 6c with the store's kit) by the serving boot 
 | A 4,092-row chunk on stages 0 and 1 (Amendment 30) | about 0.97 s each, within 10 %, stage 1 the slower | 793 and 891 ms: stage 1 the slower by 12 %, both faster than predicted | t1 |
 | A turn of about 880 new tokens (Amendment 30) | 0.7 to 0.9 s to the first token | 1.24 s (a hit) | t1 |
 | A one-request decode round (Amendment 30) | about 26 ms | 25.1 ms | t1 |
+| `rel` reads at 62,000 tokens within 2 % of 3,733 tok/s (Amendment 35) | within 2 % | +3.1 % at 60,706 | p1 |
+| `rel` memory high-water mark higher than `off` (Amendment 35) | higher | 30,394 against 30,446 MiB: not higher | p1 |
+| `rel`'s gain at 94,000 tokens up to about +9 % (Amendment 35, corrected) | up to +9 % | +9.9 % | p1 |
+| The owner's 420,000-token read on the `rel` set (Amendment 41) | 150 to 175 s | 128.04 s | p2s |
+| `mid` at 94,000 tokens (Amendment 40) | +3 to +8 % | +16.9 % (the gain grows with length: +49.6 % at 426K) | p2 |
+| `adopt` repeats `rel`'s +9.9 % within 2 points at 93K, floor 108 % (Amendment 40) | about +10 % | +22.1 % with `mid` in the set | p2 |
+| The one-step-turn decode line about 1.1 to 1.3 ms a token slower than the cold-read line (Amendment 43) | 4 % at 128K | 1.85 ms (`off`) and 0.89 (`adopt`), on different texts: direction only | p2 |
+| `off` within 1 % of `base` on every decode cell; `ahead` 3.9 to 4.5 % fewer ms a token (Amendment 46) | as stated | p3 stopped at `base`'s witness; measured in p3c: `ahead` -4.25 % (S1), -4.00 % (L1) | p3, p3c |
+| `ahead` 1.14 to 1.27 ms a round shorter on S1 and L1 (Amendment 53) | 1.14 to 1.27 ms | -1.157 and -1.179 ms | p3c |
+| `an` about equal to `ahead`; `ang` unknown (Amendment 53) | 0 to 0.1 ms | no loss; `ang` against `off` -1.279 / -1.338 ms | p3c |
+| The token cache: about 250 ms shorter at the front of a turn; a miss within 30 ms (Amendment 49) | 250 ms; +30 ms | -256.8 ms; the misses -49.8 ms | p4b |
+| The hold passes; the turn chunks measured (Amendment 59) | pass | the whole turn beside a read -57 % (asked -50 %); +4,200 at 63 % (asked at most 75 %) | p5 |
+| The turn chunks serve: every step passes; 7 of 7 against TC3 with the hold and the cache on (Amendment 63) | pass | 7 of 7 held; refused by the after-requests witness (a line that needs a lone request) | p5t |
+| The lone requests print the line; the rehearsal high 30,600 to 31,000 MiB (Amendment 64) | as stated | printed in the same second; 30,814 MiB | p5u |
+| The round at about 128K 0.85 to 0.95 ms shorter with the tensor-core scorer (Amendment 61) | 0.85 to 0.95 ms | p6 (read from the logs after the wrong line): -1.250 / -1.226 ms; p6b: -0.804 / -0.958 | p6, p6b |
+| Line C: 2n / 3n calls between two readings and n > 64(m-1) (Amendment 61) | holds | 2n / 3n held; the floor mixed units and was wrong (Amendment 69) | p6 |
+| L1 and LM about 1.2 ms shorter (Amendment 69) | 1.2 ms | 0.80 and 0.96 ms (the reference boot moved by about 0.4 ms) | p6b |
+| The quality window: text equal 8 of 8; the Engram line INCONCLUSIVE; 15 to 23 min (Amendment 73) | as stated | 8 of 8; INCONCLUSIVE; 17 min 44 s | q1 |
+| Minutes without a server: p2s 14; p2 60 to 74; p3b/p3c 79; p4 32 to 36; p5 67; p5u 13 to 17; p6 about 50; p6b about 50 | | 12.5; 61; (p3c crossed the power trip); 33.6; 54.6; 11.8; 32.6; 44.3 | |
+| Code one stream at 128K about 133 tok/s after a cold read (Amendment 74) | about 133 tok/s | 161.1 tok/s (6.2 ms a token): wrong, low | closing bench |
+| Prefill 4,400 to 4,600 tok/s at 61K to 128K (Amendment 74) | 4,400 to 4,600 | code 4,414 and 4,444: met; legal 3,746 / 3,794 and prose 3,670 / 4,033: not met (the band was drawn from code cells) | closing bench |
+| Prefill about 4,100 tok/s at 256K (Amendment 74) | about 4,100 | 4,152 / 4,076 / 4,159 (code / legal / prose): met | closing bench |
+| Three streams at 1K about 290 tok/s in sum (Amendment 74) | about 290 | code 431.8 (414.5 over the joint window): wrong, low; legal 247.5 and prose 213.3 (no kind was named) | closing bench |
+| The closing bench's reserved interval (Amendment 74) | 47 to 111 minutes, reserve 130 | 94 min 36 s | closing bench |
