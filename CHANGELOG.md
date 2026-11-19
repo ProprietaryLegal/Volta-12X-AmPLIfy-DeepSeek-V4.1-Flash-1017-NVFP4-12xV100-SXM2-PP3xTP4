@@ -3,6 +3,63 @@
 What changed in the build, newest first. One entry per window and per decision. Times are UTC. The figures are in
 [docs/measurements.md](docs/measurements.md); the story is in [docs/history.md](docs/history.md).
 
+## 2026-11-19 (afternoon): fourth release
+
+The record as it stands after the split count was adopted and the bench ran again: the serving set since window b4a
+(kit 9S, the eleven adopted lines), the windows b4a and b3a of 2026-11-19 on this page and in
+[docs/measurements.md](docs/measurements.md), the afternoon's bench and prefix-sharing measure (14:09Z to 16:24Z) as
+the at-a-glance tables, the charts and the Measured section of [README.md](README.md) and the section Closing bench,
+2026-11-19, second, of the measurements page; the morning's bench moved unchanged to
+[docs/measurements-2026-11-19-morning.md](docs/measurements-2026-11-19-morning.md); kit 9V published; the hits
+closeness measure and the window's rules not yet ([NOT-YET-PUBLISHED.md](NOT-YET-PUBLISHED.md)).
+
+## 2026-11-19, 14:09Z to 16:24Z: the bench and the prefix-sharing measure on the eleven-line set (kit 9S + the split count); the set stands
+
+The same two measures as the two runs before, on the serving port without a restart: the bench 14:09:20Z to 15:40:33Z
+(108 groups, 216 requests, judge PASS), the measure 15:40:33Z to 16:24:31Z (108 groups, 216 requests, hits 150 of 216,
+judge PASS); 2 h 15 min 11 s with the port up and its users holding; highest card sample 30,418 MiB. One stream at
+128K: code 157.4 / legal 93.1 / prose 85.6 tok/s decode; prefill 4,670 / 4,538 / 4,586 tok/s (first token 28.07 /
+28.88 / 28.58 s); at 256K first token 58.03 / 59.28 / 58.83 s. Three streams at 128K, summed 360.0 / 212.6 / 198.3.
+Hits at 128K 0.43 to 0.44 s; three streams on one cached 128K document, the all-hit repeat, 432.7 / 232.0 / 222.5
+tok/s summed. Against the morning's run (ten lines): the split count moves rounding, so every cell generated different
+text and decode per cell moved with it (-10.1 to +9.0 %, mean -0.9 %), the round unchanged; the cold reads within -0.7
+to +0.7 % of that run's second repeats; and the morning's second finding (the first cold read of a legal or prose
+document 1 to 11 s slower than its second) did not recur, every first and second repeat agreeing within 0.15 s: a first
+cold read of a 128K legal document is 28.9 s, not 39.5 s (HYPOTHESIS: the library's split search on a shape not yet
+seen, removed by the fixed split count; not established by a boot built for it). The tables are in
+`docs/measurements.md` ("Closing bench, 2026-11-19, second", with the new serving-set summary and the b4a and b3a
+window entries).
+
+## 2026-11-19, 13:45Z to 14:08Z: window b3a, the exact four-card sum (B3) ran on kit 9V and failed its closeness line; B3 closed
+
+- NOT ADOPTED: kit `PP3KIT9V-over-cut` with `VLLM_V41_TP_EXACT_SUM=1` (the engine's one-stage custom all-reduce in
+  8 MiB tiles, fixed rank order, FP32 accumulate, rounded once, so a four-card sum no longer depends on the chunk's
+  row count). The reference boot (9V unset) was identical 7 of 7 to the eleven-line capture, so the kit unset is
+  today's arithmetic; the candidate was CLEAN but farther from the capture than the yardstick allows (median first
+  divergence 13 against 50 on the long prompts, at least 25 needed). The rule had named the speed line as the one to
+  fail (ESTIMATE 6 to 12 % of a read); closeness failed first and the read cost was not measured. Kit 9S with the
+  eleven lines serves (since 14:08:19Z; 23 minutes down; Xid 0).
+- MEASURED on the board (stage 0's four cards, idle): a large all-reduce 2.632 ms with the exact sum against 1.180 ms
+  with today's dispatch, 2.2 times per call; the four ranks agree bit for bit.
+- The hits closeness measure (the window's rule, report only; the tool fixed after b4a) read all nine cells on the
+  reference boot: every resend a cache hit by timing (first token 0.25 to 0.45 s against 7 to 29 s cold); a hit's
+  greedy tokens diverge from its own cold read's within 32 tokens on five of nine prompts (median first divergence 25,
+  median mean |dlogprob| 0.0275). The server still sends no cached-token count.
+
+## 2026-11-19, 12:30Z to 13:13Z: window b4a, the split count adopted (eleven lines)
+
+- ADOPTED `TM_GEMM_TUNE=max_splits=1` on kit 9S: the dense multiply library's split count fixed at one, so a prompt
+  read's rounding no longer depends on the chunk's row count. The serving port serves since 13:13:21Z with eleven
+  lines; the reference capture is now `accepted/quality-TC3-WOA4K-S1.json` (the switch moved the long-prompt tokens:
+  identical 1 of 7, CLEAN, median first divergence 45 to 48, mean |dlogprob| 0.035 to 0.037, within the lines).
+- MEASURED against the reference boot in the same window: cold reads -0.1 / +0.2 / +0.8 / -0.3 % at 60.7K / 93K /
+  248K / 426K tokens; decode one fresh +1.3 %, one repeated +4.7 %, four together +4.3 % (inside the band in which the
+  generated text moves a cell; no gain claimed). Peak card sample 30,832 MiB.
+- The hits closeness measure (the window's rule, report only) rejected most of its own cells: the tool demanded a
+  probability mass at or under 1 + 1e-7 over twenty float32 logprobs (measured masses 1.000000134 and 1.000000119).
+  Fixed before the B3 window. The two readable cells: a 32K code hit identical to its cold read over 32 tokens; a 128K
+  legal hit diverging at token 4.
+
 ## 2026-11-19 (morning): third release
 
 The record as it stands after the final bench: the serving set every optimization of the plan's list left (kit 9S, the

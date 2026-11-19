@@ -70,7 +70,7 @@ def frame(th, title, subtitle, legend):
 def decode_chart(d, mode):
     th = THEMES[mode]
     s = frame(th, "Decode speed by context length (tok/s)",
-              "One request alone, and three requests together (each stream's rate while all three stream, summed). MEASURED 2026-11-19, 175 W, cold reads.",
+              "One request alone, and three requests together (each stream's rate while all three stream, summed). MEASURED 2026-11-19 14:09Z, 175 W, cold reads.",
               [("one request", th["s1"]), ("three together, summed", th["s2"])])
     ymax = 450.0
     for pi, k in enumerate(KINDS):
@@ -100,7 +100,7 @@ def decode_chart(d, mode):
 def first_token_chart(d, mode):
     th = THEMES[mode]
     s = frame(th, "First token: cold read against a document already in the cache (seconds, log scale)",
-              "One request. MEASURED 2026-11-19, 175 W. A cached document gives the first token in under a second at every length.",
+              "One request. MEASURED 2026-11-19 14:09Z, 175 W. A cached document gives the first token in under a second at every length.",
               [("cold read", th["s1"]), ("document already cached", th["s2"])])
     lo, hi = math.log10(0.1), math.log10(100)
     def y_of(v):

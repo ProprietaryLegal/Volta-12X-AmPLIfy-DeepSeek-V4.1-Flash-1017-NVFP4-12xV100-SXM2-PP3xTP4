@@ -6,7 +6,8 @@
 | [ARCHITECTURE.md](ARCHITECTURE.md) | three stages and their cuts, what crosses a boundary, the scheduler's spacing rule, slots, prompt chunks and the two sources of another rounding, memory per stage, the card limit, the kits, serving without checks on the public port |
 | [OPERATIONS.md](OPERATIONS.md) | how the build is installed, started, checked and stopped |
 | [measurements.md](measurements.md) | every measured figure with its window, power limit and conditions; predictions against results |
-| [measurements-2026-11-18.md](measurements-2026-11-18.md) | the bench and prefix-sharing measure of 2026-11-18 on the previous serving set (kit 9N), moved from the measurements page unchanged |
+| [measurements-2026-11-19-morning.md](measurements-2026-11-19-morning.md) | the bench and prefix-sharing measure of the morning of 2026-11-19 on the ten-line set (kit 9S before the split count), moved from the measurements page unchanged |
+| [measurements-2026-11-18.md](measurements-2026-11-18.md) | the bench and prefix-sharing measure of 2026-11-18 on the set before that (kit 9N), moved from the measurements page unchanged |
 | [history.md](history.md) | the windows from w1 to p1 in order, with what failed and why |
 | [upstream-contributions.md](upstream-contributions.md) | the upstream pull requests of PLI Labs that this build rests on |
 | [../CHANGELOG.md](../CHANGELOG.md) | what changed, by date |

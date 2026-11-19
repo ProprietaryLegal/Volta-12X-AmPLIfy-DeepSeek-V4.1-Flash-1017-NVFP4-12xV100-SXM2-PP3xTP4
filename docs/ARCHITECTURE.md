@@ -337,8 +337,11 @@ Two more kits exist beside kit 6c and are not part of the standing configuration
   (`VLLM_V41_PP_MID_PREFILL_SKIP`: the middle stage stops after layer 20 on chunks the last stage skips, exact by the
   skip's contract); and a hold of the decode steps that follow a prompt's last step, so a small turn beside a long
   read is not queued behind the read's chunks. Its arm's rule is written into the plan before its data.
-- The dense library's split switch (`TM_GEMM_TUNE=max_splits=1`) stays out of the standing configuration: its arm
-  ended INCONCLUSIVE at its quality line in window t1 (PLAN Amendment 31).
+- The dense library's split switch (`TM_GEMM_TUNE=max_splits=1`) is in the standing configuration since window b4a
+  (2026-11-19): its first arm ended INCONCLUSIVE at its quality line in window t1 (PLAN Amendment 31); window b4a judged
+  it by the closeness rule against the build's own capture and adopted it as the eleventh line (PLAN Amendments 88 and
+  89). The exact four-card sum (kit 9V, `VLLM_V41_TP_EXACT_SUM`) failed its closeness line in window b3a and stays out
+  (PLAN Amendment 90).
 - The large four-card sums of a prompt read are rounded in FP16 through NCCL, and a prompt's last chunk is read in
   the split count its row count selects (section 6). A cached or restored turn is therefore not token-identical to
   a cold read of the whole chat (window st4's restore pair: equal in 26 of 137 positions), while a restore compared

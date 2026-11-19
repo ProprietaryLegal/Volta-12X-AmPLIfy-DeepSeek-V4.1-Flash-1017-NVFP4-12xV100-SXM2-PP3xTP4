@@ -17,7 +17,7 @@ estimate unless it says so.
 | Boards | X and Y behind a PEX88096 switch, P behind a PLX 8749; order `xyp` in every window | `run/swap_arm12.sh`, PLAN section 5 |
 | Power and clock | 150 W and 1,477 MHz per card, MEASURED 2026-11-16 23:06Z to 23:14Z, through window sv1 (2026-11-17 18:16Z). **200 W** and 1,477 MHz from 2026-11-17 18:58Z (the limits service's log showed all twelve V100s "power limit set to 200W") to 2026-11-18 11:15:48Z, when the host ended under four long chats with no shutdown sequence and no kernel line (read as a power trip). **150 W** from 11:45Z. **175 W and a 1,452 MHz clock ceiling** (cards at 1,447 MHz) since 2026-11-18 12:09:23Z: every figure of windows p4 to c7a and of both benches | PLAN section 2; Amendments 28, 58 and 62 |
 | Layout | three stages of four cards, layers 0-13 / 14-27 / 28-39 | PLAN section 1 |
-| Dates | windows w1 to t1 ran on 2026-11-17 (UTC); p1 crossed midnight; p2s to q1 and the closing bench ran on 2026-11-18; st5 to c7a and the final bench on 2026-11-19 | PLAN section 9 |
+| Dates | windows w1 to t1 ran on 2026-11-17 (UTC); p1 crossed midnight; p2s to q1 and the closing bench ran on 2026-11-18; st5 to c7a and the final bench on 2026-11-19; b4a, b3a and the second bench of that day (14:09Z to 16:24Z) on 2026-11-19 | PLAN section 9 |
 | "The default" | in the window names below, the server that was restored at the end of a window before 2026-11-17 18:14Z; a window stopped it, ran its arms and restored it | PLAN section 9 |
 | The line | 31,998 MiB: the owner's limit for the highest sample on any card | PLAN section 9, line 6 |
 
@@ -85,6 +85,36 @@ MiB).
 Reading +13.7 %, decode within 2 % (ARITHMETIC). Amendment 28 records the reasoning before the data: a decode round
 keeps each card busy about a third of the time, a prompt read more.
 
+## Summary: the serving set since window b4a (kit 9S, eleven switches; 175 W, 1,452 MHz ceiling)
+
+The set since window c2a (below) plus the split count, `TM_GEMM_TUNE=max_splits=1`, the eleventh line of
+`run/state/ADOPTED.env` (window b4a, 2026-11-19 12:30:04Z to 13:13:21Z): the dense multiplies' library takes one split
+instead of searching. Its accepted capture is `accepted/quality-TC3-WOA4K-S1.json` (the ten-line capture kept beside it).
+Serves on the serving port as P3b4a-S since 2026-11-19 13:13:21Z and, after window b3a (the exact four-card sum, failed its
+closeness line, not adopted), as P3b3a-S since 14:08:19Z on the record SERVE-CHECKED of 13:10:50Z. Every figure below is
+MEASURED on 2026-11-19 at 175 W per card and the 1,452 MHz clock ceiling. The bench and the prefix-sharing measure ran
+on it from 14:09:20Z to 16:24:31Z without a restart; their tables are in the section Closing bench, 2026-11-19, second,
+below (Amendment 92). The split count moves rounding: against the ten-line capture the served answers are identical 1 of 7,
+median first divergence 45 to 48 tokens, median of the mean |dlogprob| 0.035 to 0.037 nats (window b4a; the yardstick
+of window o2 is 50 and 0.0307), and every cell of the bench generated different text from the 05:53Z run's, so the
+decode columns moved with the text (-10.1 to +9.0 %, mean -0.9 % over 54 cells) while the round itself did not (window
+b4a: one fresh request +1.3 %).
+
+| What | Figure | Window |
+|---|---|---|
+| Prefill, cold reads of 60,706 / 93,028 / 247,953 / 425,783 tokens, the only request, against the ten lines on the same boot kind | 4,659 / 4,756 / 4,552 / 4,314 tok/s against 4,664 / 4,747 / 4,515 / 4,327 (-0.1 / +0.2 / +0.8 / -0.3 %); first token 13.03 / 19.56 / 54.47 / 98.70 s | b4a |
+| Decode at four slots, against the ten lines | one request fresh 137.3 against 135.6 tok/s (+1.3 %); one repeated and four together +4.7 and +4.3 % (the text moved; report only) | b4a |
+| Closeness of the served answers to the ten-line capture | identical 1 of 7; median first divergence 45 (summary) / 48 (scaled); median mean \|dlogprob\| 0.0366 / 0.0350 nats; CLEAN (early wrong-token divergences 0 of 7) | b4a |
+| A cache hit against its own cold read (nine prompts of the bench at 32K to 128K, greedy, 32 tokens; D11) | identical 4 of 9 (prose 3 of 3, code 64K); median first divergence 25, median mean \|dlogprob\| 0.0275; every resend a hit by timing (0.25 to 0.45 s against 7.2 to 28.6 s cold) | b3a (reference arm) |
+| Highest card sample, four-chat rehearsal | 30,832 MiB; by stage 30,594 / 30,832 / 28,328 | b4a, b3a |
+| The bench, one stream decode at 128K (two repeats of one text; the spread across texts of a kind is about ±9 %) | code 157.4, legal 93.1, prose 85.6 tok/s (1K: 183.8 / 101.5 / 86.1; 256K: 153.4 / 92.4 / 84.5) | bench 2026-11-19, second |
+| The bench, one cold read, prefill at 128K and 256K | code 4,670 and 4,518 tok/s (first token 28.07 and 58.03 s); legal 4,538 and 4,422 (28.88 and 59.28 s); prose 4,586 and 4,456 (28.58 and 58.83 s); first and second repeats within 0.15 s in every cell (the slow first legal and prose read of the 05:53Z run, 1 to 11 s, did not recur) | bench 2026-11-19, second |
+| The bench, three streams released together at 128K, sum of the streams' decode rates | code 360.0, legal 212.6, prose 198.3 tok/s (the earliest-first-token-to-last-end aggregate 138.0 / 110.8 / 106.9) | bench 2026-11-19, second |
+| The prefix measure: first token on a hit at 128K; three streams on one cached 128K document, the all-hit repeat | 0.43 / 0.44 / 0.44 s (code / legal / prose); 432.7 / 232.0 / 222.5 tok/s summed (426.6 / 230.1 / 221.0 over the window) | measure 2026-11-19, second |
+| Highest card sample over the bench and the measure (2 h 15 min, 1,513 samples) | 30,418 MiB | bench 2026-11-19, second |
+
+The set before it (kit 9S, ten switches, 2026-11-19 03:55Z to 12:30Z) follows.
+
 ## Summary: the serving set since window c2a (kit 9S, ten switches; 175 W, 1,452 MHz ceiling)
 
 Three stages, every routed expert NVFP4, four slots, 4,092-row prompt chunks, card limit 31,998 MiB, kit
@@ -92,9 +122,9 @@ Three stages, every routed expert NVFP4, four slots, 4,092-row prompt chunks, ca
 adopted lines of `run/state/ADOPTED.env`: `VLLM_V41_DRAFT_GEMV2=1 VLLM_V41_EMPTY_CACHE_TOKENS=8192 VLLM_V41_INDEX_TC=1
 VLLM_V41_MULTI_SEQ_PROMPT_END_HOLD=128 VLLM_V41_PP_ANSWER_NO_SLEEP=1 VLLM_V41_PP_EMPTY_AHEAD=1
 VLLM_V41_PP_MID_PREFILL_SKIP=1 VLLM_V41_PP_TURN_CHUNKS=3 VLLM_V41_PREFIX_TOKEN_CACHE=1 VLLM_V41_WO_A_BATCHED_4K=1`; the
-accepted capture `accepted/quality-TC3-WOA4K.json` (window c2a). Serves on the serving port as P3c2a-S since 2026-11-19
+accepted capture `accepted/quality-TC3-WOA4K.json` (window c2a). Served on the serving port as P3c2a-S from 2026-11-19
 03:55:51Z, then as the way back of each later window (P3c3b-S 05:02:08Z, P3c7a-S 05:39:07Z; record SERVE-CHECKED of
-03:53:11Z). Every figure below is MEASURED on 2026-11-19 at 175 W per card and the 1,452 MHz clock ceiling unless the
+03:53:11Z), until window b4a replaced it with the eleven-line set at 12:30:04Z. Every figure below is MEASURED on 2026-11-19 at 175 W per card and the 1,452 MHz clock ceiling unless the
 row says otherwise; the windows that measured each switch alone are in the section By window. This is the set every
 optimization of Amendment 74 step 4 left: the store, the lean hand-off (C3) and the packed experts (C7) failed their
 lines on it; C1 and C4 closed without a window. The final bench and the prefix-sharing measure ran on it from
@@ -810,23 +840,63 @@ measure 07:24:46Z to 08:08:28Z (108 groups, 216 requests, hits 150 of 216, judge
 serving port up and its four users holding their traffic; highest card sample 30,418 MiB (1,522 samples). The tables are the
 section Closing bench, 2026-11-19, below; the predictions of Amendment 87 are checked in the section Predictions against results.
 
-## Closing bench, 2026-11-19 (the final bench; the serving set of window c7a, kit 9S, ten lines)
+### b4a: the split count (B4) adopted (12:30:04Z to 13:13:21Z; 175 W; kit 9S, eleven lines after)
 
-MEASURED on 2026-11-19, 05:53:12Z to 07:24:46Z, on the serving set every optimization left (kit `PP3KIT9S-over-cut`,
-the ten adopted lines, four slots; P3c7a-S, the server not restarted for the bench), 175 W per card and the 1,452 MHz clock
-ceiling: the same bench as 2026-11-18 (Amendment 74), unchanged: code, legal and prose prompts of 1,024 / 8,192 / 32,768 /
-65,536 / 131,072 / 262,144 tokens, read cold, one, two and three streams released together, two repeats each (108 groups,
-216 measured requests; greedy, 1,024 tokens out, thinking off); judge PASS completeness (token digest matched the same prompt alone 198 of 198). "Prefill tok/s" is the prompt's tokens over
-the time to its first token. **Total decode tok/s** is all streams' output tokens over the window from the earliest first token to the last request's
-end (the bench tool's arithmetic; the tool is not in this release; the 2026-11-18 bench first described this column as
-running from the first request's start, which was wrong: the numbers are unchanged, the words are corrected here and in the
-header of that page); **Sum of decode rates** adds each stream's own decode rate while all of them stream. The four users of the port held their traffic
-(no other request from 05:47Z to the "free" line of 08:10Z). What this set changes against the 2026-11-18 bench
-(kit 9N, nine lines) is one switch, the batched 4,092-row weight-only projection in prefill (window c2a), so the decode
-columns are an A/A band of the build and the prefill columns measure that switch at the bench's lengths; Amendment 87
-predicted the decode within the band, cold-read prefill +4 to +7 % at 32K and longer, and prefix hits unchanged.
-The prediction is checked in the section Predictions against results. The 2026-11-18 bench and its prefix-sharing tables, moved
-from this page unchanged, are in [measurements-2026-11-18.md](measurements-2026-11-18.md).
+The window's rule and chain are not in this release; the serving port was down 43 minutes; Xid 0; peak card sample 30,832 MiB on both arms.
+
+| What | `Wr` (kit 9S, the ten lines) | `Wc` (the ten lines + `TM_GEMM_TUNE=max_splits=1`) | Line |
+|---|---|---|---|
+| The split witness | no `TM_GEMM_TUNE` field, no parse line | every field `max_splits=1`; 16 library parse lines "max_splits 1", none other | PASS |
+| Accepted capture (`quality-TC3-WOA4K.json`) | 7 of 7 identical | identical 1 of 7; CLEAN (early wrong-token divergences 0 of 7); median first divergence 45 / 48 (asked at least half of 50), median mean \|dlogprob\| 0.0366 / 0.0350 (asked at most twice 0.0307) | HOLDS |
+| Cold reads of 60,706 / 93,028 / 247,953 / 425,783 tokens (tok/s; first token s) | 4,664 / 4,747 / 4,515 / 4,327; 13.02 / 19.60 / 54.92 / 98.41 | 4,659 / 4,756 / 4,552 / 4,314 (-0.1 / +0.2 / +0.8 / -0.3 %); 13.03 / 19.56 / 54.47 / 98.70 | within 3 % either way: PASS |
+| Decode at four slots, no request starved | one fresh 135.6 tok/s | one fresh 137.3 (+1.3 %); one repeated and four together +4.7 and +4.3 % (report only) | PASS |
+| Hits against the cold read (line e, report only) | 9 of 9 hits by timing; the tool's parser rejected 7 of 9 receipts | 9 of 9 hits; 9 of 9 rejected | a defect of the tool's float32 mass bound, fixed; re-run in b3a |
+
+Adopted: the eleventh line written, `Wc`'s long capture bound as `accepted/quality-TC3-WOA4K-S1.json`, the full check on
+the test port 13:02:43Z to 13:10:50Z, the serving boot 13:10:51Z; P3b4a-S serves the serving port since 13:13:21Z (Amendment 89).
+
+### b3a: the exact four-card sum (B3) on kit 9V ran and failed its closeness line (13:45:04Z to 14:08:19Z; 175 W; kit 9S, the eleven lines; B3 closed)
+
+The window's rule and chain are not in this release; the serving port was down 23 min 15 s; Xid 0; peak card sample 30,832 MiB on `Wr`.
+
+| What | Step 0 probe (stage 0's four cards, idle, no model) | `Wr` (kit 9V, switch unset, the eleven lines) | `Wc` (`VLLM_V41_TP_EXACT_SUM=1`) | Line |
+|---|---|---|---|---|
+| The exact sum's cost on the board, BIG tile, median of 20 timed calls | off 1.180 ms; on 2.632 ms (2.2 times; the four ranks bit-identical) | | | reported |
+| The witness | | first uses 0, the switch not set | 12 of 12 ranks on the exact path, tile 8,388,608 bytes | PASS / PASS |
+| Accepted capture (`quality-TC3-WOA4K-S1.json`) | | 7 of 7 identical (kit 9V unset is today's arithmetic) | identical 0 of 7; CLEAN; median first divergence 13 (at least 25 needed), median mean \|dlogprob\| 0.0348 | FAIL |
+| Cold reads of 60,704 / 93,025 / 247,953 / 425,780 tokens (tok/s; first token s) | | 4,675 / 4,768 / 4,532 / 4,331; 12.99 / 19.51 / 54.71 / 98.31 | not run | |
+| Decode at four slots | | one fresh 137.6, one repeated 188.5, four together 328.5 tok/s summed | not run | |
+| A hit against its own cold read (nine bench prompts, 32K to 128K; the fixed tool) | | identical 4 of 9; median first divergence 25, median mean \|dlogprob\| 0.0275; hits by timing 9 of 9 (0.25 to 0.45 s against 7.2 to 28.6 s cold); the server sends no cached-token count | | reported (D11) |
+
+The rule's prediction named the speed line as the one that fails; the closeness line failed first, so the read cost in
+percent was not measured: WRONG on the deciding line. Returned to kit 9S on a matching record; P3b3a-S serves the serving port
+since 14:08:19Z (Amendment 90).
+
+### The bench of Amendment 89 (14:09:20Z to 16:24:31Z; P3b3a-S; 175 W; kit 9S, the eleven lines; Amendment 92)
+
+The closing bench 14:09:20Z to 15:40:33Z (91 min 13 s) and the prefix-sharing measure 15:40:33Z to 16:24:31Z (43 min
+58 s) on the serving port without a restart, its users holding their traffic; both judges PASS; highest card sample 30,418 MiB
+(1,513 samples). The tables are the section Closing bench, 2026-11-19, second, below.
+
+## Closing bench, 2026-11-19, second (the eleven-line set; the serving set of window b4a, kit 9S, eleven lines)
+
+MEASURED on 2026-11-19, 14:09:20Z to 15:40:33Z, on the serving set since window b4a (kit `PP3KIT9S-over-cut`, the eleven
+adopted lines, four slots; P3b3a-S, the server not restarted for the bench), 175 W per card and the 1,452 MHz clock
+ceiling: the same bench as the two before it, unchanged (code, legal and prose prompts of 1,024 / 8,192 / 32,768 / 65,536 /
+131,072 / 262,144 tokens, read cold, one, two and three streams released together, two repeats each; 108 groups, 216
+measured requests; greedy, 1,024 tokens out, thinking off); judge PASS completeness (token digest matched the same prompt
+alone 198 of 198). "Prefill tok/s" is the prompt's tokens over the time to its first token. **Total decode tok/s** is all
+streams' output tokens over the window from the earliest first token to the last request's end (the bench tool's
+arithmetic; the tool is not in this release); **Sum of decode rates** adds each stream's own decode rate while all of them
+stream. The users of the port held their traffic (the hold line of 14:09Z, the free line of 16:26Z). What this set changes
+against the 05:53Z run is one line, the split count (window b4a), which moves rounding: every cell generated different text
+from the 05:53Z run's (0 of 54 token digests shared), so the decode columns moved with the text, -10.1 to +9.0 % by cell and
+-0.9 % on the mean of the 54 aggregate cells, the round itself unchanged (window b4a); the cold reads are within -0.7 to
++0.7 % of the 05:53Z run's second repeats at every length; and the slow first cold read of a legal or prose document seen
+in the two runs before (1 to 11 s slower than its second) did not recur, the first and the second repeat agreeing within
+0.15 s in every one-stream cell (HYPOTHESIS, from the one line that differs: the library's split search on a shape not yet
+seen, which the fixed split count removes; not established by a boot built for it). The 05:53Z run's tables are kept
+unchanged in [measurements-2026-11-19-morning.md](measurements-2026-11-19-morning.md). Amendment 92.
 
 ### Code
 
@@ -834,24 +904,24 @@ MEASURED | 175 W per card | 1452 MHz clock cap | four slots | cold, thinking off
 
 | Prompt | Streams | TTFT s by stream | Prefill tok/s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates |
 |---|---:|---|---|---|---:|---:|
-| 1K | 1 | 0.66 [0.64–0.67] | 1558 [1519–1597] | 178.3 [177.7–178.9] | 178.3 [177.7–178.9] | 178.3 [177.7–178.9] |
-| 1K | 2 | 0.80 [0.66–0.94] / 0.80 [0.65–0.94] | 1324 [1091–1557] / 1330 [1094–1565] | 167.0 [163.3–170.8] / 167.0 [163.4–170.6] | 326.1 [326.1–326.1] | 334.0 [333.9–334.2] |
-| 1K | 3 | 1.16 [0.93–1.39] / 0.93 [0.65–1.21] / 1.16 [0.65–1.67] | 918 [737–1099] / 1208 [848–1569] / 1089 [612–1566] | 143.8 [143.7–143.9] / 140.2 [130.8–149.5] / 144.1 [138.7–149.5] | 402.6 [390.2–415.0] | 428.1 [424.0–432.2] |
-| 8K | 1 | 2.53 [2.46–2.60] | 3244 [3156–3333] | 174.8 [173.2–176.4] | 174.8 [173.2–176.4] | 174.8 [173.2–176.4] |
-| 8K | 2 | 5.18 [2.46–7.91] / 5.18 [2.46–7.91] | 2186 [1036–3336] / 2185 [1036–3333] | 147.4 [123.9–170.9] / 147.6 [123.6–171.5] | 179.1 [178.9–179.2] | 295.0 [294.5–295.4] |
-| 8K | 3 | 7.97 [2.47–13.47] / 7.97 [2.46–13.47] / 8.68 [8.68–8.69] | 1961 [608–3314] / 1966 [608–3323] / 944 [943–944] | 142.6 [113.5–171.7] / 142.6 [113.5–171.7] / 134.8 [134.8–134.8] | 180.9 [180.9–181.0] | 420.0 [420.0–420.1] |
-| 32K | 1 | 7.49 [7.28–7.69] | 4380 [4262–4499] | 174.1 [172.2–176.0] | 174.1 [172.2–176.0] | 174.1 [172.2–176.0] |
-| 32K | 2 | 11.99 [11.99–11.99] / 18.53 [18.53–18.54] | 2734 [2733–2734] / 1768 [1768–1768] | 116.4 [116.3–116.5] / 172.2 [171.9–172.4] | 163.9 [163.7–164.0] | 288.6 [288.2–289.0] |
-| 32K | 3 | 15.93 [15.93–15.94] / 25.49 [25.47–25.51] / 30.29 [30.27–30.31] | 2056 [2055–2057] / 1286 [1284–1287] / 1082 [1081–1083] | 93.3 [93.2–93.4] / 135.2 [135.1–135.3] / 171.9 [171.8–171.9] | 151.1 [151.0–151.2] | 400.4 [400.1–400.7] |
-| 64K | 1 | 14.14 [13.91–14.37] | 4636 [4560–4711] | 160.3 [157.9–162.7] | 160.3 [157.9–162.7] | 160.3 [157.9–162.7] |
-| 64K | 2 | 28.44 [25.11–31.77] / 28.44 [25.10–31.78] | 2336 [2063–2610] / 2336 [2062–2611] | 133.9 [109.0–158.8] / 133.9 [109.0–158.8] | 156.1 [156.1–156.1] | 267.8 [267.8–267.9] |
-| 64K | 3 | 35.49 [35.47–35.51] / 45.27 [45.26–45.28] / 50.20 [50.19–50.21] | 1847 [1845–1848] / 1448 [1447–1448] / 1306 [1305–1306] | 87.9 [87.9–88.0] / 125.1 [125.1–125.2] / 158.4 [158.0–158.8] | 144.9 [144.9–145.0] | 371.5 [371.1–371.8] |
-| 128K | 1 | 28.15 [27.95–28.34] | 4657 [4624–4690] | 175.0 [173.4–176.5] | 175.0 [173.4–176.5] | 175.0 [173.4–176.5] |
-| 128K | 2 | 56.44 [52.95–59.93] / 56.45 [52.92–59.97] | 2331 [2187–2475] / 2331 [2186–2477] | 142.6 [112.6–172.7] / 142.8 [112.6–173.1] | 158.4 [158.3–158.4] | 285.5 [285.3–285.6] |
-| 128K | 3 | 84.77 [77.04–92.50] / 84.79 [77.00–92.58] / 87.40 [87.38–87.41] | 1559 [1417–1701] / 1559 [1416–1702] / 1500 [1499–1500] | 130.1 [88.2–171.9] / 129.9 [88.4–171.4] / 131.5 [131.3–131.7] | 142.9 [142.8–143.0] | 391.5 [391.0–392.0] |
-| 256K | 1 | 60.23 [57.83–62.62] | 4360 [4186–4533] | 168.5 [165.2–171.7] | 168.5 [165.2–171.7] | 168.5 [165.2–171.7] |
-| 256K | 2 | 115.95 [112.11–119.80] / 115.94 [112.15–119.74] | 2263 [2188–2338] / 2263 [2189–2337] | 135.6 [104.8–166.5] / 135.9 [104.9–166.9] | 148.6 [148.5–148.7] | 271.5 [271.3–271.7] |
-| 256K | 3 | 171.13 [165.54–176.72] / 182.39 [182.39–182.39] / 171.13 [165.48–176.78] | 1533 [1483–1584] / 1437 [1437–1437] / 1534 [1483–1584] | 102.5 [82.0–123.0] / 165.1 [164.5–165.7] / 102.8 [82.0–123.6] | 133.0 [132.9–133.1] | 370.4 [369.5–371.3] |
+| 1K | 1 | 0.65 [0.64–0.67] | 1567 [1538–1596] | 183.8 [183.7–184.0] | 183.8 [183.7–184.0] | 183.8 [183.7–184.0] |
+| 1K | 2 | 0.82 [0.67–0.98] / 0.81 [0.67–0.95] | 1291 [1049–1533] / 1305 [1080–1530] | 171.7 [167.8–175.6] / 171.2 [167.1–175.4] | 334.1 [333.6–334.7] | 342.9 [342.7–343.2] |
+| 1K | 3 | 1.09 [0.95–1.23] / 0.67 [0.67–0.67] / 1.09 [0.95–1.22] | 957 [832–1083] / 1532 [1526–1539] / 958 [838–1079] | 150.7 [147.7–153.6] / 142.1 [141.9–142.3] / 150.6 [147.6–153.7] | 425.2 [424.7–425.7] | 443.4 [443.1–443.7] |
+| 8K | 1 | 2.51 [2.47–2.54] | 3267 [3220–3314] | 175.5 [173.9–177.2] | 175.5 [173.9–177.2] | 175.5 [173.9–177.2] |
+| 8K | 2 | 5.22 [2.47–7.97] / 5.21 [2.47–7.95] | 2173 [1028–3317] / 2172 [1031–3312] | 148.5 [124.1–172.8] / 148.4 [124.0–172.8] | 179.4 [179.2–179.5] | 296.9 [296.8–296.9] |
+| 8K | 3 | 8.02 [2.48–13.56] / 8.02 [2.48–13.56] / 8.75 [8.74–8.76] | 1956 [604–3308] / 1954 [604–3304] / 937 [936–938] | 143.0 [113.3–172.8] / 142.9 [113.3–172.5] / 135.0 [135.0–135.1] | 180.4 [180.3–180.5] | 421.0 [420.9–421.1] |
+| 32K | 1 | 7.32 [7.31–7.33] | 4478 [4472–4485] | 175.8 [172.6–178.9] | 175.8 [172.6–178.9] | 175.8 [172.6–178.9] |
+| 32K | 2 | 15.32 [12.06–18.58] / 15.34 [12.05–18.62] | 2240 [1763–2716] / 2239 [1760–2719] | 146.4 [117.6–175.1] / 146.5 [118.0–175.1] | 165.1 [165.0–165.3] | 292.9 [292.7–293.2] |
+| 32K | 3 | 28.01 [25.59–30.42] / 15.98 [15.98–15.99] / 28.01 [25.59–30.43] | 1179 [1077–1280] / 2050 [2050–2050] / 1179 [1077–1281] | 155.1 [136.5–173.7] / 93.9 [93.8–93.9] / 155.3 [136.4–174.3] | 151.0 [150.9–151.1] | 404.2 [403.9–404.6] |
+| 64K | 1 | 13.95 [13.95–13.96] | 4697 [4696–4698] | 157.4 [155.6–159.1] | 157.4 [155.6–159.1] | 157.4 [155.6–159.1] |
+| 64K | 2 | 28.56 [25.20–31.92] / 28.56 [25.20–31.92] | 2327 [2053–2601] / 2327 [2053–2601] | 131.2 [107.3–155.2] / 131.4 [107.5–155.3] | 153.8 [153.7–153.8] | 262.6 [262.6–262.7] |
+| 64K | 3 | 43.12 [35.73–50.51] / 40.62 [35.66–45.58] / 48.07 [45.53–50.62] | 1566 [1297–1834] / 1638 [1438–1838] / 1367 [1295–1439] | 120.4 [86.4–154.4] / 104.3 [86.5–122.0] / 138.8 [122.6–155.0] | 142.9 [142.8–142.9] | 363.5 [363.5–363.5] |
+| 128K | 1 | 28.07 [28.06–28.07] | 4670 [4669–4671] | 157.4 [155.0–159.7] | 157.4 [155.0–159.7] | 157.4 [155.0–159.7] |
+| 128K | 2 | 53.23 [53.21–53.25] / 60.28 [60.26–60.29] | 2462 [2462–2463] / 2174 [2174–2175] | 104.9 [104.9–105.0] / 155.8 [155.4–156.2] | 150.1 [150.0–150.3] | 260.8 [260.3–261.2] |
+| 128K | 3 | 77.41 [77.35–77.46] / 90.48 [87.82–93.14] / 90.46 [87.86–93.05] | 1693 [1692–1695] / 1450 [1407–1492] / 1450 [1409–1492] | 83.5 [83.3–83.7] / 138.5 [121.0–156.0] / 137.9 [120.9–155.0] | 138.0 [137.8–138.2] | 360.0 [359.3–360.7] |
+| 256K | 1 | 58.03 [57.98–58.07] | 4518 [4514–4521] | 153.4 [150.6–156.1] | 153.4 [150.6–156.1] | 153.4 [150.6–156.1] |
+| 256K | 2 | 119.96 [119.87–120.06] / 112.32 [112.27–112.37] | 2185 [2184–2187] / 2334 [2333–2335] | 152.2 [151.9–152.5] / 99.0 [98.8–99.2] | 142.5 [142.3–142.7] | 251.2 [250.7–251.7] |
+| 256K | 3 | 165.09 [164.96–165.22] / 179.15 [176.51–181.78] / 179.17 [176.23–182.12] | 1588 [1587–1589] / 1464 [1442–1485] / 1463 [1439–1488] | 78.6 [78.5–78.7] / 132.7 [114.9–150.5] / 133.1 [114.8–151.3] | 129.8 [129.8–129.8] | 344.4 [344.0–344.8] |
 
 ### Legal
 
@@ -859,24 +929,24 @@ MEASURED | 175 W per card | 1452 MHz clock cap | four slots | cold, thinking off
 
 | Prompt | Streams | TTFT s by stream | Prefill tok/s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates |
 |---|---:|---|---|---|---:|---:|
-| 1K | 1 | 0.69 [0.65–0.74] | 1485 [1390–1579] | 97.3 [94.0–100.6] | 97.3 [94.0–100.6] | 97.3 [94.0–100.6] |
-| 1K | 2 | 0.82 [0.67–0.96] / 0.82 [0.68–0.95] | 1298 [1062–1533] / 1289 [1077–1501] | 94.2 [93.0–95.4] / 94.2 [93.0–95.4] | 185.8 [185.8–185.9] | 188.4 [188.4–188.4] |
-| 1K | 3 | 0.82 [0.67–0.96] / 1.18 [0.67–1.69] / 1.10 [0.95–1.25] | 1294 [1064–1525] / 1065 [606–1523] / 948 [822–1073] | 80.3 [78.1–82.6] / 82.5 [80.7–84.3] / 82.1 [79.7–84.4] | 237.6 [233.4–241.8] | 244.9 [242.1–247.7] |
-| 8K | 1 | 2.60 [2.51–2.70] | 3152 [3035–3269] | 99.7 [91.1–108.3] | 99.7 [91.1–108.3] | 99.7 [91.1–108.3] |
-| 8K | 2 | 8.01 [8.01–8.01] / 2.53 [2.53–2.53] | 1023 [1022–1023] / 3241 [3239–3243] | 104.3 [104.2–104.4] / 84.0 [83.9–84.1] | 133.8 [133.7–133.9] | 188.3 [188.1–188.5] |
-| 8K | 3 | 8.09 [2.52–13.65] / 8.08 [2.53–13.62] / 8.83 [8.82–8.83] | 1923 [600–3246] / 1920 [601–3240] / 928 [927–929] | 84.0 [68.3–99.7] / 84.0 [68.2–99.8] / 85.6 [85.5–85.7] | 143.6 [143.5–143.7] | 253.5 [253.3–253.8] |
-| 32K | 1 | 8.10 [7.49–8.71] | 4070 [3764–4376] | 92.9 [92.0–93.9] | 92.9 [92.0–93.9] | 92.9 [92.0–93.9] |
-| 32K | 2 | 15.65 [12.38–18.93] / 15.64 [12.38–18.91] | 2189 [1731–2647] / 2190 [1733–2648] | 81.1 [72.1–90.1] / 81.2 [71.8–90.6] | 114.5 [114.3–114.8] | 162.3 [161.9–162.7] |
-| 32K | 3 | 21.24 [16.45–26.04] / 28.48 [26.04–30.92] / 23.68 [16.43–30.93] | 1626 [1259–1992] / 1159 [1060–1259] / 1527 [1059–1994] | 65.3 [55.2–75.4] / 81.0 [75.4–86.6] / 70.9 [55.2–86.6] | 116.6 [116.6–116.6] | 217.2 [217.2–217.2] |
-| 64K | 1 | 17.95 [14.30–21.59] | 3809 [3035–4582] | 99.5 [98.6–100.3] | 99.5 [98.6–100.3] | 99.5 [98.6–100.3] |
-| 64K | 2 | 25.81 [25.81–25.81] / 32.50 [32.48–32.51] | 2539 [2539–2540] / 2017 [2016–2018] | 75.2 [75.1–75.3] / 96.7 [96.6–96.8] | 118.5 [118.4–118.7] | 171.9 [171.7–172.0] |
-| 64K | 3 | 43.95 [36.51–51.39] / 46.39 [46.37–46.42] / 43.98 [36.60–51.36] | 1535 [1275–1795] / 1413 [1412–1413] / 1533 [1276–1791] | 75.0 [56.9–93.1] / 79.8 [79.8–79.8] / 75.2 [57.0–93.3] | 119.0 [118.9–119.0] | 230.0 [229.9–230.1] |
-| 128K | 1 | 34.09 [28.70–39.48] | 3944 [3320–4568] | 94.2 [93.9–94.6] | 94.2 [93.9–94.6] | 94.2 [93.9–94.6] |
-| 128K | 2 | 61.39 [61.37–61.42] / 54.39 [54.35–54.43] | 2135 [2134–2136] / 2410 [2408–2412] | 91.7 [91.4–91.9] / 71.0 [71.0–71.0] | 112.5 [112.4–112.6] | 162.6 [162.4–162.9] |
-| 128K | 3 | 92.25 [89.59–94.91] / 79.22 [79.18–79.26] / 92.24 [89.65–94.83] | 1422 [1381–1463] / 1655 [1654–1655] / 1422 [1382–1462] | 81.4 [74.9–87.9] / 53.3 [53.3–53.3] / 81.4 [75.1–87.7] | 112.3 [112.2–112.4] | 216.1 [215.9–216.3] |
-| 256K | 1 | 64.46 [59.23–69.68] | 4094 [3762–4426] | 90.0 [87.7–92.3] | 90.0 [87.7–92.3] | 90.0 [87.7–92.3] |
-| 256K | 2 | 122.47 [122.41–122.53] / 114.92 [114.88–114.95] | 2140 [2139–2142] / 2281 [2280–2282] | 88.5 [88.2–88.8] / 67.4 [67.3–67.4] | 106.9 [106.8–107.0] | 155.9 [155.5–156.2] |
-| 256K | 3 | 186.56 [186.51–186.62] / 169.70 [169.61–169.79] / 180.84 [180.80–180.89] | 1405 [1405–1406] / 1545 [1544–1546] / 1450 [1449–1450] | 84.3 [84.2–84.3] / 50.0 [49.9–50.1] / 70.9 [70.9–70.9] | 105.7 [105.6–105.8] | 205.1 [205.1–205.2] |
+| 1K | 1 | 0.67 [0.66–0.68] | 1526 [1507–1545] | 101.5 [101.0–102.1] | 101.5 [101.0–102.1] | 101.5 [101.0–102.1] |
+| 1K | 2 | 0.95 [0.95–0.95] / 0.67 [0.67–0.67] | 1075 [1073–1077] / 1520 [1519–1522] | 97.4 [97.1–97.7] / 95.0 [94.7–95.3] | 189.7 [189.2–190.3] | 192.4 [191.8–192.9] |
+| 1K | 3 | 1.33 [1.24–1.41] / 0.67 [0.67–0.68] / 1.33 [0.96–1.70] | 775 [726–824] / 1524 [1515–1532] / 835 [604–1066] | 84.4 [83.4–85.4] / 80.3 [78.9–81.7] / 84.4 [83.5–85.3] | 240.3 [235.9–244.7] | 249.2 [247.7–250.7] |
+| 8K | 1 | 2.52 [2.52–2.52] | 3253 [3251–3255] | 92.9 [92.5–93.4] | 92.9 [92.5–93.4] | 92.9 [92.5–93.4] |
+| 8K | 2 | 5.28 [2.53–8.04] / 5.30 [2.53–8.07] | 2127 [1019–3234] / 2126 [1015–3236] | 82.0 [74.0–90.0] / 82.0 [74.4–89.5] | 120.9 [120.6–121.2] | 163.9 [163.5–164.4] |
+| 8K | 3 | 5.70 [2.55–8.85] / 5.71 [2.55–8.87] / 13.71 [13.70–13.72] | 2068 [925–3211] / 2070 [923–3216] / 598 [597–598] | 67.3 [60.7–73.9] / 67.3 [60.7–73.9] / 84.3 [84.3–84.4] | 131.8 [131.7–131.8] | 218.9 [218.9–218.9] |
+| 32K | 1 | 7.53 [7.52–7.53] | 4354 [4351–4356] | 92.5 [92.2–92.8] | 92.5 [92.2–92.8] | 92.5 [92.2–92.8] |
+| 32K | 2 | 18.96 [18.94–18.97] / 12.41 [12.41–12.42] | 1729 [1727–1730] / 2640 [2639–2641] | 89.1 [88.6–89.5] / 71.2 [71.0–71.5] | 113.5 [113.0–113.9] | 160.3 [159.7–161.0] |
+| 32K | 3 | 16.47 [16.46–16.48] / 28.63 [26.15–31.11] / 28.62 [26.16–31.07] | 1990 [1988–1991] / 1153 [1053–1253] / 1153 [1055–1252] | 54.5 [54.4–54.6] / 79.4 [74.1–84.8] / 79.4 [73.9–84.9] | 115.0 [114.9–115.1] | 213.3 [213.1–213.5] |
+| 64K | 1 | 14.37 [14.34–14.39] | 4561 [4553–4570] | 93.4 [92.9–94.0] | 93.4 [92.9–94.0] | 93.4 [92.9–94.0] |
+| 64K | 2 | 29.29 [25.94–32.65] / 29.30 [25.93–32.68] | 2267 [2007–2527] / 2267 [2005–2528] | 80.9 [71.7–90.1] / 81.1 [71.3–90.9] | 113.4 [113.1–113.7] | 162.0 [161.4–162.6] |
+| 64K | 3 | 49.18 [46.64–51.72] / 41.71 [36.74–46.68] / 44.38 [36.73–52.04] | 1336 [1267–1405] / 1594 [1404–1784] / 1522 [1259–1784] | 80.0 [73.1–86.8] / 64.3 [53.6–75.0] / 70.5 [54.4–86.5] | 113.9 [113.1–114.6] | 214.7 [213.2–216.3] |
+| 128K | 1 | 28.88 [28.87–28.90] | 4538 [4536–4541] | 93.1 [92.8–93.3] | 93.1 [92.8–93.3] | 93.1 [92.8–93.3] |
+| 128K | 2 | 61.75 [61.73–61.77] / 54.66 [54.64–54.68] | 2123 [2122–2123] / 2398 [2397–2399] | 89.7 [89.7–89.8] / 69.9 [69.9–69.9] | 110.7 [110.6–110.7] | 159.6 [159.6–159.7] |
+| 128K | 3 | 95.35 [95.35–95.36] / 79.56 [79.54–79.58] / 90.07 [90.04–90.11] | 1375 [1375–1375] / 1647 [1647–1648] / 1455 [1455–1456] | 86.1 [86.1–86.2] / 52.6 [52.6–52.7] / 73.8 [73.7–74.0] | 110.8 [110.8–110.9] | 212.6 [212.4–212.8] |
+| 256K | 1 | 59.28 [59.25–59.31] | 4422 [4420–4424] | 92.4 [92.2–92.6] | 92.4 [92.2–92.6] | 92.4 [92.2–92.6] |
+| 256K | 2 | 118.90 [115.04–122.75] / 118.92 [115.17–122.68] | 2207 [2136–2279] / 2207 [2137–2276] | 78.3 [67.6–89.0] / 78.4 [67.5–89.2] | 107.0 [107.0–107.1] | 156.7 [156.5–156.8] |
+| 256K | 3 | 178.52 [170.18–186.87] / 178.53 [169.93–187.13] / 181.23 [181.10–181.37] | 1472 [1403–1540] / 1472 [1401–1543] / 1446 [1445–1448] | 67.7 [50.1–85.3] / 67.7 [50.2–85.3] / 71.5 [71.5–71.6] | 106.0 [105.9–106.0] | 207.0 [207.0–207.0] |
 
 ### Prose
 
@@ -884,36 +954,33 @@ MEASURED | 175 W per card | 1452 MHz clock cap | four slots | cold, thinking off
 
 | Prompt | Streams | TTFT s by stream | Prefill tok/s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates |
 |---|---:|---|---|---|---:|---:|
-| 1K | 1 | 0.65 [0.63–0.67] | 1571 [1527–1615] | 85.6 [85.0–86.1] | 85.6 [85.0–86.1] | 85.6 [85.0–86.1] |
-| 1K | 2 | 0.92 [0.92–0.93] / 0.65 [0.65–0.65] | 1110 [1105–1114] / 1578 [1577–1579] | 82.1 [82.0–82.1] / 80.4 [80.4–80.4] | 160.6 [160.6–160.7] | 162.5 [162.4–162.5] |
-| 1K | 3 | 0.93 [0.64–1.21] / 1.01 [0.64–1.37] / 1.29 [0.93–1.65] | 1219 [849–1589] / 1169 [747–1591] / 858 [621–1096] | 70.2 [67.9–72.5] / 70.5 [69.9–71.2] / 71.9 [71.2–72.5] | 206.2 [203.1–209.3] | 212.6 [211.6–213.6] |
-| 8K | 1 | 2.54 [2.47–2.61] | 3231 [3142–3320] | 93.5 [92.6–94.3] | 93.5 [92.6–94.3] | 93.5 [92.6–94.3] |
-| 8K | 2 | 5.22 [2.49–7.94] / 5.20 [2.47–7.92] | 2163 [1031–3295] / 2176 [1034–3318] | 83.3 [75.6–91.1] / 83.2 [75.2–91.2] | 122.7 [122.5–122.8] | 166.5 [166.3–166.7] |
-| 8K | 3 | 2.49 [2.49–2.49] / 13.50 [13.50–13.51] / 8.71 [8.71–8.72] | 3295 [3294–3296] / 607 [607–607] / 940 [940–940] | 62.2 [62.2–62.2] / 86.6 [86.5–86.6] / 75.8 [75.8–75.9] | 134.4 [134.4–134.4] | 224.6 [224.5–224.7] |
-| 32K | 1 | 7.92 [7.38–8.46] | 4158 [3876–4440] | 86.9 [86.2–87.6] | 86.9 [86.2–87.6] | 86.9 [86.2–87.6] |
-| 32K | 2 | 18.66 [18.66–18.66] / 12.13 [12.12–12.14] | 1756 [1756–1756] / 2702 [2700–2703] | 84.7 [84.6–84.8] / 68.3 [68.2–68.4] | 109.9 [109.8–110.1] | 153.0 [152.8–153.3] |
-| 32K | 3 | 20.91 [16.10–25.72] / 23.35 [16.11–30.59] / 28.15 [25.68–30.62] | 1655 [1274–2036] / 1553 [1071–2034] / 1173 [1070–1276] | 61.9 [52.8–70.9] / 66.8 [52.8–80.8] / 75.7 [70.8–80.6] | 112.9 [112.8–113.0] | 204.4 [204.3–204.5] |
-| 64K | 1 | 14.41 [14.10–14.71] | 4550 [4454–4647] | 86.2 [85.6–86.8] | 86.2 [85.6–86.8] | 86.2 [85.6–86.8] |
-| 64K | 2 | 28.85 [25.52–32.17] / 28.87 [25.50–32.23] | 2303 [2037–2568] / 2302 [2033–2570] | 75.3 [66.9–83.6] / 75.4 [67.1–83.6] | 108.1 [108.0–108.2] | 150.6 [150.6–150.7] |
-| 64K | 3 | 48.37 [45.87–50.87] / 36.04 [36.03–36.05] / 48.38 [45.87–50.89] | 1358 [1288–1429] / 1819 [1818–1819] / 1358 [1288–1429] | 74.8 [69.8–79.8] / 51.7 [51.7–51.7] / 74.7 [69.8–79.7] | 110.9 [110.8–110.9] | 201.2 [201.2–201.3] |
-| 128K | 1 | 30.40 [28.37–32.43] | 4331 [4042–4621] | 79.9 [76.2–83.6] | 79.9 [76.2–83.6] | 79.9 [76.2–83.6] |
-| 128K | 2 | 60.84 [60.83–60.85] / 53.81 [53.81–53.81] | 2154 [2154–2155] / 2436 [2436–2436] | 80.8 [80.8–80.8] / 64.2 [64.2–64.2] | 103.8 [103.8–103.9] | 145.0 [145.0–145.1] |
-| 128K | 3 | 88.83 [88.75–88.90] / 94.10 [94.02–94.18] / 78.39 [78.32–78.46] | 1476 [1474–1477] / 1393 [1392–1394] / 1672 [1671–1674] | 66.6 [66.6–66.6] / 76.7 [76.7–76.8] / 49.0 [48.9–49.1] | 105.7 [105.5–105.8] | 192.3 [192.2–192.5] |
-| 256K | 1 | 61.89 [58.79–64.99] | 4247 [4034–4459] | 84.4 [84.0–84.8] | 84.4 [84.0–84.8] | 84.4 [84.0–84.8] |
-| 256K | 2 | 114.07 [114.03–114.11] / 121.72 [121.66–121.78] | 2298 [2297–2299] / 2154 [2153–2155] | 62.9 [62.8–63.0] / 81.5 [81.4–81.5] | 101.1 [101.0–101.3] | 144.3 [144.2–144.5] |
-| 256K | 3 | 176.31 [167.73–184.90] / 173.49 [167.89–179.09] / 181.93 [179.15–184.72] | 1490 [1418–1563] / 1513 [1464–1561] / 1441 [1419–1463] | 62.3 [47.3–77.3] / 56.8 [47.4–66.1] / 71.6 [66.0–77.3] | 101.7 [101.6–101.7] | 190.7 [190.7–190.7] |
+| 1K | 1 | 0.64 [0.64–0.64] | 1603 [1600–1607] | 86.1 [85.8–86.3] | 86.1 [85.8–86.3] | 86.1 [85.8–86.3] |
+| 1K | 2 | 0.78 [0.64–0.92] / 0.78 [0.65–0.92] | 1348 [1107–1588] / 1343 [1117–1570] | 81.6 [80.8–82.5] / 81.6 [80.8–82.5] | 161.4 [161.4–161.4] | 163.3 [163.3–163.3] |
+| 1K | 3 | 1.22 [1.21–1.22] / 0.80 [0.66–0.94] / 0.80 [0.66–0.94] | 842 [841–844] / 1318 [1085–1551] / 1322 [1089–1554] | 72.6 [72.6–72.7] / 70.6 [70.0–71.2] / 70.6 [69.9–71.4] | 209.6 [209.4–209.8] | 213.9 [213.7–214.1] |
+| 8K | 1 | 2.49 [2.48–2.49] | 3296 [3294–3297] | 89.6 [88.8–90.3] | 89.6 [88.8–90.3] | 89.6 [88.8–90.3] |
+| 8K | 2 | 7.97 [7.97–7.98] / 2.49 [2.48–2.49] | 1027 [1027–1028] / 3296 [3291–3300] | 86.9 [86.8–87.0] / 72.3 [72.2–72.5] | 118.6 [118.4–118.7] | 159.3 [159.1–159.5] |
+| 8K | 3 | 11.19 [8.76–13.62] / 8.08 [2.53–13.62] / 5.65 [2.50–8.79] | 768 [601–935] / 1918 [601–3235] / 2106 [932–3279] | 76.8 [71.7–81.8] / 70.6 [59.5–81.6] / 65.7 [59.4–71.9] | 129.9 [129.7–130.0] | 213.0 [212.7–213.3] |
+| 32K | 1 | 7.39 [7.38–7.41] | 4432 [4423–4441] | 94.7 [94.4–95.1] | 94.7 [94.4–95.1] | 94.7 [94.4–95.1] |
+| 32K | 2 | 15.47 [12.17–18.76] / 15.47 [12.19–18.75] | 2220 [1747–2692] / 2218 [1748–2688] | 82.3 [72.9–91.7] / 82.4 [72.8–92.0] | 115.5 [115.4–115.6] | 164.7 [164.6–164.9] |
+| 32K | 3 | 21.00 [16.16–25.84] / 28.30 [25.81–30.79] / 23.44 [16.16–30.72] | 1648 [1268–2028] / 1167 [1064–1269] / 1547 [1067–2027] | 66.1 [56.0–76.3] / 82.1 [76.5–87.7] / 71.7 [55.8–87.6] | 116.9 [116.7–117.0] | 219.9 [219.8–220.1] |
+| 64K | 1 | 14.22 [14.21–14.22] | 4610 [4609–4611] | 83.3 [82.9–83.8] | 83.3 [82.9–83.8] | 83.3 [82.9–83.8] |
+| 64K | 2 | 25.86 [25.63–26.10] / 32.62 [32.38–32.86] | 2534 [2511–2557] / 2009 [1994–2024] | 65.1 [65.0–65.3] / 80.7 [80.5–80.9] | 105.3 [105.1–105.5] | 145.8 [145.4–146.2] |
+| 64K | 3 | 48.73 [46.27–51.20] / 41.24 [36.32–46.16] / 43.77 [36.21–51.34] | 1348 [1280–1417] / 1612 [1420–1804] / 1543 [1277–1810] | 71.8 [67.0–76.6] / 58.8 [50.2–67.4] / 63.3 [50.3–76.3] | 108.1 [107.9–108.3] | 194.0 [193.6–194.4] |
+| 128K | 1 | 28.58 [28.54–28.62] | 4586 [4579–4593] | 85.6 [85.2–85.9] | 85.6 [85.2–85.9] | 85.6 [85.2–85.9] |
+| 128K | 2 | 57.61 [54.04–61.17] / 57.60 [54.05–61.15] | 2284 [2143–2426] / 2284 [2143–2425] | 74.6 [65.8–83.4] / 74.6 [65.9–83.3] | 105.5 [105.4–105.6] | 149.2 [149.1–149.4] |
+| 128K | 3 | 91.95 [89.31–94.59] / 91.89 [89.23–94.56] / 78.75 [78.67–78.82] | 1427 [1386–1468] / 1428 [1386–1469] / 1664 [1663–1666] | 74.3 [69.0–79.5] / 74.0 [68.6–79.5] / 50.0 [49.8–50.2] | 106.9 [106.7–107.1] | 198.3 [197.9–198.7] |
+| 256K | 1 | 58.83 [58.76–58.91] | 4456 [4450–4461] | 84.5 [83.8–85.2] | 84.5 [83.8–85.2] | 84.5 [83.8–85.2] |
+| 256K | 2 | 117.74 [113.86–121.63] / 117.77 [113.98–121.56] | 2229 [2155–2302] / 2228 [2156–2300] | 72.5 [63.1–81.9] / 72.4 [63.1–81.7] | 101.4 [101.3–101.4] | 144.9 [144.8–145.0] |
+| 256K | 3 | 181.80 [178.16–185.44] / 173.27 [166.96–179.59] / 176.10 [168.30–183.89] | 1443 [1414–1471] / 1515 [1460–1570] / 1492 [1426–1558] | 72.2 [66.4–78.0] / 56.8 [47.5–66.1] / 62.6 [47.2–77.9] | 101.7 [101.5–102.0] | 191.6 [191.3–191.8] |
 
-**With prefix sharing, again: the same measure on the kit 9S set.** For each length and kind one cold "warm read" put the
-document in the prefix cache; then one, two and three streams on that document, released together, two repeats (108 groups,
-216 measured requests; MEASURED 2026-11-19 07:24:46Z to 08:08:28Z on the same serving set, 175 W, the 1,452 MHz
-ceiling, right after the bench above, the server not restarted). A hit is a first token under a quarter of the warm read's.
-Hits 150 of 216 as on 2026-11-18: the 36 requests at 1K are not hits by that rule, and 30 requests re-read the document,
-one per new slot the first time a second or a third stream shared it, never after. On a hit the first token at 128K came in
-0.42 to 0.43 s and at 256K in 0.61 to 0.68 s; three streams on one cached 128K document, the all-hit repeat: code 405.1 tok/s
-summed and 399.8 over the window, legal 244.0 and 242.2, prose 223.2 and 221.5. 0 of 150 hits reproduced the warm read's
-token digest and all 30 re-reads did (the judge's count of 36 adds six of the 1K requests). The warm reads were 4.0 to
-4.2 % faster than on 2026-11-18 at 128K and 256K (code 27.96 and 57.76 s). Hit decode rates moved with the generated text
-as in the bench above (the rounding change moved the greedy continuation in every cell of 8K and longer).
+The prefix-sharing measure that followed, 15:40:33Z to 16:24:31Z (108 groups, 216 requests, 18 warm reads, hits 150 of
+216, the server sending a cached-token count for 0; judge PASS; a hit is a first token under a quarter of the warm read's;
+the 36 requests at 1K are not hits by that rule, and 30 requests re-read the document, one per new slot the first time a
+second or a third stream shared it, never after): hits at 128K first token 0.43 / 0.44 / 0.44 s (code / legal / prose; 0.42
+to 0.43 in the 05:53Z run), at 256K 0.63 to 0.73 s; the warm reads within -0.4 to +0.3 % of the 05:53Z run's at 32K and
+longer; the all-hit repeat of three streams on one cached 128K document 432.7 / 232.0 / 222.5 tok/s summed (426.6 / 230.1 /
+221.0 over the window; 405.5 / 244.2 / 223.4 summed in the 05:53Z run, the text having moved). 0 of 150 hits reproduced the
+warm read's token digest and all 30 re-reads did.
 
 ### Code, with prefix sharing
 
@@ -921,30 +988,30 @@ MEASURED | 175 W per card | 1452 MHz clock cap | four slots | document in the pr
 
 | Prompt | Streams | TTFT s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates | Hits | Overlap |
 |---|---:|---|---|---:|---:|---|---|
-| 1K | warm read | 0.66 (1,541 tok/s) | 177.0 | - | - | - | - |
-| 1K | 1 | 0.22 [0.19–0.25] | 179.3 [176.1–182.4] | 179.3 [176.1–182.4] | 179.3 [176.1–182.4] | 0/2 | together |
-| 1K | 2 | 0.19 [0.19–0.20] / 0.48 [0.25–0.71] | 164.8 [157.4–172.2] / 171.3 [169.3–173.3] | 327.7 [311.8–343.6] | 336.1 [326.7–345.6] | 0/4 | together |
-| 1K | 3 | 0.26 [0.21–0.31] / 0.29 [0.24–0.34] / 0.55 [0.27–0.83] | 144.5 [139.6–149.4] / 145.2 [138.5–151.9] / 149.8 [149.0–150.5] | 429.2 [411.5–446.9] | 439.5 [427.2–451.8] | 0/6 | together |
-| 8K | warm read | 2.49 (3,295 tok/s) | 176.0 | - | - | - | - |
-| 8K | 1 | 0.21 [0.21–0.22] | 180.0 [177.4–182.6] | 180.0 [177.4–182.6] | 180.0 [177.4–182.6] | 2/2 | together |
-| 8K | 2 | 0.26 [0.22–0.29] / 3.16 [0.25–6.07] | 147.0 [120.1–173.9] / 172.2 [171.7–172.8] | 259.1 [173.3–344.9] | 319.2 [291.8–346.7] | 3/4 | together |
-| 8K | 3 | 0.34 [0.33–0.34] / 0.27 [0.25–0.28] / 3.30 [0.23–6.36] | 131.9 [112.6–151.2] / 130.9 [111.8–150.0] / 155.4 [149.0–161.9] | 346.4 [246.9–445.8] | 418.3 [386.3–450.2] | 5/6 | together |
-| 32K | warm read | 7.33 (4,468 tok/s) | 176.4 | - | - | - | - |
-| 32K | 1 | 0.26 [0.26–0.26] | 185.0 [183.3–186.7] | 185.0 [183.3–186.7] | 185.0 [183.3–186.7] | 2/2 | together |
-| 32K | 2 | 7.76 [0.27–15.26] / 0.31 [0.28–0.35] | 175.1 [174.5–175.8] / 126.2 [76.0–176.5] | 223.3 [98.4–348.3] | 301.4 [251.7–351.0] | 3/4 | together |
-| 32K | 3 | 0.28 [0.27–0.30] / 8.03 [0.39–15.68] / 0.36 [0.33–0.39] | 112.9 [73.9–151.8] / 164.9 [154.3–175.5] / 113.6 [74.3–153.0] | 299.5 [144.7–454.3] | 391.4 [323.7–459.1] | 5/6 | together |
-| 64K | warm read | 13.93 (4,705 tok/s) | 162.6 | - | - | - | - |
-| 64K | 1 | 0.30 [0.29–0.30] | 170.1 [168.1–172.2] | 170.1 [168.1–172.2] | 170.1 [168.1–172.2] | 2/2 | together |
-| 64K | 2 | 0.32 [0.31–0.33] / 11.88 [0.53–23.23] | 111.2 [63.2–159.1] / 163.2 [162.9–163.5] | 193.3 [70.1–316.6] | 274.4 [226.1–322.7] | 3/4 | together |
-| 64K | 3 | 0.50 [0.47–0.52] / 0.40 [0.35–0.45] / 12.11 [0.38–23.84] | 101.8 [61.4–142.3] / 101.0 [61.1–140.9] / 151.6 [140.0–163.2] | 261.0 [103.2–418.9] | 354.4 [285.7–423.2] | 5/6 | together |
-| 128K | warm read | 27.96 (4,687 tok/s) | 176.4 | - | - | - | - |
-| 128K | 1 | 0.43 [0.42–0.44] | 163.3 [161.4–165.3] | 163.3 [161.4–165.3] | 163.3 [161.4–165.3] | 2/2 | together |
-| 128K | 2 | 0.49 [0.45–0.53] / 19.03 [0.46–37.60] | 109.5 [62.3–156.7] / 166.4 [155.1–177.7] | 178.7 [47.7–309.7] | 275.9 [240.0–311.8] | 3/4 | together |
-| 128K | 3 | 0.64 [0.60–0.68] / 19.37 [0.59–38.15] / 0.52 [0.52–0.52] | 98.6 [60.7–136.6] / 155.7 [134.9–176.6] / 97.0 [60.5–133.6] | 235.2 [70.7–399.8] | 351.4 [297.8–405.1] | 5/6 | together |
-| 256K | warm read | 57.76 (4,539 tok/s) | 171.3 | - | - | - | - |
-| 256K | 1 | 0.65 [0.63–0.66] | 167.3 [164.8–169.8] | 167.3 [164.8–169.8] | 167.3 [164.8–169.8] | 2/2 | together |
-| 256K | 2 | 34.31 [1.07–67.54] / 0.71 [0.70–0.72] | 165.1 [158.8–171.4] / 107.0 [62.1–151.8] | 164.9 [28.1–301.7] | 272.1 [233.5–310.7] | 3/4 | together |
-| 256K | 3 | 0.97 [0.81–1.14] / 34.68 [1.06–68.30] / 0.96 [0.74–1.18] | 99.3 [60.1–138.5] / 154.2 [137.0–171.4] / 96.4 [61.1–131.7] | 216.8 [41.8–391.8] | 349.9 [292.7–407.2] | 5/6 | together |
+| 1K | warm read | 0.66 (1,547 tok/s) | 184.4 | - | - | - | - |
+| 1K | 1 | 0.21 [0.21–0.22] | 185.6 [182.8–188.3] | 185.6 [182.8–188.3] | 185.6 [182.8–188.3] | 0/2 | together |
+| 1K | 2 | 0.50 [0.28–0.72] / 0.21 [0.20–0.22] | 176.9 [175.3–178.4] / 169.4 [162.0–176.9] | 337.4 [322.0–352.8] | 346.3 [337.3–355.3] | 0/4 | together |
+| 1K | 3 | 0.63 [0.34–0.93] / 0.33 [0.25–0.40] / 0.30 [0.22–0.39] | 155.0 [154.2–155.9] / 148.8 [143.6–154.1] / 148.7 [140.7–156.8] | 439.2 [417.7–460.8] | 452.6 [438.5–466.7] | 0/6 | together |
+| 8K | warm read | 2.47 (3,316 tok/s) | 177.5 | - | - | - | - |
+| 8K | 1 | 0.22 [0.22–0.23] | 188.1 [185.4–190.8] | 188.1 [185.4–190.8] | 188.1 [185.4–190.8] | 2/2 | together |
+| 8K | 2 | 0.25 [0.21–0.30] / 3.14 [0.23–6.06] | 152.4 [123.7–181.0] / 176.3 [173.2–179.4] | 266.1 [174.1–358.1] | 328.7 [297.0–360.5] | 3/4 | together |
+| 8K | 3 | 0.27 [0.22–0.33] / 3.35 [0.27–6.42] / 0.32 [0.22–0.42] | 136.1 [114.4–157.9] / 160.1 [156.7–163.5] / 136.1 [116.6–155.7] | 355.9 [246.3–465.6] | 432.3 [394.5–470.2] | 5/6 | together |
+| 32K | warm read | 7.31 (4,485 tok/s) | 179.4 | - | - | - | - |
+| 32K | 1 | 0.26 [0.26–0.27] | 167.7 [166.3–169.1] | 167.7 [166.3–169.1] | 167.7 [166.3–169.1] | 2/2 | together |
+| 32K | 2 | 7.81 [0.32–15.29] / 0.27 [0.25–0.28] | 169.3 [160.4–178.2] / 112.2 [65.6–158.8] | 207.9 [98.6–317.1] | 281.5 [243.8–319.2] | 3/4 | together |
+| 32K | 3 | 8.05 [0.37–15.72] / 0.39 [0.35–0.43] / 0.29 [0.29–0.29] | 157.2 [139.0–175.3] / 102.0 [63.8–140.1] / 100.7 [63.6–137.7] | 278.2 [144.3–412.0] | 359.8 [302.7–416.8] | 5/6 | together |
+| 64K | warm read | 13.89 (4,719 tok/s) | 160.3 | - | - | - | - |
+| 64K | 1 | 0.31 [0.30–0.32] | 162.9 [161.5–164.3] | 162.9 [161.5–164.3] | 162.9 [161.5–164.3] | 2/2 | together |
+| 64K | 2 | 11.93 [0.37–23.49] / 0.40 [0.36–0.45] | 157.3 [154.2–160.5] / 109.0 [62.2–155.8] | 188.7 [69.3–308.0] | 266.3 [222.7–309.9] | 3/4 | together |
+| 64K | 3 | 12.34 [0.65–24.03] / 0.38 [0.38–0.39] / 0.45 [0.44–0.45] | 148.3 [136.8–159.9] / 96.5 [60.5–132.6] / 96.9 [60.7–133.2] | 249.0 [102.1–395.8] | 341.8 [281.1–402.5] | 5/6 | together |
+| 128K | warm read | 28.03 (4,677 tok/s) | 161.3 | - | - | - | - |
+| 128K | 1 | 0.43 [0.41–0.45] | 175.4 [173.8–177.0] | 175.4 [173.8–177.0] | 175.4 [173.8–177.0] | 2/2 | together |
+| 128K | 2 | 0.48 [0.45–0.51] / 18.91 [0.56–37.25] | 114.6 [63.9–165.3] / 163.8 [159.7–167.9] | 188.8 [47.4–330.2] | 278.4 [223.6–333.2] | 3/4 | together |
+| 128K | 3 | 0.57 [0.53–0.60] / 19.30 [0.65–37.95] / 0.62 [0.53–0.70] | 102.0 [61.5–142.4] / 152.8 [144.1–161.5] / 103.5 [61.3–145.7] | 248.1 [70.1–426.1] | 358.3 [284.4–432.2] | 5/6 | together |
+| 256K | warm read | 57.83 (4,533 tok/s) | 158.5 | - | - | - | - |
+| 256K | 1 | 0.64 [0.63–0.64] | 149.6 [146.9–152.3] | 149.6 [146.9–152.3] | 149.6 [146.9–152.3] | 2/2 | together |
+| 256K | 2 | 34.72 [1.07–68.37] / 0.80 [0.79–0.82] | 150.0 [143.1–156.8] / 99.0 [59.6–138.4] | 151.5 [27.6–275.3] | 249.0 [216.4–281.5] | 3/4 | together |
+| 256K | 3 | 35.15 [1.13–69.17] / 0.87 [0.83–0.92] / 1.07 [1.00–1.14] | 140.9 [124.1–157.7] / 89.0 [57.4–120.7] / 90.1 [58.4–121.8] | 200.6 [41.0–360.3] | 320.1 [273.5–366.6] | 5/6 | together |
 
 ### Legal, with prefix sharing
 
@@ -952,30 +1019,30 @@ MEASURED | 175 W per card | 1452 MHz clock cap | four slots | document in the pr
 
 | Prompt | Streams | TTFT s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates | Hits | Overlap |
 |---|---:|---|---|---:|---:|---|---|
-| 1K | warm read | 0.67 (1,539 tok/s) | 100.7 | - | - | - | - |
-| 1K | 1 | 0.19 [0.19–0.19] | 103.0 [102.5–103.5] | 103.0 [102.5–103.5] | 103.0 [102.5–103.5] | 0/2 | together |
-| 1K | 2 | 0.23 [0.19–0.27] / 0.47 [0.22–0.72] | 95.0 [92.3–97.7] / 96.2 [95.2–97.3] | 187.8 [181.2–194.3] | 191.2 [187.5–195.0] | 0/4 | together |
-| 1K | 3 | 0.30 [0.20–0.40] / 0.60 [0.27–0.94] / 0.26 [0.20–0.32] | 83.7 [82.0–85.4] / 85.0 [84.2–85.8] / 83.5 [81.0–86.1] | 247.0 [238.3–255.8] | 252.2 [247.2–257.2] | 0/6 | together |
-| 8K | warm read | 2.53 (3,234 tok/s) | 108.2 | - | - | - | - |
-| 8K | 1 | 0.22 [0.21–0.22] | 97.0 [96.5–97.5] | 97.0 [96.5–97.5] | 97.0 [96.5–97.5] | 2/2 | together |
-| 8K | 2 | 0.27 [0.25–0.29] / 3.17 [0.23–6.11] | 83.1 [74.2–92.0] / 97.5 [91.6–103.4] | 156.4 [129.8–183.0] | 180.6 [177.6–183.7] | 3/4 | together |
-| 8K | 3 | 3.41 [0.31–6.52] / 0.35 [0.25–0.45] / 0.30 [0.24–0.37] | 87.0 [80.7–93.2] / 74.1 [67.9–80.4] / 74.1 [67.1–81.0] | 209.4 [177.9–240.9] | 235.2 [228.2–242.2] | 5/6 | together |
-| 32K | warm read | 7.52 (4,356 tok/s) | 94.0 | - | - | - | - |
-| 32K | 1 | 0.26 [0.25–0.26] | 97.4 [97.1–97.8] | 97.4 [97.1–97.8] | 97.4 [97.1–97.8] | 2/2 | together |
-| 32K | 2 | 7.89 [0.33–15.44] / 0.28 [0.25–0.31] | 91.8 [91.3–92.3] / 70.8 [50.0–91.7] | 130.4 [77.7–183.2] | 162.6 [141.3–184.0] | 3/4 | together |
-| 32K | 3 | 8.16 [0.32–16.00] / 0.38 [0.38–0.39] / 0.37 [0.31–0.43] | 83.0 [80.5–85.4] / 64.0 [47.1–80.8] / 64.1 [47.0–81.2] | 176.0 [110.9–241.2] | 211.0 [179.5–242.5] | 5/6 | together |
-| 64K | warm read | 14.27 (4,592 tok/s) | 100.1 | - | - | - | - |
-| 64K | 1 | 0.33 [0.32–0.33] | 97.8 [97.5–98.2] | 97.8 [97.5–98.2] | 97.8 [97.5–98.2] | 2/2 | together |
-| 64K | 2 | 0.39 [0.36–0.41] / 14.26 [0.35–28.18] | 63.3 [34.4–92.2] / 95.5 [91.7–99.3] | 118.5 [53.7–183.2] | 158.8 [133.7–183.9] | 3/4 | together |
-| 64K | 3 | 14.65 [0.44–28.87] / 0.48 [0.47–0.49] / 0.37 [0.35–0.38] | 88.6 [81.1–96.0] / 57.4 [33.4–81.4] / 57.0 [33.3–80.7] | 160.0 [78.4–241.6] | 203.0 [162.7–243.2] | 5/6 | together |
-| 128K | warm read | 28.71 (4,565 tok/s) | 95.2 | - | - | - | - |
-| 128K | 1 | 0.42 [0.41–0.42] | 98.6 [98.2–99.0] | 98.6 [98.2–99.0] | 98.6 [98.2–99.0] | 2/2 | together |
-| 128K | 2 | 0.52 [0.52–0.53] / 23.25 [0.46–46.04] | 62.3 [31.3–93.3] / 94.0 [92.8–95.2] | 110.9 [36.4–185.4] | 156.3 [126.5–186.1] | 3/4 | together |
-| 128K | 3 | 0.65 [0.60–0.69] / 0.56 [0.54–0.58] / 23.70 [0.51–46.89] | 56.2 [30.6–81.8] / 55.9 [30.5–81.3] / 88.0 [80.9–95.1] | 148.0 [53.7–242.2] | 200.1 [156.2–244.0] | 5/6 | together |
-| 256K | warm read | 59.21 (4,428 tok/s) | 92.5 | - | - | - | - |
-| 256K | 1 | 0.68 [0.63–0.73] | 94.5 [94.0–95.0] | 94.5 [94.0–95.0] | 94.5 [94.0–95.0] | 2/2 | together |
-| 256K | 2 | 38.95 [0.78–77.12] / 0.96 [0.79–1.13] | 89.5 [86.4–92.6] / 59.6 [30.8–88.5] | 97.8 [23.4–172.2] | 149.1 [123.4–174.9] | 3/4 | together |
-| 256K | 3 | 1.01 [0.98–1.05] / 0.87 [0.84–0.90] / 39.60 [1.02–78.18] | 53.7 [30.0–77.3] / 53.4 [30.0–76.8] / 85.0 [77.8–92.1] | 132.3 [34.7–229.9] | 192.0 [152.1–231.9] | 5/6 | together |
+| 1K | warm read | 0.67 (1,519 tok/s) | 102.3 | - | - | - | - |
+| 1K | 1 | 0.21 [0.20–0.21] | 99.0 [98.4–99.7] | 99.0 [98.4–99.7] | 99.0 [98.4–99.7] | 0/2 | together |
+| 1K | 2 | 0.26 [0.21–0.32] / 0.56 [0.25–0.87] | 91.7 [89.0–94.4] / 95.6 [93.9–97.3] | 182.8 [178.0–187.7] | 187.3 [186.3–188.4] | 0/4 | together |
+| 1K | 3 | 0.30 [0.25–0.34] / 0.56 [0.29–0.83] / 0.27 [0.23–0.31] | 81.2 [79.3–83.2] / 84.2 [82.9–85.5] / 81.1 [79.6–82.6] | 242.5 [237.8–247.3] | 246.5 [244.5–248.6] | 0/6 | together |
+| 8K | warm read | 2.52 (3,251 tok/s) | 93.3 | - | - | - | - |
+| 8K | 1 | 0.22 [0.22–0.23] | 95.9 [95.3–96.4] | 95.9 [95.3–96.4] | 95.9 [95.3–96.4] | 2/2 | together |
+| 8K | 2 | 3.17 [0.24–6.11] / 0.33 [0.25–0.41] | 90.1 [90.1–90.1] / 82.6 [73.8–91.3] | 149.3 [118.8–179.7] | 172.7 [163.9–181.4] | 3/4 | together |
+| 8K | 3 | 3.33 [0.28–6.38] / 0.30 [0.27–0.34] / 0.37 [0.34–0.40] | 80.6 [79.4–81.9] / 73.4 [67.2–79.7] / 73.8 [67.5–80.1] | 201.4 [165.0–237.9] | 227.9 [216.6–239.1] | 5/6 | together |
+| 32K | warm read | 7.51 (4,363 tok/s) | 93.1 | - | - | - | - |
+| 32K | 1 | 0.27 [0.27–0.28] | 98.2 [97.6–98.8] | 98.2 [97.6–98.8] | 98.2 [97.6–98.8] | 2/2 | together |
+| 32K | 2 | 0.34 [0.30–0.37] / 7.88 [0.31–15.45] | 71.8 [50.2–93.4] / 91.7 [90.4–93.0] | 131.6 [77.3–185.8] | 163.5 [140.6–186.4] | 3/4 | together |
+| 32K | 3 | 8.10 [0.27–15.92] / 0.35 [0.31–0.39] / 0.42 [0.39–0.45] | 83.0 [80.9–85.2] / 64.5 [47.4–81.5] / 64.8 [47.6–81.9] | 176.7 [111.1–242.3] | 212.3 [180.2–244.4] | 5/6 | together |
+| 64K | warm read | 14.26 (4,596 tok/s) | 94.7 | - | - | - | - |
+| 64K | 1 | 0.33 [0.32–0.35] | 97.1 [96.7–97.4] | 97.1 [96.7–97.4] | 97.1 [96.7–97.4] | 2/2 | together |
+| 64K | 2 | 0.42 [0.40–0.44] / 14.33 [0.39–28.26] | 63.6 [34.3–92.8] / 93.1 [92.4–93.8] | 118.7 [52.8–184.7] | 156.7 [128.2–185.2] | 3/4 | together |
+| 64K | 3 | 0.50 [0.49–0.51] / 0.41 [0.40–0.43] / 14.69 [0.44–28.94] | 57.1 [33.3–80.8] / 56.7 [33.3–80.1] / 86.0 [80.4–91.6] | 158.7 [77.3–240.1] | 199.8 [158.2–241.4] | 5/6 | together |
+| 128K | warm read | 28.74 (4,560 tok/s) | 94.4 | - | - | - | - |
+| 128K | 1 | 0.44 [0.44–0.44] | 93.8 [93.3–94.2] | 93.8 [93.3–94.2] | 93.8 [93.3–94.2] | 2/2 | together |
+| 128K | 2 | 0.53 [0.49–0.56] / 23.95 [0.57–47.33] | 58.5 [28.7–88.3] / 91.3 [88.9–93.7] | 106.0 [35.5–176.5] | 149.8 [122.4–177.2] | 3/4 | together |
+| 128K | 3 | 0.62 [0.59–0.65] / 24.52 [0.73–48.31] / 0.58 [0.52–0.65] | 52.6 [27.9–77.3] / 85.8 [77.7–93.9] / 52.4 [28.0–76.7] | 141.1 [52.4–229.9] | 190.8 [149.8–231.8] | 5/6 | together |
+| 256K | warm read | 59.24 (4,425 tok/s) | 92.7 | - | - | - | - |
+| 256K | 1 | 0.70 [0.68–0.72] | 90.2 [89.9–90.6] | 90.2 [89.9–90.6] | 90.2 [89.9–90.6] | 2/2 | together |
+| 256K | 2 | 0.81 [0.78–0.84] / 39.68 [0.96–78.41] | 56.3 [28.3–84.3] / 89.2 [85.3–93.0] | 95.8 [23.1–168.5] | 145.5 [121.3–169.6] | 3/4 | together |
+| 256K | 3 | 1.04 [0.83–1.26] / 0.88 [0.83–0.92] / 40.35 [1.15–79.54] | 50.8 [27.5–74.1] / 49.8 [27.6–72.0] / 83.3 [73.5–93.2] | 124.6 [34.2–214.9] | 183.9 [148.3–219.6] | 5/6 | together |
 
 ### Prose, with prefix sharing
 
@@ -983,30 +1050,30 @@ MEASURED | 175 W per card | 1452 MHz clock cap | four slots | document in the pr
 
 | Prompt | Streams | TTFT s by stream | Decode tok/s by stream | Total decode tok/s | Sum of decode rates | Hits | Overlap |
 |---|---:|---|---|---:|---:|---|---|
-| 1K | warm read | 0.64 (1,592 tok/s) | 86.2 | - | - | - | - |
-| 1K | 1 | 0.19 [0.19–0.19] | 84.5 [81.3–87.8] | 84.5 [81.3–87.8] | 84.5 [81.3–87.8] | 0/2 | together |
-| 1K | 2 | 0.49 [0.27–0.71] / 0.20 [0.19–0.21] | 82.5 [81.8–83.2] / 81.1 [79.4–82.7] | 161.3 [157.2–165.3] | 163.6 [161.2–166.0] | 0/4 | together |
-| 1K | 3 | 0.64 [0.36–0.93] / 0.26 [0.23–0.29] / 0.27 [0.24–0.30] | 72.7 [72.3–73.1] / 71.2 [69.8–72.5] / 71.3 [69.7–72.9] | 212.0 [206.8–217.3] | 215.2 [211.8–218.5] | 0/6 | together |
-| 8K | warm read | 2.53 (3,233 tok/s) | 94.9 | - | - | - | - |
-| 8K | 1 | 0.21 [0.21–0.22] | 93.3 [92.7–93.9] | 93.3 [92.7–93.9] | 93.3 [92.7–93.9] | 2/2 | together |
-| 8K | 2 | 3.18 [0.28–6.08] / 0.22 [0.22–0.23] | 89.8 [88.7–90.9] / 80.2 [72.1–88.3] | 148.0 [119.6–176.4] | 170.0 [163.0–177.0] | 3/4 | together |
-| 8K | 3 | 0.29 [0.27–0.31] / 0.35 [0.33–0.36] / 3.30 [0.23–6.37] | 72.0 [65.9–78.0] / 72.2 [66.2–78.3] / 80.3 [77.6–83.0] | 199.5 [166.5–232.5] | 224.5 [215.1–233.9] | 5/6 | together |
-| 32K | warm read | 7.40 (4,430 tok/s) | 87.8 | - | - | - | - |
-| 32K | 1 | 0.26 [0.25–0.27] | 93.6 [93.3–94.0] | 93.6 [93.3–94.0] | 93.6 [93.3–94.0] | 2/2 | together |
-| 32K | 2 | 7.82 [0.29–15.36] / 0.32 [0.30–0.34] | 87.3 [85.7–88.8] / 69.2 [49.2–89.2] | 126.6 [75.8–177.5] | 156.5 [134.9–178.0] | 3/4 | together |
-| 32K | 3 | 8.11 [0.39–15.82] / 0.29 [0.28–0.29] / 0.34 [0.34–0.35] | 79.4 [78.4–80.4] / 62.1 [46.4–77.8] / 62.3 [46.5–78.1] | 170.8 [108.6–233.1] | 203.8 [173.3–234.2] | 5/6 | together |
-| 64K | warm read | 14.11 (4,644 tok/s) | 86.7 | - | - | - | - |
-| 64K | 1 | 0.32 [0.31–0.33] | 82.9 [82.4–83.3] | 82.9 [82.4–83.3] | 82.9 [82.4–83.3] | 2/2 | together |
-| 64K | 2 | 0.34 [0.30–0.38] / 14.23 [0.40–28.05] | 55.3 [32.5–78.2] / 82.2 [78.8–85.6] | 103.9 [51.6–156.3] | 137.5 [118.0–156.9] | 3/4 | together |
-| 64K | 3 | 0.41 [0.32–0.51] / 14.63 [0.33–28.93] / 0.43 [0.42–0.44] | 50.3 [31.1–69.6] / 75.4 [68.8–82.0] / 50.2 [31.2–69.3] | 140.4 [74.7–206.2] | 175.9 [144.2–207.7] | 5/6 | together |
-| 128K | warm read | 28.40 (4,615 tok/s) | 83.9 | - | - | - | - |
-| 128K | 1 | 0.42 [0.41–0.43] | 89.7 [89.4–90.1] | 89.7 [89.4–90.1] | 89.7 [89.4–90.1] | 2/2 | together |
-| 128K | 2 | 23.91 [0.48–47.33] / 0.56 [0.54–0.57] | 84.3 [83.8–84.8] / 56.9 [28.5–85.3] | 102.1 [34.7–169.5] | 141.2 [112.3–170.1] | 3/4 | together |
-| 128K | 3 | 24.48 [0.63–48.32] / 0.64 [0.55–0.73] / 0.59 [0.56–0.62] | 79.1 [74.4–83.8] / 51.3 [27.7–74.8] / 50.9 [27.8–73.9] | 136.3 [51.1–221.5] | 181.2 [139.3–223.2] | 5/6 | together |
-| 256K | warm read | 58.74 (4,463 tok/s) | 84.7 | - | - | - | - |
-| 256K | 1 | 0.61 [0.60–0.63] | 80.0 [79.6–80.5] | 80.0 [79.6–80.5] | 80.0 [79.6–80.5] | 2/2 | together |
-| 256K | 2 | 0.83 [0.75–0.91] / 40.26 [0.78–79.75] | 50.7 [25.7–75.6] / 79.9 [75.1–84.7] | 86.2 [22.5–150.0] | 130.5 [110.4–150.7] | 3/4 | together |
-| 256K | 3 | 40.98 [0.92–81.05] / 0.98 [0.89–1.07] / 0.89 [0.84–0.94] | 75.4 [66.1–84.8] / 45.8 [25.1–66.5] / 45.4 [25.1–65.8] | 115.0 [33.3–196.8] | 166.6 [134.9–198.3] | 5/6 | together |
+| 1K | warm read | 0.64 (1,601 tok/s) | 87.2 | - | - | - | - |
+| 1K | 1 | 0.20 [0.20–0.21] | 91.6 [91.1–92.0] | 91.6 [91.1–92.0] | 91.6 [91.1–92.0] | 0/2 | together |
+| 1K | 2 | 0.26 [0.21–0.31] / 0.48 [0.25–0.71] | 85.4 [83.2–87.5] / 85.0 [82.8–87.2] | 166.6 [159.1–174.1] | 170.3 [166.0–174.7] | 0/4 | together |
+| 1K | 3 | 0.64 [0.49–0.79] / 0.22 [0.21–0.24] / 0.36 [0.29–0.43] | 75.1 [73.4–76.8] / 74.5 [73.5–75.5] / 75.1 [73.8–76.5] | 218.7 [211.8–225.7] | 224.8 [220.7–228.9] | 0/6 | together |
+| 8K | warm read | 2.49 (3,284 tok/s) | 90.3 | - | - | - | - |
+| 8K | 1 | 0.21 [0.21–0.22] | 93.5 [93.1–93.9] | 93.5 [93.1–93.9] | 93.5 [93.1–93.9] | 2/2 | together |
+| 8K | 2 | 3.20 [0.30–6.09] / 0.26 [0.24–0.27] | 88.1 [86.9–89.3] / 80.7 [72.6–88.9] | 147.0 [116.3–177.6] | 168.8 [159.5–178.2] | 3/4 | together |
+| 8K | 3 | 3.33 [0.29–6.36] / 0.31 [0.27–0.34] / 0.29 [0.23–0.35] | 78.7 [78.0–79.5] / 72.1 [66.1–78.2] / 72.0 [66.4–77.6] | 197.3 [161.9–232.6] | 222.9 [211.9–233.8] | 5/6 | together |
+| 32K | warm read | 7.39 (4,435 tok/s) | 95.5 | - | - | - | - |
+| 32K | 1 | 0.27 [0.27–0.27] | 86.5 [86.1–87.0] | 86.5 [86.1–87.0] | 86.5 [86.1–87.0] | 2/2 | together |
+| 32K | 2 | 7.84 [0.31–15.38] / 0.33 [0.29–0.37] | 87.4 [82.3–92.6] / 64.8 [47.0–82.6] | 121.3 [78.3–164.4] | 152.2 [139.6–164.9] | 3/4 | together |
+| 32K | 3 | 0.38 [0.36–0.40] / 0.31 [0.30–0.33] / 8.14 [0.47–15.82] | 58.3 [44.4–72.1] / 58.1 [44.3–71.8] / 79.1 [72.4–85.7] | 163.4 [111.7–215.1] | 195.4 [174.4–216.4] | 5/6 | together |
+| 64K | warm read | 14.11 (4,645 tok/s) | 84.9 | - | - | - | - |
+| 64K | 1 | 0.34 [0.33–0.34] | 89.1 [88.7–89.6] | 89.1 [88.7–89.6] | 89.1 [88.7–89.6] | 2/2 | together |
+| 64K | 2 | 14.24 [0.35–28.12] / 0.40 [0.39–0.42] | 84.4 [83.9–85.0] / 59.4 [33.5–85.4] | 110.5 [51.2–169.8] | 143.8 [117.3–170.4] | 3/4 | together |
+| 64K | 3 | 0.49 [0.45–0.54] / 0.40 [0.39–0.42] / 14.62 [0.45–28.79] | 53.7 [32.4–75.0] / 53.4 [32.4–74.3] / 78.0 [74.5–81.5] | 148.8 [74.9–222.7] | 185.0 [146.3–223.8] | 5/6 | together |
+| 128K | warm read | 28.49 (4,601 tok/s) | 87.6 | - | - | - | - |
+| 128K | 1 | 0.44 [0.42–0.46] | 89.0 [88.6–89.4] | 89.0 [88.6–89.4] | 89.0 [88.6–89.4] | 2/2 | together |
+| 128K | 2 | 0.56 [0.51–0.60] / 24.38 [0.51–48.26] | 55.7 [26.6–84.9] / 85.8 [84.1–87.5] | 101.3 [34.4–168.2] | 141.6 [114.1–169.0] | 3/4 | together |
+| 128K | 3 | 0.65 [0.57–0.74] / 24.96 [0.63–49.28] / 0.59 [0.57–0.62] | 50.2 [25.9–74.4] / 80.8 [74.0–87.5] / 49.9 [26.0–73.8] | 135.8 [50.8–220.8] | 180.8 [139.4–222.3] | 5/6 | together |
+| 256K | warm read | 58.87 (4,453 tok/s) | 85.6 | - | - | - | - |
+| 256K | 1 | 0.69 [0.65–0.73] | 87.0 [86.5–87.5] | 87.0 [86.5–87.5] | 87.0 [86.5–87.5] | 2/2 | together |
+| 256K | 2 | 39.60 [0.97–78.24] / 0.86 [0.85–0.87] | 83.7 [82.1–85.3] / 54.8 [28.1–81.5] | 92.7 [22.9–162.6] | 138.5 [113.5–163.5] | 3/4 | together |
+| 256K | 3 | 0.93 [0.92–0.94] / 0.88 [0.87–0.90] / 40.15 [1.07–79.24] | 49.4 [27.5–71.4] / 49.3 [27.4–71.1] / 78.6 [71.9–85.3] | 123.4 [34.0–212.9] | 177.3 [140.1–214.5] | 5/6 | together |
 
 ## Predictions against results
 
@@ -1072,3 +1139,7 @@ MEASURED | 175 W per card | 1452 MHz clock cap | four slots | document in the pr
 | Three streams: the summed decode within the band; the aggregate column +4 to 7 % (Amendment 87) | as stated | the sum moved with the text (-4.0 to +7.5 %); the aggregate +0.0 to +4.5 % and -1.7 at worst: wrong, the column starts at the earliest first token, not the first request's start (the 2026-11-18 description was wrong) | final bench |
 | Prefix hits unchanged (128K 0.40 to 0.47 s; 390 / 254 / 228 tok/s on one cached 128K document); warm reads +4 to 7 % (Amendment 87) | as stated | 0.42 to 0.43 s; 399.8 / 242.2 / 221.5; warm reads 4.0 to 4.2 % faster: met | prefix measure |
 | The bench 85 to 100 minutes, the measure 40 to 50, about 2 h 15 in all (Amendment 87) | as stated | 91 min 34 s; 43 min 42 s; 2 h 15 min 16 s: met | final bench |
+| B4: not identical, CLEAN and HOLDS against the o2 yardstick; reads within 3 % either way; decode under 2 % either way (Amendment 88) | as stated | identical 1 of 7, CLEAN, HOLDS (45 to 48 against 50; 0.0350 to 0.0366 against 0.0307): met; reads -0.3 to +0.8 %: met; decode one fresh +1.3 % met, the repeated and four-together cells +4.7 and +4.3 % (the text moved): exceeded upward | b4a |
+| B3: line c (speed) is the line that fails, by a cost estimate of 6 to 12 % of a 128K read (the window's rule, Amendment 88) | fails on c | line b (closeness) failed first, median first divergence 13 against 50; c never ran: wrong on the deciding line; the probe's board cost 2.2 times a large call stands | b3a |
+| A hit IDENTICAL to its cold read on every prompt under B3 and B4 (the B3 rule's line e, ESTIMATE) | 9 of 9 | B3 did not serve; under B4 alone identical 4 of 9, median first divergence 25: not met (D11) | b3a |
+| The bench and the measure about 2 h 15 min on the eleven-line set, the users holding once (Amendment 89) | 2 h 15 | 91 min 13 s; 43 min 58 s; 2 h 15 min 11 s: met | bench 2026-11-19, second |
