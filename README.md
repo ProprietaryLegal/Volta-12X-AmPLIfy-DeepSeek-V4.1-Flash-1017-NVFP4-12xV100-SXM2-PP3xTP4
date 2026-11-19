@@ -12,7 +12,7 @@ and optimization plan, the time budget and the tools whose cleaning is done. Wha
 
 Built by **Nick Mermiges, Esq.**, founder of [PLI Labs](https://proprietarylegal.ai/labs.html) · [proprietarylegal.ai](https://proprietarylegal.ai)
 
-[What this is](#what-this-is) · [What runs](#what-runs) · [Measured](#measured) · [What worked](#what-worked) ·
+[At a glance](#at-a-glance) · [What this is](#what-this-is) · [What runs](#what-runs) · [Measured](#measured) · [What worked](#what-worked) ·
 [What did not work](#what-did-not-work-or-is-not-yet-good) · [In progress](#in-progress) · [Next](#next) ·
 [Hardware](#hardware) · [Running it](#running-it) · [Repository layout](#repository-layout) ·
 [Related builds](#related-builds)
@@ -21,6 +21,31 @@ Every figure on this page is labelled. **MEASURED** means a log or probe on our 
 (windows are short labels such as `o2`, `s4`, `t1`, `p1`; dates and UTC times are in
 [docs/measurements.md](docs/measurements.md)). **ESTIMATED** means arithmetic or a model, with its basis.
 **UPSTREAM** means someone else's number. A figure from one run says so.
+
+## At a glance
+
+MEASURED 2026-11-18 on the serving set (kit 9N, nine adopted switches), 175 W per card, 1,452 MHz clock cap, four
+slots, cold reads, thinking off, 1,024 tokens out, mean of two runs; the prompts are a code file, a legal brief and
+prose. Three figures in a cell are **code / legal / prose**. Full tables with min-max and every stream: [Measured](#measured).
+
+| Context (prompt tokens) | One request: decode tok/s | One request: prompt read tok/s | One request: first token, cold | Three requests together: decode tok/s, summed | First token, document already cached |
+|---|---|---|---|---|---|
+| **1K** | 178 / 99 / 84 | 1,491 / 1,383 / 1,559 | 0.7 / 0.8 / 0.7 s | 432 / 248 / 213 | 0.2 s (no hit by the quarter rule: the read itself is 0.7 s) |
+| **8K** | 170 / 102 / 94 | 3,147 / 2,920 / 2,953 | 2.6 / 2.8 / 2.8 s | 413 / 259 / 226 | 0.2 s |
+| **32K** | 173 / 89 / 90 | 4,178 / 3,086 / 3,751 | 7.8 / 12.3 / 8.9 s | 398 / 209 / 212 | 0.2 s |
+| **64K** | 166 / 94 / 85 | 4,414 / 3,746 / 3,670 | 14.9 / 18.1 / 18.7 s | 379 / 218 / 205 | 0.3 s |
+| **128K** | 161 / 87 / 87 | 4,444 / 3,794 / 4,033 | 29.5 / 35.4 / 32.8 s | 364 / 205 / 200 | 0.4 to 0.5 s |
+| **256K** | 168 / 94 / 79 | 4,152 / 4,076 / 4,159 | 63.3 / 64.4 / 63.1 s | 368 / 209 / 178 | 0.7 s |
+
+- **Context and slots.** 524,288 tokens of context per request; four conversations kept warm at once (four slots).
+- **Three requests together.** Each stream's own decode rate while all three stream, summed: the throughput once
+  every prompt is in. The pipeline carries one request per step, so long prompts are read one after another and
+  the later streams wait for the earlier reads; counted over the whole joint window, three cold 128K requests give
+  139 / 109 / 108 tok/s. With the document already in the cache the wait disappears: three code streams on one cached
+  128K document decode 390 tok/s over the joint window (legal 254, prose 228), within 2 % of the sum.
+- **Cached documents.** A request on a document the server has already read gets its first token in under a second at
+  every length (the last column). The first time a second or a third stream shares a document the server reads it
+  once more; after that every stream hits.
 
 ## What this is
 
