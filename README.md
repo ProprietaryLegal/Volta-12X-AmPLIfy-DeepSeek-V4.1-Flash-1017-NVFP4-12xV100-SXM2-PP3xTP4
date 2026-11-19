@@ -69,8 +69,7 @@ know):
 
 ## Fourth release (2026-11-19, afternoon, commit `03f71bc`): what changed
 
-Measured by window b4a (12:30:04Z to 13:13:21Z) on two boots of one kind at 175 W per card and the 1,452 MHz clock
-ceiling: `Wr` = kit 9S with the ten lines of the third release, `Wc` = the same with `TM_GEMM_TUNE=max_splits=1`.
+Measured by window b4a (12:30:04Z to 13:13:21Z) on two boots of one kind at the serving cap: `Wr` = kit 9S with the ten lines of the third release, `Wc` = the same with `TM_GEMM_TUNE=max_splits=1`.
 Window b3a (13:45:04Z to 14:08:19Z) then tried the exact four-card sum. The bench and the prefix-sharing measure ran on
 the serving port without a restart, 14:09:20Z to 16:24:31Z, against the same two measures of the morning on the ten
 lines (05:53Z to 08:08Z). Every cell is copied from [docs/measurements.md](docs/measurements.md) (windows b4a and b3a,
@@ -122,7 +121,7 @@ row count, and `tools/tm_dispatch_emulation.py` re-implements that cost model to
 
 ## Third release (2026-11-19, morning, commit `6985aa1`): what changed
 
-Measured by window c2a (03:19:25Z to 03:55:51Z) on two boots of kit 9S at 175 W and the 1,452 MHz ceiling: `Wr` with
+Measured by window c2a (03:19:25Z to 03:55:51Z) on two boots of kit 9S at the serving cap: `Wr` with
 `VLLM_V41_WO_A_BATCHED_4K` off (the nine lines of the second release), `Wc` with it on. Windows st5 to st7, c3a, c3b and
 c7a tried the other levers of the plan's list and failed their lines. The bench and the prefix-sharing measure ran again
 on the serving boot of c7a without a restart, 05:53:12Z to 08:08:28Z, against the closing bench of 2026-11-18 on the nine
@@ -179,19 +178,19 @@ No outside code is new in this release. Kits 9S, 9Q, 9T, 9R and 9U are ours; the
 
 Measured by the windows p2s to q1 of 2026-11-18, each a reference boot against a candidate with one change, its rule
 written before its data, and by the closing bench on the serving set (21:01Z to 22:36Z) with the prefix-sharing measure
-(22:38Z to 23:22Z). The first release served kit 6c with no adopted line at 200 W; the second serves kit 9N with nine
-lines at 175 W and the 1,452 MHz ceiling. The power changed in between (the host tripped at 200 W, below), so each row
-names its power, and a row compares only figures of one window where it can.
+(22:38Z to 23:22Z). The first release served kit 6c with no adopted line; the second serves kit 9N with nine lines at the
+serving cap named under Results. The cap was higher before the host tripped (below): windows p1, p2, p3b and p3c and the
+runs after g1 ran at that higher cap, so a row setting them beside the second release crosses caps, and a row compares
+only figures of one window where it can.
 
 | | Before: the first release, or the window's reference boot | After: the second release | Change | Measured in |
 |---|---|---|---|---|
 | Kit and lines | `PP3KIT6c-over-cut`, no lines (the first release) | `PP3KIT9N-over-cut`; the nine lines of the table above, all but the batched projection and the split count | | p2s to p6b |
-| Power and clock | 200 W, 1,477 MHz | 175 W, 1,452 MHz ceiling (cards at 1,447 MHz) | | |
-| Cold reads of 60,704 / 93,027 / 247,952 / 425,776 tokens, 200 W, the release setting and the middle-stage skip | 3,810 / 3,696 / 3,284 / 2,757 tok/s (kit 8, `off`) | 4,562 / 4,515 / 4,405 / 4,223 tok/s (`adopt`) | +19.7 / +22.1 / +34.1 / +53.2 % (line: +5 % at 93K) | p2 |
-| One cold read of about 425,780 tokens, the only request on the serving port | 173.49 s, 2,454 tok/s (kit 8 `off`, 200 W) | 102.73 s, 4,145 tok/s (175 W) | | p1; p5u |
-| Decode round at about 128K, after a one-step turn / after a cold read | 28.2 / 26.3 ms (p3b's reference boot, kit 9M with the loop switches off, 200 W) | 25.8 / 25.7 ms | | p3b; p6b |
+| Cold reads of 60,704 / 93,027 / 247,952 / 425,776 tokens, the release setting and the middle-stage skip | 3,810 / 3,696 / 3,284 / 2,757 tok/s (kit 8, `off`) | 4,562 / 4,515 / 4,405 / 4,223 tok/s (`adopt`) | +19.7 / +22.1 / +34.1 / +53.2 % (line: +5 % at 93K) | p2 |
+| One cold read of about 425,780 tokens, the only request on the serving port | 173.49 s, 2,454 tok/s (kit 8 `off`) | 102.73 s, 4,145 tok/s | | p1; p5u |
+| Decode round at about 128K, after a one-step turn / after a cold read | 28.2 / 26.3 ms (p3b's reference boot, kit 9M with the loop switches off) | 25.8 / 25.7 ms | | p3b; p6b |
 | Decode round on a short chat | 25.5 ms (the same boot) | 24.4 ms | | p3b; p6b |
-| Four requests together, fresh text, sum | 312.1 tok/s (kit 6c, 200 W, one run) | 337.9 tok/s | +6.7 % against the same window's reference boot without the scorer (316.6) | after g1; p6b |
+| Four requests together, fresh text, sum | 312.1 tok/s (kit 6c, one run) | 337.9 tok/s | +6.7 % against the same window's reference boot without the scorer (316.6) | after g1; p6b |
 | First token of a turn alone on a 128,000-token chat, +880 / +2,048 / +4,200 / +10,000 new tokens (medians of two) | 1.184 / 2.061 / 3.687 / 4.963 s (`off`, the serving lines without the two switches) | 1.131 / 1.471 / 2.319 / 3.623 s (turn chunks) | +4,200: 63 % of `off` (line: at most 75 %) | p5 |
 | A turn of 880 tokens beside another chat's 248,000-token read, the whole turn (medians of three) | 11.99 s | 5.12 s; the read's first token 60.99 s against 62.66 | -57 % (line: -50 %) | p5 |
 | The front of a turn on a 128,000-token chat (template, tokenizing, hashing), median of 20 turns | 308.0 ms | 47.2 ms | 0 of 20 turns not faster (line: 150 ms) | p4b |
@@ -199,7 +198,7 @@ names its power, and a row compares only figures of one window where it can.
 | Closing bench, one stream at 128K, decode / prefill, code / legal / prose | | 161.1 / 86.9 / 87.3 tok/s; 4,444 / 3,794 / 4,033 tok/s | first bench of the build | bench of 2026-11-18 |
 
 What the windows found beyond the table. The middle-stage skip was PREDICTED at +3 to +8 % and gave +10.4 % at 61K to
-+49.6 % at 426K alone: wrong, low, the gain growing with length. In p3c (200 W) the engine core's own counters showed
++49.6 % at 426K alone: wrong, low, the gain growing with length. In p3c the engine core's own counters showed
 2.83 ms from an answer to the next submission after a one-step turn; with the spacing step submitted ahead the round
 shortened by 1.157 ms on a short chat and 1.179 ms at 128K (-4.55 / -4.19 %), PREDICTED 1.14 to 1.27 ms, met. The turn
 chunks are another rounding of the same arithmetic, so the accepted capture became `quality-TC3.json`. The tensor-core
@@ -222,17 +221,18 @@ on twelve workers in p6b) and carries tests computed by hand from the real lines
 The build's record after window p1: kit 6c serving at four slots under the card limit, the measurements of windows w1 to
 p1, the architecture, the history, the kernel and optimization plan, the time budget and three reviews. Kit 6c is 11
 files over `f20d155`: three pipeline stages, the scheduler's spacing rule for a pipeline of three, up to eight slots, the
-middle stage's memory changes and the optional card limit.
+middle stage's memory changes and the optional card limit. Windows s4 and o2 ran at a lower power cap than the serving
+one, p1, t1 and the runs after g1 at a higher one.
 
 | What | Figure | Window |
 |---|---|---|
-| One request, fresh / repeated text, four slots | 128.1 / 176.6 tok/s at 150 W; 129.7 / 179.2 at 200 W (one run) | s4; after g1 |
-| Four requests together, fresh / repeated, sum | 306.6 / 453.4 tok/s at 150 W (60.5 to 85.5 and 110.9 to 117.8 each); 312.1 / 447.5 at 200 W (one run) | s4; after g1 |
-| Three requests together, fresh / repeated, sum, 150 W | 288.0 / 444.6 tok/s | o2 |
-| Prompt read, one 62,263-token prompt | 3,284 tok/s at 150 W; 3,733 at 200 W (+13.7 %, one run) | s4; after g1 |
-| Cold reads of 60,706 / 93,025 / 247,953 / 425,777 tokens, 200 W, one run | 3,850 / 3,833 / 3,316 / 2,454 tok/s | p1 |
-| One-request decode round, 200 W, one run | 25.1 ms | t1 |
-| The release setting, 200 W | reads +12.6 % at 61K and +9.9 % at 93K, identical answers, no higher memory peak | p1 |
+| One request, fresh / repeated text, four slots | 128.1 / 176.6 tok/s (s4); 129.7 / 179.2 (after g1, one run) | s4; after g1 |
+| Four requests together, fresh / repeated, sum | 306.6 / 453.4 tok/s (s4; 60.5 to 85.5 and 110.9 to 117.8 each); 312.1 / 447.5 (after g1, one run) | s4; after g1 |
+| Three requests together, fresh / repeated, sum | 288.0 / 444.6 tok/s | o2 |
+| Prompt read, one 62,263-token prompt | 3,284 tok/s (s4); 3,733 (after g1, +13.7 %, one run) | s4; after g1 |
+| Cold reads of 60,706 / 93,025 / 247,953 / 425,777 tokens, one run | 3,850 / 3,833 / 3,316 / 2,454 tok/s | p1 |
+| One-request decode round, one run | 25.1 ms | t1 |
+| The release setting | reads +12.6 % at 61K and +9.9 % at 93K, identical answers, no higher memory peak | p1 |
 | Load, launch to ready | 134 s | s4 |
 | Highest card sample, four grown chats at once | 30,398 MiB (29,838 / 30,398 / 28,892 by stage); 0 out-of-memory lines | s4 |
 
@@ -257,7 +257,7 @@ is the precedent for taking the embedding off the middle stage (our change is ne
 ## Results
 
 All numbers are ours, MEASURED with our own clients on the twelve-card host, on the serving set since window b4a: kit
-`PP3KIT9S-over-cut`, the eleven adopted lines, four slots, 175 W per card and the 1,452 MHz clock ceiling, unless a row
+`PP3KIT9S-over-cut`, the eleven adopted lines, four slots, 175 W per card and the 1,452 MHz clock ceiling (cards at 1,447 MHz), unless a row
 names another window. Greedy decoding, thinking off, 1,024 tokens out, unless a row says otherwise. The bench and the
 prefix-sharing measure ran on the serving port without a restart (14:09:20Z to 16:24:31Z on 2026-11-19), their users
 holding their traffic; the earlier releases' rows are in their sections above, and the earlier benches stay in
@@ -341,7 +341,7 @@ How to read these figures:
   repeat: code 432.7 tok/s summed and 426.6 over the window, legal 232.0 and 230.1, prose 222.5 and 221.0. The first
   time a second or a third stream shares a document the server reads it once more; after that every stream hits.
 
-Fixed cells, one boot each, the serving arithmetic (four slots, 175 W):
+Fixed cells, one boot each, the serving arithmetic (four slots):
 
 | Row | Result | Measured in |
 |---|---|---|
@@ -352,7 +352,7 @@ Fixed cells, one boot each, the serving arithmetic (four slots, 175 W):
 | Cold reads of 60,706 / 93,028 / 247,953 / 425,783 tokens, the only request | 4,659 / 4,756 / 4,552 / 4,314 tok/s; first token 13.03 / 19.56 / 54.47 / 98.70 s | b4a, `Wc` |
 | Load, launch to ready | 164 to 197 s | st7, c3a |
 
-Where the time goes, from the engine's own timers and the torch profiler (window t1, kit 6c, 200 W, one run;
+Where the time goes, from the engine's own timers and the torch profiler (window t1, kit 6c, one run;
 [research/TWELVE-CARD-TIME-BUDGET.md](research/TWELVE-CARD-TIME-BUDGET.md)): one 4,092-row prompt chunk's median forward
 span is 793 / 891 / 844 ms by stage, of which experts with the shared layer, router and their sums are 318 / 334 / 271
 ms, attention 119 / 130 / 112 ms and the index 53 / 142 / 222 ms (it grows with context). A one-request decode round was
@@ -365,8 +365,8 @@ ms at 128,000 tokens and 31.0 ms at 249,000, the growth being the index.
 |---|---|---|
 | Context | 524,288 tokens a request, four slots | the profile |
 | One cold read of 425,783 tokens, the only request | first token 98.70 s, 4,314 tok/s | b4a |
-| Four documents of 110,000 to 140,000 tokens read at once | first token after 129 to 166 s each | s4 (kit 6c, 150 W) |
-| A turn alone on a 128,000-token chat, with the turn chunks, first token (medians of two) | +880 new tokens 1.131 s; +2,048 1.471 s; +4,200 2.319 s; +10,000 3.623 s | p5 (175 W) |
+| Four documents of 110,000 to 140,000 tokens read at once | first token after 129 to 166 s each | s4 (kit 6c) |
+| A turn alone on a 128,000-token chat, with the turn chunks, first token (medians of two) | +880 new tokens 1.131 s; +2,048 1.471 s; +4,200 2.319 s; +10,000 3.623 s | p5 |
 | A turn of 880 tokens beside another chat's 248,000-token read, with the hold (medians of three) | first token 3.26 s, whole turn 5.12 s; the read's first token 60.99 s | p5 |
 | The front of a turn on a 128,000-token chat (template, tokenizing, hashing), with the token cache | 47.2 ms (median of 20 turns) | p4b |
 | Prefix hits in the measure | 150 of 216: the 36 requests at 1K are not hits by the rule, and 30 requests re-read the document, one per new slot the first time a second or a third stream shared it, never after | measure 15:40Z |
@@ -427,8 +427,8 @@ better for a given kind of work, and answer quality in use is not established by
 | Input | Value | Source |
 |---|---|---|
 | Card limit | `VLLM_V41_CARD_LIMIT_MIB=31998` on every stage; allocator limits 31,131 / 31,117 / 31,133 MiB by stage | k1 |
-| Power limit | 175 W per card since 2026-11-18 12:09:23Z. Before: 150 W to 2026-11-17 18:58Z; 200 W to 2026-11-18 11:15:48Z, when the host tripped under four long chats; 150 W from 11:45Z | measurements, Conditions |
-| Clock ceiling | 1,452 MHz (cards at 1,447 MHz) since the same moment; 1,477 MHz before | same |
+| Power limit | the cap named under Results, since 2026-11-18 12:09:23Z; the earlier caps, and the host's trip under the higher one at 11:15:48Z, are in [docs/measurements.md](docs/measurements.md), Conditions | measurements, Conditions |
+| Clock ceiling | the ceiling named under Results, since the same moment; a higher one before | same |
 | Profile | pipeline parallel 3, tensor parallel 4, `VLLM_PP_LAYER_PARTITION=14,14,12`; `max-num-batched-tokens 4096` (4,092-row chunks); `max-num-seqs 4`; context 524,288; residency `two_tier` with every routed expert hot; per-stage reserves 3,686 / 3,686 / 7,361 MiB | [docs/OPERATIONS.md](docs/OPERATIONS.md) |
 | Device order | the first stage's four cards first (the Engram reader requires device = rank), then stage 1, then stage 2; the first hand-off inside one PCIe switch | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), section 9 |
 | Accepted capture | `accepted/quality-TC3-WOA4K-S1.json`, decided in one place from the adopted lines | b4a |
@@ -440,7 +440,7 @@ better for a given kind of work, and answer quality in use is not established by
 
 | Serving set | Served | Decode, one stream, code, 128K | Measured in |
 |---|---|---|---|
-| Kit 6c, no lines (first release) | 2026-11-17, from window w5, to 2026-11-18 04:17Z | not benched at 128K; one request on fresh text 128.1 tok/s (150 W), 129.7 (200 W) | s4; after g1 |
+| Kit 6c, no lines (first release) | 2026-11-17, from window w5, to 2026-11-18 04:17Z | not benched at 128K; one request on fresh text 128.1 tok/s (s4), 129.7 (after g1) | s4; after g1 |
 | Kit 8, then kit 9M, one to eight lines | 2026-11-18 04:29:52Z to 20:19:16Z | not benched | p2s to p5u |
 | Kit 9N, nine lines (second release) | 2026-11-18 20:19:16Z to 2026-11-19 03:55:51Z | 161.1 tok/s | bench of 2026-11-18 |
 | Kit 9S, ten lines (third release) | 2026-11-19 03:55:51Z to 12:30Z | 175.0 tok/s | morning bench |
@@ -476,8 +476,8 @@ the drafter is on (it was off only in the quality window's one-slot boots). New 
   a board; the pipeline hand-off between boards goes over PCIe. On our host two boards sit behind one PEX88096 switch
   and the third behind a PLX 8749: the first hand-off stays inside the PEX switch, the second crosses host bridges.
 - PCIe ACS redirect cleared on the switches above the cards: with it set, card-to-card transfers hang.
-- A power supply that holds twelve cards under long prompts: at 200 W a card our host ended without a shutdown sequence
-  under four long chats (2026-11-18 11:15:48Z); the build runs at 175 W and a 1,452 MHz ceiling.
+- A power supply that holds twelve cards under long prompts: at a higher power cap our host ended without a shutdown
+  sequence under four long chats (2026-11-18 11:15:48Z); the build runs at the cap and ceiling named under Results.
 - Volta has FP16 `mma.sync.m8n8k4` only, with no FP4 or FP8 tensor cores: every 4-bit format is decoded in software
   into FP16 operands, so low-bit experts pay by reading fewer bytes, not by faster math.
 - The engine of PLI Labs' eight-card builds at commit `f20d155` (1Cat-vLLM #1277 with Volta sPLIt's patch series and
@@ -531,8 +531,8 @@ chains are not in this release; both pages say what they do, so the steps can be
   one-sided now, thresholds unmoved; a judge whose units did not match failed the scorer in p6, rerun as p6b on the
   corrected line, not re-judged; a witness waiting for a one-time line passed by chance in p4b and failed by chance in
   p5t, and the check now sends the lone request that prints it.
-- **The power trip at 200 W** (2026-11-18 11:15:48Z). Long prompts read about a third slower at 150 W than at 200 W (the
-  426K read 152.0 s against 100.8 s, p3r and p2); 175 W gives 102.7 to 104.5 s. The restart tool of the standing rule
+- **The power trip at a higher power cap** (2026-11-18 11:15:48Z). Long prompts read about a third slower at a lower cap
+  than at that higher one (the 426K read 152.0 s against 100.8 s, p3r and p2); the serving cap gives 102.7 to 104.5 s. The restart tool of the standing rule
   required kit 6c and could not have started the build; it is to be fixed to serve what the record names.
 - **The conversation store, the lean pipeline hand-off, the packed expert records and the exact four-card sum** failed
   their lines (third and fourth releases above).
