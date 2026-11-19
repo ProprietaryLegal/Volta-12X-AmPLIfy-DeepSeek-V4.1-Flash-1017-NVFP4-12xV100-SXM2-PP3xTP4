@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="392" viewBox="0 0 880 392" role="img" aria-label="First token: cold read against a document already in the cache (seconds, log scale)">
+<rect width="880" height="392" fill="#fcfcfb"/>
+<text x="24.0" y="30.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" fill="#1a1a19" text-anchor="start" font-weight="600">First token: cold read against a document already in the cache (seconds, log scale)</text>
+<text x="24.0" y="50.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#5c5b56" text-anchor="start" font-weight="normal">One request. MEASURED 2026-11-18, 175 W. A cached document gives the first token in under a second at every length.</text>
+<circle cx="29" cy="70" r="5" fill="#2a78d6"/>
+<text x="38.0" y="74.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#5c5b56" text-anchor="start" font-weight="normal">cold read</text>
+<circle cx="122.4" cy="70" r="5" fill="#eb6834"/>
+<text x="131.4" y="74.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#5c5b56" text-anchor="start" font-weight="normal">document already cached</text>
+<text x="64.0" y="100.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#1a1a19" text-anchor="start" font-weight="600">Code</text>
+<line x1="64" x2="380" y1="330.0" y2="330.0" stroke="#e4e3df" stroke-width="1"/>
+<text x="56.0" y="334.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="end" font-weight="normal">0.1 s</text>
+<line x1="64" x2="380" y1="257.3" y2="257.3" stroke="#e4e3df" stroke-width="1"/>
+<text x="56.0" y="261.3" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="end" font-weight="normal">1 s</text>
+<line x1="64" x2="380" y1="184.7" y2="184.7" stroke="#e4e3df" stroke-width="1"/>
+<text x="56.0" y="188.7" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="end" font-weight="normal">10 s</text>
+<line x1="64" x2="380" y1="112.0" y2="112.0" stroke="#e4e3df" stroke-width="1"/>
+<text x="56.0" y="116.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="end" font-weight="normal">100 s</text>
+<text x="90.3" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">1K</text>
+<path d="M69.3,330 v-57.0 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v57.0 z" fill="#2a78d6"/>
+<path d="M91.3,330 v-19.4 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v19.4 z" fill="#eb6834"/>
+<text x="143.0" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">8K</text>
+<path d="M122.0,330 v-98.9 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v98.9 z" fill="#2a78d6"/>
+<path d="M144.0,330 v-19.4 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v19.4 z" fill="#eb6834"/>
+<text x="195.7" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">32K</text>
+<path d="M174.7,330 v-133.7 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v133.7 z" fill="#2a78d6"/>
+<path d="M196.7,330 v-24.9 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v24.9 z" fill="#eb6834"/>
+<text x="248.3" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">64K</text>
+<path d="M227.3,330 v-153.8 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v153.8 z" fill="#2a78d6"/>
+<path d="M249.3,330 v-31.7 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v31.7 z" fill="#eb6834"/>
+<text x="301.0" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">128K</text>
+<path d="M280.0,330 v-175.5 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v175.5 z" fill="#2a78d6"/>
+<text x="290.0" y="145.5" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#1a1a19" text-anchor="middle" font-weight="600">29.5</text>
+<path d="M302.0,330 v-41.3 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v41.3 z" fill="#eb6834"/>
+<text x="312.0" y="279.7" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#1a1a19" text-anchor="middle" font-weight="600">0.4</text>
+<text x="353.7" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">256K</text>
+<path d="M332.7,330 v-199.6 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v199.6 z" fill="#2a78d6"/>
+<text x="342.7" y="121.4" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#1a1a19" text-anchor="middle" font-weight="600">63.3</text>
+<path d="M354.7,330 v-55.6 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v55.6 z" fill="#eb6834"/>
+<text x="364.7" y="265.4" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#1a1a19" text-anchor="middle" font-weight="600">0.7</text>
+<text x="468.0" y="100.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#1a1a19" text-anchor="start" font-weight="600">Legal</text>
+<line x1="468" x2="784" y1="330.0" y2="330.0" stroke="#e4e3df" stroke-width="1"/>
+<text x="460.0" y="334.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="end" font-weight="normal">0.1 s</text>
+<line x1="468" x2="784" y1="257.3" y2="257.3" stroke="#e4e3df" stroke-width="1"/>
+<text x="460.0" y="261.3" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="end" font-weight="normal">1 s</text>
+<line x1="468" x2="784" y1="184.7" y2="184.7" stroke="#e4e3df" stroke-width="1"/>
+<text x="460.0" y="188.7" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="end" font-weight="normal">10 s</text>
+<line x1="468" x2="784" y1="112.0" y2="112.0" stroke="#e4e3df" stroke-width="1"/>
+<text x="460.0" y="116.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="end" font-weight="normal">100 s</text>
+<text x="494.3" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">1K</text>
+<path d="M473.3,330 v-59.6 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v59.6 z" fill="#2a78d6"/>
+<path d="M495.3,330 v-16.3 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v16.3 z" fill="#eb6834"/>
+<text x="547.0" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">8K</text>
+<path d="M526.0,330 v-101.5 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v101.5 z" fill="#2a78d6"/>
+<path d="M548.0,330 v-20.9 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v20.9 z" fill="#eb6834"/>
+<text x="599.7" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">32K</text>
+<path d="M578.7,330 v-147.8 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v147.8 z" fill="#2a78d6"/>
+<path d="M600.7,330 v-26.2 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v26.2 z" fill="#eb6834"/>
+<text x="652.3" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">64K</text>
+<path d="M631.3,330 v-160.0 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v160.0 z" fill="#2a78d6"/>
+<path d="M653.3,330 v-31.7 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v31.7 z" fill="#eb6834"/>
+<text x="705.0" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">128K</text>
+<path d="M684.0,330 v-181.2 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v181.2 z" fill="#2a78d6"/>
+<text x="694.0" y="139.8" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#1a1a19" text-anchor="middle" font-weight="600">35.4</text>
+<path d="M706.0,330 v-44.8 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v44.8 z" fill="#eb6834"/>
+<text x="716.0" y="276.2" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#1a1a19" text-anchor="middle" font-weight="600">0.5</text>
+<text x="757.7" y="348.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="middle" font-weight="normal">256K</text>
+<path d="M736.7,330 v-200.1 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v200.1 z" fill="#2a78d6"/>
+<text x="746.7" y="120.9" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#1a1a19" text-anchor="middle" font-weight="600">64.4</text>
+<path d="M758.7,330 v-55.6 a4,4 0 0 1 4,-4 h12 a4,4 0 0 1 4,4 v55.6 z" fill="#eb6834"/>
+<text x="768.7" y="265.4" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#1a1a19" text-anchor="middle" font-weight="600">0.7</text>
+<text x="24.0" y="378.0" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="10.5" fill="#5c5b56" text-anchor="start" font-weight="normal">Cached: the server has read the document before (another slot or an earlier turn); the first time a second or third stream shares it the server reads it once more.</text>
+</svg>

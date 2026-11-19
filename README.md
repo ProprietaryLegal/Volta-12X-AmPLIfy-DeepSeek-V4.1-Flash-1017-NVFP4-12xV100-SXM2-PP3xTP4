@@ -24,28 +24,55 @@ Every figure on this page is labelled. **MEASURED** means a log or probe on our 
 
 ## At a glance
 
-MEASURED 2026-11-18 on the serving set (kit 9N, nine adopted switches), 175 W per card, 1,452 MHz clock cap, four
-slots, cold reads, thinking off, 1,024 tokens out, mean of two runs; the prompts are a code file, a legal brief and
-prose. Three figures in a cell are **code / legal / prose**. Full tables with min-max and every stream: [Measured](#measured).
+**161 tokens a second** on a code request with 128,000 tokens of context, a 128,000-token file read in **30 seconds**
+(4,444 tok/s), **four conversations** kept warm with **524,288 tokens** of context each. MEASURED 2026-11-18 on the
+serving set (kit 9N, nine adopted switches), 175 W per card, 1,452 MHz clock cap, four slots, cold reads, thinking off,
+1,024 tokens out, mean of two runs. Prose figures, min-max and every stream are in [Measured](#measured).
 
-| Context (prompt tokens) | One request: decode tok/s | One request: prompt read tok/s | One request: first token, cold | Three requests together: decode tok/s, summed | First token, document already cached |
-|---|---|---|---|---|---|
-| **1K** | 178 / 99 / 84 | 1,491 / 1,383 / 1,559 | 0.7 / 0.8 / 0.7 s | 432 / 248 / 213 | 0.2 s (no hit by the quarter rule: the read itself is 0.7 s) |
-| **8K** | 170 / 102 / 94 | 3,147 / 2,920 / 2,953 | 2.6 / 2.8 / 2.8 s | 413 / 259 / 226 | 0.2 s |
-| **32K** | 173 / 89 / 90 | 4,178 / 3,086 / 3,751 | 7.8 / 12.3 / 8.9 s | 398 / 209 / 212 | 0.2 s |
-| **64K** | 166 / 94 / 85 | 4,414 / 3,746 / 3,670 | 14.9 / 18.1 / 18.7 s | 379 / 218 / 205 | 0.3 s |
-| **128K** | 161 / 87 / 87 | 4,444 / 3,794 / 4,033 | 29.5 / 35.4 / 32.8 s | 364 / 205 / 200 | 0.4 to 0.5 s |
-| **256K** | 168 / 94 / 79 | 4,152 / 4,076 / 4,159 | 63.3 / 64.4 / 63.1 s | 368 / 209 / 178 | 0.7 s |
+**Code** (a source file as the prompt)
 
-- **Context and slots.** 524,288 tokens of context per request; four conversations kept warm at once (four slots).
-- **Three requests together.** Each stream's own decode rate while all three stream, summed: the throughput once
-  every prompt is in. The pipeline carries one request per step, so long prompts are read one after another and
-  the later streams wait for the earlier reads; counted over the whole joint window, three cold 128K requests give
-  139 / 109 / 108 tok/s. With the document already in the cache the wait disappears: three code streams on one cached
-  128K document decode 390 tok/s over the joint window (legal 254, prose 228), within 2 % of the sum.
+| Context (prompt tokens) | Decode tok/s, one request | Prompt read tok/s | First token, cold | Three requests together, tok/s summed | First token, document already cached |
+|---|---:|---:|---:|---:|---:|
+| **1K** | 178 | 1,491 | 0.7 s | 432 | 0.2 s* |
+| **8K** | 170 | 3,147 | 2.6 s | 413 | 0.2 s |
+| **32K** | 173 | 4,178 | 7.8 s | 398 | 0.2 s |
+| **64K** | 166 | 4,414 | 14.9 s | 379 | 0.3 s |
+| **128K** | 161 | 4,444 | 29.5 s | 364 | 0.4 s |
+| **256K** | 168 | 4,152 | 63.3 s | 368 | 0.7 s |
+
+**Legal** (a brief as the prompt)
+
+| Context (prompt tokens) | Decode tok/s, one request | Prompt read tok/s | First token, cold | Three requests together, tok/s summed | First token, document already cached |
+|---|---:|---:|---:|---:|---:|
+| **1K** | 99 | 1,383 | 0.8 s | 248 | 0.2 s* |
+| **8K** | 102 | 2,920 | 2.8 s | 259 | 0.2 s |
+| **32K** | 89 | 3,086 | 12.3 s | 209 | 0.3 s |
+| **64K** | 94 | 3,746 | 18.1 s | 218 | 0.3 s |
+| **128K** | 87 | 3,794 | 35.4 s | 205 | 0.5 s |
+| **256K** | 94 | 4,076 | 64.4 s | 209 | 0.7 s |
+
+\* At 1K the request's fixed cost is most of the read, so the cache cannot show.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/decode-by-context-dark.svg">
+  <img alt="Decode speed by context length: one request and three together, code and legal" src="docs/img/decode-by-context-light.svg" width="880">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/first-token-dark.svg">
+  <img alt="First token on a cold read against a document already cached, log scale, code and legal" src="docs/img/first-token-light.svg" width="880">
+</picture>
+
+- **Three requests together** is each stream's own decode rate while all three stream, summed: the throughput once every
+  prompt is in. The pipeline carries one request per step, so long prompts are read one after another and the later
+  streams wait for the earlier reads; counted over the whole joint window, three cold 128K requests give 139 tok/s on
+  code and 109 on legal. With the document already in the cache the wait disappears: three code streams on one cached
+  128K document decode 390 tok/s over the joint window (legal 254), within 2 % of the sum.
 - **Cached documents.** A request on a document the server has already read gets its first token in under a second at
-  every length (the last column). The first time a second or a third stream shares a document the server reads it
-  once more; after that every stream hits.
+  every length. The first time a second or a third stream shares a document the server reads it once more; after that
+  every stream hits.
+- The charts are drawn from the tables of [docs/measurements.md](docs/measurements.md) by
+  [docs/img/make_charts.py](docs/img/make_charts.py).
 
 ## What this is
 
