@@ -2,10 +2,11 @@
 
 | File | What it is |
 |---|---|
-| [../README.md](../README.md) | the front page: what the build is, what runs, the measured tables, what worked and what did not, what is in progress |
+| [../README.md](../README.md) | the front page: what the build is and does, what each release changed with its before and after figures, the results (speed, long context and cached prompts, gates, run-time inputs, earlier serving sets), the served settings, the requirements, what did not work, what is next |
+| [../RUNNING.md](../RUNNING.md) | how the build is run: the engine and the kit, the cards and the model files, the profile and the switches, the two-part start, the stop, a test window and its judges, the CPU checks |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | three stages and their cuts, what crosses a boundary, the scheduler's spacing rule, slots, prompt chunks and the two sources of another rounding, memory per stage, the card limit, the kits, serving without checks on the public port |
 | [OPERATIONS.md](OPERATIONS.md) | how the build is installed, started, checked and stopped |
-| [measurements.md](measurements.md) | every measured figure with its window, power limit and conditions; predictions against results |
+| [measurements.md](measurements.md) | every measured figure with its window, power limit and conditions; predictions against results; the README's narrative of the fourth release (what worked, what did not, what was in progress), moved here unchanged |
 | [measurements-2026-11-19-morning.md](measurements-2026-11-19-morning.md) | the bench and prefix-sharing measure of the morning of 2026-11-19 on the ten-line set (kit 9S before the split count), moved from the measurements page unchanged |
 | [measurements-2026-11-18.md](measurements-2026-11-18.md) | the bench and prefix-sharing measure of 2026-11-18 on the set before that (kit 9N), moved from the measurements page unchanged |
 | [history.md](history.md) | the windows from w1 to p1 in order, with what failed and why |
