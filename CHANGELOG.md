@@ -3,6 +3,101 @@
 What changed in the build, newest first. One entry per window and per decision. Times are UTC. The figures are in
 [docs/measurements.md](docs/measurements.md); the story is in [docs/history.md](docs/history.md).
 
+## 2026-11-19 (morning): third release
+
+The record as it stands after the final bench: the serving set every optimization of the plan's list left (kit 9S, the
+ten adopted lines; window c2a), the windows st5 to c7a of 2026-11-19 on this page and in
+[docs/measurements.md](docs/measurements.md), the final bench and the prefix-sharing measure again (05:53Z to 08:08Z)
+as the at-a-glance tables, the charts and the Measured section of [README.md](README.md) and the section Closing
+bench, 2026-11-19, of the measurements page; the 2026-11-18 bench moved unchanged to
+[docs/measurements-2026-11-18.md](docs/measurements-2026-11-18.md). Kits 9S (serving), 9Q, 9T, 9R and 9U (the two
+failed windows' kits, default-off switches) are published under `kit/`. Three corrections of record: the aggregate
+column Total decode tok/s runs from the earliest first token to the last request's end, not from the first request's
+start as the 2026-11-18 text said (numbers unchanged); a one-stream decode figure is the figure of the text generated in
+its cell (the rounding change moved the text in every cell of 8K and longer and the figure with it, up to 8.6 % either
+way, the round unchanged), so the two benches' decode columns are not a before-and-after; and the first cold read of a
+legal or prose document is 1 to 11 s slower than its second repeat in both benches (code's are not; cause not
+established), so those one-stream cells are means of a slow and a fast repeat, footnoted with the second repeat's figure.
+
+## 2026-11-19, 05:53Z to 08:08Z: the final bench and the prefix-sharing measure again, on the set every optimization left (kit 9S, ten lines); the set stands (Amendment 87)
+
+The same two measures as 2026-11-18, unchanged, on the serving boot of window c7a without a restart: the bench 05:53:12Z
+to 07:24:46Z (108 groups, 216 requests, judge PASS), the measure 07:24:46Z to 08:08:28Z (108 groups, 216 requests, hits
+150 of 216, judge PASS); 2 h 15 min with the serving port up and its users holding; highest card sample 30,418 MiB. One
+stream at 128K: code 175.0 / legal 94.2 / prose 79.9 tok/s decode; prefill 4,657 / 3,944 / 4,331 tok/s (first token
+28.15 / 34.09 / 30.40 s); at 256K first token 60.23 / 64.46 / 61.89 s. Three streams at 128K, summed 391.5 / 216.1 /
+192.3. Hits at 128K 0.42 to 0.43 s; three streams on one cached 128K document 399.8 / 242.2 / 221.5 tok/s over their
+window. Against 2026-11-18: cold code reads +4.8 to +5.0 % at 32K and longer (the batched projection, as predicted),
+warm reads +4.0 to 4.2 %; legal and prose reads +3.5 to +4.3 % on their second repeats. Three findings: (1) the generated
+text moved with the rounding change in every cell of 8K and longer, and decode per cell moved with the text, -8.5 to
++8.6 % (mean +0.9 %); the round itself is unchanged (windows c3b and c7a); (2) in both benches the first cold read of a
+legal or prose document is 1 to 11 s slower than its second, code not; cause not established; (3) the aggregate column Total
+decode tok/s runs from the earliest first token to the last end (the tool's arithmetic), not from the first
+request's start as the pages had it: words corrected, numbers unchanged. The tables are in the measurements page
+(the section Closing bench, 2026-11-19) and README.md.
+
+## 2026-11-19, 05:07Z to 05:39Z: window c7a, the packed-576 experts (C7) ran on kit 9U and failed their line; C7 closed (Amendments 85 and 86)
+
+Qualification only: kit 9U = kit 9S plus the three packed-expert files; the re-cut packs and the small library staged
+outside the serving trees. The reference boot (kit 9U, switch off) passed every line, identical 7 of 7, rounds S1
+24.388 / SM 24.284 / L1 25.895 / LM 25.588 ms, highest card sample 30,832 MiB. The packed boot (switch on, twelve
+workers packed) was identical 7 of 7 but its rounds were longer: L1 +0.095 ms, LM +0.155 ms (the line asked for at
+least 0.3 ms shorter), S1 +0.27 % and SM +0.90 % (within 2 %). Memory over the same phases: 756 / 878 / 878 MiB less a
+card by stage (MEASURED). The prediction (0.33 to 0.41 ms shorter) was wrong in sign. Way back by the chain: the
+library out, kit 9S, the ten lines, the serving state matching its record, serving again at 05:39:07Z. 32 min 26 s
+without the serving port (ESTIMATE 43 to 48). The packed experts are a failed optimization on this build as the rule
+stands.
+
+## 2026-11-19, 04:32Z to 05:02Z: window c3b, the lean pipeline hand-off (C3) ran on kit 9T and failed its line; C3 closed (Amendments 84 and 85)
+
+Start A = kit 9S with the ten adopted lines (the C2 window's result); kit 9T = kit 9S plus kit 9Q's three worker
+files. Both boots clean, identical 7 of 7 to the reference capture, peak 30,830 MiB, zero out-of-memory lines, Xid 0.
+Reference boot rounds S1 30.810 / SM 27.555 / L1 26.253 / LM 25.954 ms. Candidate (the switch at 1, twelve active
+hand-off markers): LM 25.822 ms, 0.133 ms shorter, under the rule's 0.3 ms line: FAIL; L1 0.306 ms shorter with the
+two boots' spreads overlapping: UNREADABLE; S1 and SM 21 and 12 % shorter against a reference whose short cells spread
+24.7 to 44.1 ms: not a measured gain. The prediction (0.15 to 0.45 ms a round) was met at its low end; the line was
+not. The way back by the chain: kit 9S, the ten lines, the serving state matching its record, serving again at
+05:02:08Z. 29 min 23 s without the serving port (ESTIMATE 36 to 42). The lean hand-off is a failed optimization on
+this build.
+
+## 2026-11-19, 03:58Z to 04:49Z: start A had moved; kits 9T and 9U cut over kit 9S; the C7 re-cut (Amendment 85)
+
+The dry run of c3b's gate refused ("expected kit 9N alone"): the C2 window had moved the serving kit to 9S and the
+reference to `quality-TC3-WOA4K.json`. Rule: every kit tested from here is cut over 9S. The C3 and C7 chains were
+re-based (kits 9T and 9U, pins, gates, simulators); a defect of the private kit updater found on the way (a refused
+apply left the current-kit marker naming the kit just rolled back) was fixed the same morning. The C7 re-cut ran on the
+CPU beside the serving arm: 320 packed pack files (61,440 experts, 288,777,830,400 bytes), the pack manifest digest,
+the small library; nothing touched the cards.
+
+## 2026-11-19, 03:19Z to 03:56Z: window c2a, the batched 4,092-row weight-only projection adopted; the build serves kit 9S with ten switches (Amendment 83)
+
+From the serving boot of c3a (kit 9N, nine lines): kit 9S; reference boot Wr and candidate Wc
+(`VLLM_V41_WO_A_BATCHED_4K=1`). Wc cold reads 4,663 / 4,741 / 4,531 / 4,309 tok/s for 60,705 / 93,025 / 247,948 /
+425,779 tokens delivered, +4.2 / +4.0 / +4.0 / +7.0 % against Wr (4,476 / 4,559 / 4,358 / 4,028); closeness against the
+accepted capture HOLDS (median first divergence 58, median mean |dlogprob| 0.0354 nats); peak 30,832 MiB, zero
+out-of-memory lines. The prediction (about 2.7 %) was WRONG, low. Adopted: ten lines; the reference capture from here
+is `accepted/quality-TC3-WOA4K.json`; the serving check PASS on the test port at 03:53:11Z, serving at 03:55:51Z.
+36 min 26 s without the serving port (ESTIMATE 35 to 46).
+
+## 2026-11-19, 02:32Z to 02:52Z: window c3a, the lean pipeline hand-off (C3) on kit 9P did not boot; INCONCLUSIVE (Amendment 82)
+
+The reference boot passed every line (identical 7 of 7, 30,814 MiB). The candidate's middle-stage workers refused in
+the hand-off's constructor: the kit assumed a hidden size of 4,096; the model's is 5,120 (GGUF metadata, receipt
+`accepted/model-geometry.json`). Its CPU test had taken 4,096 from inside the test, not from the model. The way back:
+kit 9N, the nine lines, serving again at 02:51:45Z; 20 minutes without the serving port. Fix: kit 9Q (geometry from
+the model, each refused condition its own error, the test reading the receipt), re-run as c3b.
+
+## 2026-11-19, 00:00Z to 02:21Z: windows st5, st6 and st7, the conversation store failed its timing line; the store stays off (Amendments 79, 80 and 81)
+
+st5 stopped at its hand-off probe: a port race in a borrowed rendezvous probe (a port chosen by bind-and-close, taken
+by another process before the child bound it); fixed in the build's own probe (the parent holds the listening socket).
+st6 served the unchanged configuration again at 01:11:43Z after an hour lost to a one-off runner (a `diff | grep -c`
+under `pipefail`; 59 minutes). st7 (01:11:53Z to 02:21:15Z, 69 minutes): every state line of the store passed (dump,
+restart on the saved set, exact answers after restart, memory equal to the store-off boot); the timing line failed:
+first token of the larger turns 4.718 and 3.722 s with the store on against 3.596 and 3.590 s off (limit 3.696); small
+turns 3.029 and 0.999 s against 2.586 and 2.302 (INCONCLUSIVE). The overlay rolled back; the previous record's
+configuration served again from 02:21:15Z. The store is a failed optimization on this build as the rule stands.
+
 ## 2026-11-18 (evening): second release
 
 - **The first release's kits were published without their `files/models/` directory.** The repository's ignore
