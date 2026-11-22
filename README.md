@@ -265,6 +265,29 @@ holding their traffic; the earlier releases' rows are in their sections above, a
 [docs/measurements-2026-11-19-morning.md](docs/measurements-2026-11-19-morning.md). The bench tools are not in this
 release; their arithmetic is in [docs/measurements.md](docs/measurements.md).
 
+### Quality: community benchmarks (2026-11-20 to 2026-11-22)
+
+The sets the 1Cat-vLLM README cites, run on the serving port as ordinary traffic (kit `PP3KIT9X-over-cut`, the serving
+set after this release; thinking on, temperature 0), each scored by its own tool against its own answers. MEASURED;
+conditions, commands, per-task figures and the comparison's sources in [docs/benchmarks.md](docs/benchmarks.md).
+
+| Set | Ours | Original 1017 weights (UPSTREAM, self-reported by others) |
+|---|---|---|
+| HumanEval / HumanEval+ (164) | 98.2 / 92.7 | HumanEval 95.73 |
+| MBPP / MBPP+ (378) | 97.4 / 82.5 | none found |
+| MATH-500 (500) | 97.0 | none found |
+| GSM8K (1,319) | 94.7 | 96.97; 93.5 |
+| MMLU (20 per subject, 1,140) | 92.5 | 88.22 (all 14,042) |
+| MMLU-Pro (100 per category, 1,400) | 86.4 | 85.7 (300-question sample, reasoning on) |
+| LegalBench (lm-eval's 5 tasks, 250) | 72.0 | 83.28 (vals.ai, all 162 tasks, API) |
+| LongBench-E (9 tasks, 450) | 68.8 | none found |
+| WikiText-2 perplexity (8 x 2,048 tokens) | 2.394 | none found |
+
+The settings behind the comparison column differ from ours (samples, thinking, task sets); it shows the compressed
+build kept the model, not a ranking. A speed measure after the last set found the server about seven times slower
+than the 2026-11-19 figures below (one request 18 to 26 tok/s); the cause is under investigation and
+[docs/benchmarks.md](docs/benchmarks.md#speed) has the figures.
+
 ### Speed
 
 The bench: code, legal and prose prompts of 1,024 / 8,192 / 32,768 / 65,536 / 131,072 / 262,144 tokens (a source file, a
