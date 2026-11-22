@@ -285,8 +285,9 @@ conditions, commands, per-task figures and the comparison's sources in [docs/ben
 
 The settings behind the comparison column differ from ours (samples, thinking, task sets); it shows the compressed
 build kept the model, not a ranking. A speed measure after the last set found the server about seven times slower
-than the 2026-11-19 figures below (one request 18 to 26 tok/s); the cause is under investigation and
-[docs/benchmarks.md](docs/benchmarks.md#speed) has the figures.
+than the 2026-11-19 figures below; the cause, the prompt store's full conversation tier, was fixed the same day and
+the speed re-measured: one request 135.4 / 135.5 tok/s fresh and 185.8 / 186.2 repeated at 175 W, four together 324
+summed ([docs/benchmarks.md](docs/benchmarks.md#speed)).
 
 ### Speed
 

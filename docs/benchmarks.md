@@ -99,16 +99,27 @@ on), `slots_cells.py`, two passes: one request 134.4 / 135.8 tok/s on fresh text
 four requests together, summed, 308.6 / 318.5 fresh and 385.9 / 462.5 repeated; cold reads of 60,705 to 425,780
 tokens at 4,181 to 4,468 tok/s.
 
-**The same measure on 2026-11-22 (MEASURED, 175 W, the same tool and texts as window x2, 07:01Z to 07:09Z).** One request
-18.1 / 19.1 tok/s fresh and 24.5 / 25.6 repeated; four together, summed, 51.0 / 53.1 fresh and 74.9 / 80.3 repeated;
-no request starved. That is about one seventh of window x2. The server's own log shows the decode round of a lone
-request at 26 to 30 ms on 2026-11-20 and 90 to 165 ms since the benchmarks ran; the clocks, the power cap, memory and
-the drafter's acceptance (3.1 to 5.7 tokens per round) are normal. The cause is under investigation (the lead suspect
-is the prompt store's conversation tier, which the benchmarks filled to its disk budget); the speed figures will be
-updated when it is found. The benchmark answers above were all produced in this slower state; the scores are what the
-model answered, not how fast.
+**The slowdown found after the benchmarks, and its fix (2026-11-22, MEASURED).** The same measure at 07:01Z to
+07:09Z (175 W) gave one request 18.1 / 19.1 tok/s fresh and 24.5 / 25.6 repeated, four together 51.0 / 53.1 and 74.9 /
+80.3 summed: about one seventh of window x2. The server's log showed a lone request's decode round rising from 26 to
+30 ms (2026-11-20) to 90 to 165 ms as the benchmarks ran, with clocks, power, memory and drafter acceptance normal: the
+scheduler's own turn had grown to about 55 ms. The cause was the prompt store's conversation tier, which the
+benchmarks' 5,640 prompts had filled to its 400 GiB disk budget (6,330 entries). With that tier moved aside and the
+server restarted (15:04Z, the same kit and settings), the same measure gave:
+
+| Measure (two passes) | 185 W | 175 W | Window x2, 175 W (2026-11-19) |
+|---|---|---|---|
+| One request, fresh text | 132.8 / 136.5 | 135.4 / 135.5 | 134.4 / 135.8 |
+| One request, repeated text | 182.8 / 185.1 | 185.8 / 186.2 | 183.0 / 185.8 |
+| Four together, fresh, summed | 277.8 / 324.5 | 323.7 / 324.3 | 308.6 / 318.5 |
+| Four together, repeated, summed | 468.8 / 471.3 | 468.2 / 471.0 | 385.9 / 462.5 |
+
+tok/s; no request starved in any pass; a lone request's decode round about 24 ms again. The cap above 175 W does not
+change these short-prompt figures. The engine fix for the store's per-turn cost at a large conversation tier is being
+written. The benchmark answers above were produced in the slower state; the scores
+are what the model answered, not how fast.
 
 **Under the benchmark load (MEASURED, the relay's log, 5,640 requests over 2026-11-20 to 2026-11-22, three in flight).**
 Median output rate per request, prompt reading included, by set: MATH-500 29.0, GSM8K 24.1, HumanEval+ 25.5, MBPP+
 23.0, MMLU 15.9, MMLU-Pro 14.2, LegalBench 10.1, LongBench-E 10.4 tok/s. These are short answers arriving every few
-seconds three at a time, in the slower state above, and are not a speed figure for the build.
+seconds three at a time, mostly in the slower state above, and are not a speed figure for the build.
