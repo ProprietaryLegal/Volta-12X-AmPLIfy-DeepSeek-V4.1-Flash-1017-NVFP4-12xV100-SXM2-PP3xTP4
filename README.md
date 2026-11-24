@@ -123,6 +123,7 @@ understate a serving boot's.
 | | 93,031 tokens | 4,793 tok/s, first token 19.41 s |
 | | 247,951 tokens | 4,549 tok/s, first token 54.51 s |
 | | 425,781 tokens | 4,339 tok/s, first token 98.14 s |
+| Prefill, cold read before the decode cell below, median of four | about 127,663 tokens | 4,630 tok/s |
 | Decode, one request, fresh text (600 tokens out), two passes | short prompt | 136.0 / 136.9 tok/s |
 | Decode, one request, repeated text, two passes | short prompt | 187.0 / 187.1 tok/s |
 | Decode, four requests together, fresh text, sum of the four rates | short prompts | 318.2 / 317.8 tok/s (wall 256.8 / 256.4) |
@@ -132,9 +133,10 @@ understate a serving boot's.
 | Highest card sample, four-chat rehearsal (largest prompt about 153,600 tokens) | | 30,072 MiB |
 | The move from kit 10 to kit 11, nothing serving | | 33 min 45 s (PREDICTED 33) |
 
-Against aw6's boot A on kit 10 every decode cell is within 0.25 % (PREDICTED: within the band). The 61K read is 4 %
-under aw6's 4,707 tok/s and the other three within 0.9 % (4,774 / 4,591 / 4,302): one boot's first cold read, not a
-result. A first token on a pinned or cached prefix is under a second at every length (Long context, below).
+Against aw6's boot A on kit 10 every decode cell is within 0.25 % (PREDICTED: within the band). The reads moved more:
+the 61K read is 4.1 % under aw6's 4,707 tok/s and the 128K median 3.9 % under its 4,816, while the 93K, 248K and 426K
+reads are within 0.9 % of aw6's 4,774 / 4,591 / 4,302. One boot each, recorded and not judged; kit 11 changes no
+prompt step, and whether the two lower cells repeat is not established. A first token on a pinned or cached prefix is under a second at every length (Long context, below).
 
 **Kit 10 against kit 9Z, one change in one window (MEASURED, window aw5, 2026-11-24 09:35:48Z to 10:34:54Z: R and its
 repeat R2 on kit 9Z, the arm on kit 9Z with kit 10's kernel; line: each read cell at least 3 % faster and beyond the
