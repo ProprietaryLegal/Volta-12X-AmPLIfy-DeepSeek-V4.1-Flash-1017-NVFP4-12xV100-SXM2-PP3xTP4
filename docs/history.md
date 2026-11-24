@@ -346,3 +346,43 @@ environment variable, a line no CPU test had produced. It was the fifth stop of 
 a real log of its kind. The first valid figure for a turn of 4,200 new tokens on a 128,600-token chat came from the
 same window: 3.31 s of reading, not the 2.37 s the turn model had assumed. The build served again from 00:06:33Z,
 unchanged.
+
+## The fifth release: everything on, the slowdown, and one change per boot (2026-11-19 evening to 2026-11-24)
+
+The fourth release's set did not stay the serving set for long. At about 16:50Z on 2026-11-19 the owner decided to
+switch on the conversation store, its pinned prefixes and every optimization already built. The lean hand-off and the
+packed experts had failed their speed lines alone, and the store its timing line; they went on together as kit 9X with
+the cached-token count of kit 9W, which an engineer had first thought was lost in the scheduler and was in fact dropped
+in two serving files. Window x1 stopped three minutes after its boot on a witness that read a list of names instead of
+the installed kit. Window x2 qualified the set on one boot (identity 7 of 7, every witness, the four-chat high 758 MiB
+under b4a's as predicted), and kit 9X served on twenty lines from 18:46:11Z. A finding of the window: its cells step had
+judged the A arm against itself, a pass by construction; it now records A and judges only a second arm against it.
+Kit 9Y, the partial-prefix hit, was built that evening and has not run.
+
+The community benchmarks ran on that set from 2026-11-20 to 2026-11-22. The speed measure after them found the server
+about seven times slower. Clocks, power, memory and the drafter's acceptance were normal; the engine core's own turn had
+grown to about 55 ms. The store's conversation tier had filled to its 400 GiB disk budget, and the scheduler asked the
+store for its statistics on every step, which kit 9X answered by walking every entry. Window fx1 moved the tier aside
+and the speed came back. Kit 9Z keeps the counts instead. Its first install, early on 2026-11-23, was refused by the
+serving check, because no route qualified a new kit on the all-on set; kit 9X went back after 7 minutes. The route was
+written as one chain, reviewed, and run as window z9a, which served kit 9Z from 16:20:36Z.
+
+From the evening of 2026-11-23 a campaign worked through a ranked list of levers for decode and prefill, each
+confirmed or closed by its own window or by a probe on a separate V100 bench card. One chain ran a list of arms, one
+change per boot, with the reference first and its repeat last. Its first run (aw1) stopped at its own evidence check on
+a measuring tool's progress line that its simulations, built on stand-ins that print nothing, had never met; the fix
+put the evidence on a stream of its own and replayed every measuring part against the real tools. Window aw1f
+measured: the speculative tree's counter cost 5 to 16 % decode where nothing was predicted, and its table closed the
+tree; the tensor-core prompt scorer was exact and slower, and closed. Windows aw2 to aw4 showed the mHC transition
+kernel fast, +4 to +5 % on every read, and twice outside the keep line. Its arithmetic differed from the reference by
+one half-precision unit in a few hundred of twenty million outputs, too little to explain the loss; aw4 then showed
+the stack token-identical across two boots of the same kit, so the loss was real. Kit 10's kernel adds an exact
+coefficient stage: in aw5 it read +3.1 to +3.3 % faster, token-identical, and was adopted; aw6 requalified it and it
+served from 12:28:30Z on 2026-11-24. The drafter's prompt tail moved nothing and closed.
+
+The rest of the list closed on the bench card: the materialize-once mHC coefficient overlap (after vLLM #57603) missed
+its per-call target, the group-wave expert prefill port of 1Cat-vLLM #1595 was exact and 5 to 6 ms a layer slower than
+the resident pack, and a 4-bit pack for the drafter's query projections was slower than the FP8 GEMV it would replace,
+because Volta decodes 4-bit values in software. The early control header on the pipeline hand-off was estimated at 0.8
+to 1.2 % of a decode round, below any band one window can see; the owner had it installed, the adoption band became
+the larger of 1.8 % and the window's own spread, and window aw7 requalified kit 11, which serves since 15:57:15Z.

@@ -87,6 +87,11 @@ model's tokenizer, the first eight consecutive 2,048-token windows, each sent as
 `prompt_logprobs`; perplexity = exp(−mean log-probability) over the 16,376 scored tokens. Segments 1.94, 1.52, 1.70,
 3.24, 3.57, 2.20, 2.49, 3.40.
 
+**2026-11-24.** The scores on this page were measured on kit 9X (window x2's set, 2026-11-20 to 2026-11-22). The
+server has run kit 11 since 2026-11-24 15:57:15Z (window aw7): the same twenty lines and the same accepted capture,
+with kit 9Z's store counts, kit 10's mHC prompt kernel and kit 11's early control header added. The kernel is
+token-identical to kit 9Z on the seven long prompts; the sets have not been run again on kit 11.
+
 ## Speed
 
 Scores do not depend on speed; these figures say how fast the same build answers.
@@ -115,8 +120,8 @@ server restarted (15:04Z, the same kit and settings), the same measure gave:
 | Four together, repeated, summed | 468.8 / 471.3 | 468.2 / 471.0 | 385.9 / 462.5 |
 
 tok/s; no request starved in any pass; a lone request's decode round about 24 ms again. The cap above 175 W does not
-change these short-prompt figures. The engine fix for the store's per-turn cost at a large conversation tier is being
-written. The benchmark answers above were produced in the slower state; the scores
+change these short-prompt figures. The engine fix for the store's per-turn cost at a large conversation tier is kit
+9Z, serving from 2026-11-23 (window z9a). The benchmark answers above were produced in the slower state; the scores
 are what the model answered, not how fast.
 
 **Under the benchmark load (MEASURED, the relay's log, 5,640 requests over 2026-11-20 to 2026-11-22, three in flight).**
