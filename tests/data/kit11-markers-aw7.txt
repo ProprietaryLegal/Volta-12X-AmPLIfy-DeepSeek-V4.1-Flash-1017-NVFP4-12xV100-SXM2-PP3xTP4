@@ -1,0 +1,48 @@
+(Worker_PP1_TP3 pid=1818243) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 3 layers 14-27 two-tier tier digest e5de309f5ef2a62e799302c8b6349e5eadc39be00983b349a4298a20ae21b4d5
+(Worker_PP1_TP3 pid=1818243) INFO 11-24 15:27:19 [gguf_loader.py:179] nvfp4_8r: TP rank 3 layers 14-27 free 28.96 GiB reserve 3.60 GiB hot budget 25.36 GiB, 5376 hot / 0 cold experts, free after 4.75 GiB
+(Worker_PP1_TP3 pid=1818243) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP1_TP3 pid=1818243) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 1, TP rank 3)
+(Worker_PP1_TP0 pid=1818245) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 0 layers 14-27 two-tier tier digest e5de309f5ef2a62e799302c8b6349e5eadc39be00983b349a4298a20ae21b4d5
+(Worker_PP1_TP0 pid=1818245) INFO 11-24 15:27:12 [gguf_loader.py:179] nvfp4_8r: TP rank 0 layers 14-27 free 28.96 GiB reserve 3.60 GiB hot budget 25.36 GiB, 5376 hot / 0 cold experts, free after 4.75 GiB
+(Worker_PP1_TP0 pid=1818245) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP1_TP0 pid=1818245) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 1, TP rank 0)
+(Worker_PP0_TP0 pid=1818248) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 0 layers 0-13 two-tier tier digest e5de309f5ef2a62e799302c8b6349e5eadc39be00983b349a4298a20ae21b4d5
+(Worker_PP0_TP0 pid=1818248) INFO 11-24 15:27:18 [gguf_loader.py:179] nvfp4_8r: TP rank 0 layers 0-13 free 29.14 GiB reserve 3.60 GiB hot budget 25.54 GiB, 5376 hot / 0 cold experts, free after 4.94 GiB
+(Worker_PP0_TP0 pid=1818248) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP0_TP0 pid=1818248) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 0, TP rank 0)
+(Worker_PP0_TP1 pid=1818249) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 1 layers 0-13 two-tier tier digest e5de309f5ef2a62e799302c8b6349e5eadc39be00983b349a4298a20ae21b4d5
+(Worker_PP0_TP1 pid=1818249) INFO 11-24 15:27:27 [gguf_loader.py:179] nvfp4_8r: TP rank 1 layers 0-13 free 29.14 GiB reserve 3.60 GiB hot budget 25.54 GiB, 5376 hot / 0 cold experts, free after 4.94 GiB
+(Worker_PP0_TP1 pid=1818249) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP0_TP1 pid=1818249) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 0, TP rank 1)
+(Worker_PP2_TP2 pid=1818250) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 2 layers 28-39 two-tier tier digest 606f558e014930f9c1669f03c71c28945c4631568e39cd308c6c7f4077c7bfb9
+(Worker_PP2_TP2 pid=1818250) INFO 11-24 15:27:07 [gguf_loader.py:179] nvfp4_8r: TP rank 2 layers 28-39 free 29.07 GiB reserve 7.19 GiB hot budget 21.88 GiB, 4608 hot / 0 cold experts, free after 8.33 GiB
+(Worker_PP2_TP2 pid=1818250) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP2_TP2 pid=1818250) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 2, TP rank 2)
+(Worker_PP0_TP2 pid=1818251) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 2 layers 0-13 two-tier tier digest e5de309f5ef2a62e799302c8b6349e5eadc39be00983b349a4298a20ae21b4d5
+(Worker_PP0_TP2 pid=1818251) INFO 11-24 15:27:27 [gguf_loader.py:179] nvfp4_8r: TP rank 2 layers 0-13 free 29.14 GiB reserve 3.60 GiB hot budget 25.54 GiB, 5376 hot / 0 cold experts, free after 4.94 GiB
+(Worker_PP0_TP2 pid=1818251) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP0_TP2 pid=1818251) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 0, TP rank 2)
+(Worker_PP0_TP3 pid=1818252) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 3 layers 0-13 two-tier tier digest e5de309f5ef2a62e799302c8b6349e5eadc39be00983b349a4298a20ae21b4d5
+(Worker_PP0_TP3 pid=1818252) INFO 11-24 15:27:18 [gguf_loader.py:179] nvfp4_8r: TP rank 3 layers 0-13 free 29.14 GiB reserve 3.60 GiB hot budget 25.54 GiB, 5376 hot / 0 cold experts, free after 4.94 GiB
+(Worker_PP0_TP3 pid=1818252) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP0_TP3 pid=1818252) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 0, TP rank 3)
+(Worker_PP1_TP1 pid=1818253) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 1 layers 14-27 two-tier tier digest e5de309f5ef2a62e799302c8b6349e5eadc39be00983b349a4298a20ae21b4d5
+(Worker_PP1_TP1 pid=1818253) INFO 11-24 15:27:26 [gguf_loader.py:179] nvfp4_8r: TP rank 1 layers 14-27 free 28.96 GiB reserve 3.60 GiB hot budget 25.36 GiB, 5376 hot / 0 cold experts, free after 4.75 GiB
+(Worker_PP1_TP1 pid=1818253) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP1_TP1 pid=1818253) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 1, TP rank 1)
+(Worker_PP1_TP2 pid=1818254) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 2 layers 14-27 two-tier tier digest e5de309f5ef2a62e799302c8b6349e5eadc39be00983b349a4298a20ae21b4d5
+(Worker_PP1_TP2 pid=1818254) INFO 11-24 15:27:12 [gguf_loader.py:179] nvfp4_8r: TP rank 2 layers 14-27 free 28.96 GiB reserve 3.60 GiB hot budget 25.36 GiB, 5376 hot / 0 cold experts, free after 4.75 GiB
+(Worker_PP1_TP2 pid=1818254) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP1_TP2 pid=1818254) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 1, TP rank 2)
+(Worker_PP2_TP1 pid=1818255) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 1 layers 28-39 two-tier tier digest 606f558e014930f9c1669f03c71c28945c4631568e39cd308c6c7f4077c7bfb9
+(Worker_PP2_TP1 pid=1818255) INFO 11-24 15:27:00 [gguf_loader.py:179] nvfp4_8r: TP rank 1 layers 28-39 free 29.07 GiB reserve 7.19 GiB hot budget 21.88 GiB, 4608 hot / 0 cold experts, free after 8.33 GiB
+(Worker_PP2_TP1 pid=1818255) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP2_TP1 pid=1818255) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 2, TP rank 1)
+(Worker_PP2_TP0 pid=1818256) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 0 layers 28-39 two-tier tier digest 606f558e014930f9c1669f03c71c28945c4631568e39cd308c6c7f4077c7bfb9
+(Worker_PP2_TP0 pid=1818256) INFO 11-24 15:27:16 [gguf_loader.py:179] nvfp4_8r: TP rank 0 layers 28-39 free 29.07 GiB reserve 7.19 GiB hot budget 21.88 GiB, 4608 hot / 0 cold experts, free after 8.33 GiB
+(Worker_PP2_TP0 pid=1818256) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP2_TP0 pid=1818256) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 2, TP rank 0)
+(Worker_PP2_TP3 pid=1818257) INFO 11-24 15:25:39 [gguf_loader.py:157] nvfp4_8r: TP rank 3 layers 28-39 two-tier tier digest 606f558e014930f9c1669f03c71c28945c4631568e39cd308c6c7f4077c7bfb9
+(Worker_PP2_TP3 pid=1818257) INFO 11-24 15:27:01 [gguf_loader.py:179] nvfp4_8r: TP rank 3 layers 28-39 free 29.07 GiB reserve 7.19 GiB hot budget 21.88 GiB, 4608 hot / 0 cold experts, free after 8.33 GiB
+(Worker_PP2_TP3 pid=1818257) INFO 11-24 15:27:29 [deepseek_v41_regs.py:103] VLLM_V41_MHC_PREFILL=1 first dispatch rows=4096
+(Worker_PP2_TP3 pid=1818257) INFO 11-24 15:27:34 [v41_pp_handoff.py:523] VLLM_V41_PP_CONTROL_AHEAD=1 first transfer (stage 2, TP rank 3)
