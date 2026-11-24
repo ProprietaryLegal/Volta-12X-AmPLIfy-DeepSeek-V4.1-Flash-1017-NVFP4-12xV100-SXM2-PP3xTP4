@@ -13,7 +13,7 @@ of kits 10 and 11 with a CPU test on window aw7's real boot lines; the fifth rel
 window chains, the window specification tools and the store's tests are not yet published
 ([NOT-YET-PUBLISHED.md](NOT-YET-PUBLISHED.md)).
 
-## 2026-11-24, 15:23Z to 15:57:15Z: window aw7, kit 11 requalified and serving
+## 2026-11-24, 15:23:32Z to 15:57:15Z: window aw7, kit 11 requalified and serving
 
 Kit 11 (kit 10 plus the early control header on the pipeline hand-off, on by default) met every line of the
 requalification: identity 7 of 7, the same store record set, none of its four new switches in the API server's
@@ -32,7 +32,7 @@ FP8 GEMV's 0.741 / 0.738 (bar: 0.25 ms faster): closed. A group-wave expert pref
 #1601's append dispatch): bitwise exact, 23.793 / 26.096 ms a layer against 17.958 / 21.029 (bar: 2.0 ms faster):
 closed.
 
-## 2026-11-24, to 12:28:30Z: window aw6, kit 10 requalified and serving
+## 2026-11-24, 11:55:38Z to 12:28:30Z: window aw6, kit 10 requalified and serving
 
 Kit 10 (kit 9Z plus the register-resident mHC transition kernel, on by default) met every line: identity 7 of 7
 (median first divergence 166), the same store record set, neither mHC switch in the API server's environment, mHC
