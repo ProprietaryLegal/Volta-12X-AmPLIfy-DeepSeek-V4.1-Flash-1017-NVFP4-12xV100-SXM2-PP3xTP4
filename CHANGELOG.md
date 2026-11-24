@@ -3,6 +3,132 @@
 What changed in the build, newest first. One entry per window and per decision. Times are UTC. The figures are in
 [docs/measurements.md](docs/measurements.md); the story is in [docs/history.md](docs/history.md).
 
+## 2026-11-24: fifth release
+
+The record as it stands with kit 11 serving: kits 9W, 9X, 9Y, 9Z, 10 and 11 in `kit/` (the conversation store's
+modules, the kits' `apply.sh` and their compiled libraries withheld, their `MANIFEST` rows kept); the receipt counters
+of kits 10 and 11 with a CPU test on window aw7's real boot lines; the fifth release's section of
+[README.md](README.md), the twenty adopted lines and the requalification form in [RUNNING.md](RUNNING.md) and
+[docs/OPERATIONS.md](docs/OPERATIONS.md), the windows x1 to aw7 in [docs/measurements.md](docs/measurements.md). The
+window chains, the window specification tools and the store's tests are not yet published
+([NOT-YET-PUBLISHED.md](NOT-YET-PUBLISHED.md)).
+
+## 2026-11-24, 15:23Z to 15:57:15Z: window aw7, kit 11 requalified and serving
+
+Kit 11 (kit 10 plus the early control header on the pipeline hand-off, on by default) met every line of the
+requalification: identity 7 of 7, the same store record set, none of its four new switches in the API server's
+environment, the mHC dispatch and the control header's first transfer on 12 of 12 workers, every store, API, pin and
+state judge PASS, the adopted lines byte-identical, Xid 0, four-chat high 30,072 MiB. Serving since 15:57:15Z; 33 min
+45 s with nothing serving (PREDICTED 33). Recorded, not judged: decode cells within 0.25 % of aw6 (PREDICTED), reads
+4,515 / 4,793 / 4,549 / 4,339 tok/s at 61K / 93K / 248K / 426K. Kit 11's gain is ESTIMATE 0.8 to 1.2 % decode, below the
+band, installed on the owner's decision. From this window on the speed band is the larger of 1.8 % and the window's own
+A/A spread (it was 3 %), on the owner's decision.
+
+## 2026-11-24, before aw7: three levers closed on a separate V100 bench card
+
+The materialize-once mHC coefficient overlap (after vLLM #57603 and #64892): 7.168 µs a call where 5.61 was needed,
+exact 40 of 40: closed. A 4-bit dense pack for the drafter's query projections: 0.916 / 0.910 ms a round against the
+FP8 GEMV's 0.741 / 0.738 (bar: 0.25 ms faster): closed. A group-wave expert prefill port of 1Cat-vLLM #1595 (with
+#1601's append dispatch): bitwise exact, 23.793 / 26.096 ms a layer against 17.958 / 21.029 (bar: 2.0 ms faster):
+closed.
+
+## 2026-11-24, to 12:28:30Z: window aw6, kit 10 requalified and serving
+
+Kit 10 (kit 9Z plus the register-resident mHC transition kernel, on by default) met every line: identity 7 of 7
+(median first divergence 166), the same store record set, neither mHC switch in the API server's environment, mHC
+dispatch 12 of 12, every x2 judge PASS, the adopted lines byte-identical, Xid 0, four-chat high 30,072 MiB. Serving
+from 12:28:30Z; 32 min 52 s with nothing serving (PREDICTED about 35). Reads recorded: 4,707 / 4,774 / 4,591 / 4,302
+tok/s.
+
+## 2026-11-24, 09:35:48Z to 10:34:54Z: window aw5, the mHC kernel ADOPTED; the drafter's prompt tail closed
+
+Against kit 9Z in the same window: reads +3.24 / +3.14 / +3.30 % at 94K / 250K / 420K (4,825.6 / 4,634.7 / 4,396.2
+against 4,697.0 / 4,507.1 / 4,278.5 tok/s), decode +0.0 to +0.5 %, token-identical 7 of 7, 29,796 MiB, dispatch 12 of 12.
+R/R2 spread 0.107 to 0.966 %; the gain clears the 3 % band by 0.14 to 0.30 points (PREDICTED +3.5 to +4.5 %: high). The
+drafter's prompt tail booted and moved nothing (reads -0.17 to -0.36 %, decode -0.3 to -0.5 %): closed.
+
+## 2026-11-24, 06:06:45Z to 06:41:15Z: window aw4, the A/A floor is 0; the second mHC kernel fails the keep line
+
+Kit 9Z's captures of aw3 and aw4 are identical 7 of 7 (PREDICTED: not clean), so the keep line measures real change. The
+second mHC kernel (the reference's reduction order, bit-equal on the bench card's model-free test) read +4.0 to +4.7 %
+and failed the keep line (median first divergence 45, mean |dlogprob| 0.0376). The drafter-tail kit refused to boot.
+
+## 2026-11-24, 03:52:32Z to 04:37:08Z: window aw3, the first mHC kernel fails the keep line
+
+Reads +4.66 / +4.61 / +3.76 %, decode in band, 29,796 MiB, Xid 0; CLEAN but WORSE on the keep line (median first
+divergence 52 where 104 was asked, mean |dlogprob| 0.0343 where 0.018). Not adopted.
+
+## 2026-11-24, 02:04:54Z to 02:56:48Z: window aw2, the first mHC kernel fast but unjudged
+
+Reads +4.4 to +4.9 %, decode -1.8 to -2.2 %; its quality judge kept no figures and its memory sampler never wrote:
+INCONCLUSIVE, two chain defects, fixed. The profiler arm: the drafter 338 ms a profiled turn on the last stage, stage
+spans 801 / 777 / 809 ms a chunk. The batched prompt top-k closed (18.1 ms saved a call where 35.4 was the gate).
+
+## 2026-11-24, 00:17:15Z to 01:03:35Z: window aw1f, the measuring window; the tree and the tensor-core prompt scorer closed
+
+R and R2 within 0.5 % on every used cell. The speculative tree's counter cost 5.4 to 16.2 % decode (PREDICTED: nothing),
+and its table closed the tree (best seven-row tree +0.066 accepted tokens a round where 0.474 were needed). One-card
+probes: the tensor-core prompt scorer exact and slower (401.2 against 324.3 ms at 250,000 keys), closed; the mHC
+kernel 1.45 ms saved a 4,092-row step, to the next window.
+
+## 2026-11-23, 22:43:12Z to 23:01:49Z: window aw1, the new chain's first run stops at its evidence check
+
+A measuring tool's progress line reached the evidence stream and the check refused it; the chain put kit 9Z back by
+itself. Fixed: evidence goes on a stream nothing else writes to, every measuring part replayed against the real tools.
+Arm R (kit 9Z): reads 4,603 / 4,678 / 4,503 / 4,274 tok/s at 62K / 94K / 250K / 420K; one request 136.2 fresh, 185.2
+repeated; four together 325.0 / 469.7 summed.
+
+## 2026-11-23, 19:12Z to 19:17:52Z: a restart from a new drive; the campaign's reference
+
+No kit or switch change. Kit 9Z at 175 W: one request 135.4 / 136.6 tok/s fresh and 177.1 / 178.6 repeated, four
+together 323.9 / 326.2 and 466.9 / 468.1 summed; cold reads 4,681 / 4,725 at 94K and 4,457 / 4,531 at 250K; 2.845 draft
+tokens accepted a round.
+
+## 2026-11-23, 15:46:10Z to 16:20:36Z: window z9a, kit 9Z requalified and serving
+
+The new requalification chain moved the all-on set from kit 9X to kit 9Z: the eight hand-off pairs, every witness,
+the store's line on the same record set, identity 7 of 7 (median first divergence 166). Short prompts, recorded: one
+request 133.8 fresh and 176.3 repeated, four together 314.5 and 457.1 summed. Serving from 16:20:36Z.
+
+## 2026-11-23, 03:20Z to 03:30Z: the first install of kit 9Z refused; kit 9X restored
+
+The kit installed and verified, then the serving check refused: no route then qualified a new kit on the all-on set.
+Kit 9X put back, the conversation tier moved aside again; 7 minutes nothing serving.
+
+## 2026-11-22, 15:04Z: window fx1, the slowdown fixed; kit 9Z written
+
+After the community benchmarks the server ran about seven times slower: the store's conversation tier at its 400 GiB
+disk budget, the engine core's turn about 55 ms, a lone round 90 to 165 ms. With the tier moved aside: one request
+135.4 / 135.5 tok/s fresh and 185.8 / 186.2 repeated, four together 323.7 / 324.3 and 468.2 / 471.0 summed at 175 W
+([docs/benchmarks.md](docs/benchmarks.md#speed)). Kit 9Z keeps the store's counts: 0.0029 ms a call against 58.3 ms
+on the tier's real index (MEASURED on a CPU).
+
+## 2026-11-20 to 2026-11-22: the community benchmarks
+
+The sets 1Cat-vLLM cites, on the serving set (kit 9X) as ordinary traffic, thinking on
+([docs/benchmarks.md](docs/benchmarks.md)). On 2026-11-20 a restore of 93,026 tokens from the store's disk tier gave its
+first token in 0.72 s on the idle serving set.
+
+## 2026-11-19, 19:04Z to 20:00Z: kit 9Y built, the partial-prefix hit
+
+`VLLM_V41_PARTIAL_PREFIX` (default off): a request that leaves a slot's prompt starts from the slot's last ring
+checkpoint at or below the shared length. CPU-tested; not run on the cards.
+
+## 2026-11-19, 17:53Z to 18:46:11Z: windows x1 and x2, kit 9X with everything on, serving
+
+x1 stopped 3 minutes after boot on a defect of its pipe witness (it read the receive-buffer wait from a list of names,
+not the installed kit). x2 qualified kit 9X with the twenty lines on one boot: every witness, identity 7 of 7, the
+store, API and pin lines (two pinned 40,000-token hits, first token 0.45 s), no request starved, four-chat high 30,072
+MiB (758 under b4a, PREDICTED), the rehearsal's larger turns +0.41 s (PREDICTED 0.1 to 1.1). Serving since 18:46:11Z.
+Its cold reads were 1 to 10 % under b4a's because the arm ran the store's test-only dump hook.
+
+## 2026-11-19, 16:40Z to 17:06Z: kit 9W, the cached-token count; the owner's decision to switch everything on
+
+The count of cached prompt tokens reached the engine's output and was dropped in two serving files; kit 9W changes those
+two. On `/v1/messages` `input_tokens` plus `cache_read_input_tokens` is the prompt, with an explicit 0 on a cold read,
+once the profile line `enable-prompt-tokens-details: true` is on. The owner then decided to switch on the conversation
+store, the pinned prefixes and every optimization built: kit 9X and window x2 were prepared.
+
 ## 2026-11-19 (afternoon): fourth release
 
 The record as it stands after the split count was adopted and the bench ran again: the serving set since window b4a
