@@ -10,8 +10,8 @@ our earlier work). The non-expert tensors and the Engram table are the
 the tokenizer and the DSpark drafter are DeepSeek's. This repository holds no weights, no expert packs and no compiled
 libraries, and it downloads nothing.
 
-This repository is the build's record as of its fourth release (2026-11-19, afternoon): the engine changes as install
-kits in `kit/` (`PP3KIT9S-over-cut` serves), the judges and probes of the test windows in `tools/` with CPU tests in
+This repository is the build's record as of its fifth release (2026-11-24): the engine changes as install
+kits in `kit/` (`PP3KIT11-over-cut` serves), the judges and probes of the test windows in `tools/` with CPU tests in
 `tests/`, the measurements in [docs/measurements.md](docs/measurements.md), the architecture, the history of every
 window, the kernel and optimization plan and the time budget. The serving profile is described in [docs/OPERATIONS.md](docs/OPERATIONS.md) and [RUNNING.md](RUNNING.md); it is
 not shipped as a file. The window driver, its chains, the bench tools and the launcher are not in this release: they name
@@ -20,7 +20,8 @@ the host's layout ([NOT-YET-PUBLISHED.md](NOT-YET-PUBLISHED.md)).
 The engine is PLI Labs' copy of [1CatAI/1Cat-vLLM](https://github.com/1CatAI/1Cat-vLLM), the SM70 fork of vLLM, with
 the DeepSeek-V4.1-Flash package of [#1277](https://github.com/1CatAI/1Cat-vLLM/pull/1277), as PLI Labs' eight-card builds
 carry it at commit `f20d155`. Every change for twelve cards reaches that tree as a kit of whole engine files; the serving
-kit is engine `9733024` plus the batched projection, 18 files. Each kit's `MANIFEST` pins the sha256 of every file it
+kit is engine `9733024` plus every adopted change since, 55 files (44 published; the conversation store's modules and
+the compiled libraries are withheld). Each kit's `MANIFEST` pins the sha256 of every file it
 replaces and of every new file, so a kit applies only to the bytes it was cut for and comes out byte for byte. The base
 engine is not published as a tree; [engine/README.md](engine/README.md) lists every kit with its commit and state. The
 three-stage layout is that of PLI Labs' 1Cat-vLLM pull request [#1031](https://github.com/1CatAI/1Cat-vLLM/pull/1031),
@@ -46,11 +47,14 @@ What it does:
   every length from 8K to 256K (MEASURED, below); a turn on a grown chat reads only what the turn added.
 - DSpark speculative decoding with DeepSeek's drafter on the last stage.
 - A card limit on every stage (31,998 MiB, a fuse at the owner's line for the highest sample on any card).
-- vLLM's OpenAI-compatible API server, with a token cache that tokenizes only what a chat added.
+- vLLM's OpenAI-compatible API server, with a token cache that tokenizes only what a chat added, the cached-token count
+  in every reply's usage, and the Anthropic Messages route with its tokenize call.
+- A conversation store: finished prompts' state saved to host memory and disk and restored on a later request that
+  holds the whole saved prompt, with pinned prefixes a client warms on purpose (on since window x2).
 - A serving form that never serves while it checks: the full checks run on a test port and write a record; the serving
   boot sends no request and refuses bytes the record does not name.
 
-The eleven adopted lines (the serving record carries their digest; the serving boot refuses a set the record does not
+The twenty adopted lines (the serving record carries their digest; the serving boot refuses a set the record does not
 know):
 
 | Line | What it does | Window |
@@ -66,6 +70,124 @@ know):
 | `VLLM_V41_INDEX_TC=1` | the sparse-attention index scorer on the tensor cores | p6b |
 | `VLLM_V41_WO_A_BATCHED_4K=1` | the attention output projection of a 4,092-row prompt chunk in one batched launch | c2a |
 | `TM_GEMM_TUNE=max_splits=1` | the TurboMind multiply library's own switch: one split of the inner dimension at every row count | b4a |
+| `VLLM_V41_PP_LEAN_HANDOFF=1` | the leaner pipeline hand-off of kit 9T, its geometry read from the model (with kit 11 its control header goes first) | x2 |
+| `VLLM_V41_EXPERT_PACKED576=1` | the expert records of kit 9U without their zero padding | x2 |
+| `VLLM_V41_PP_LOOP_STATS=64` | the engine core's loop counters, printed every 64 answers (a diagnostic; it changes no step) | x2 |
+| `VLLM_V41_STORE=1` | the conversation store and its pinned prefixes | x2 |
+| `VLLM_V41_STORE_PINNED_RAM_BYTES`, `_CONVERSATION_RAM_BYTES`, `_PINNED_DISK_BYTES`, `_CONVERSATION_DISK_BYTES` | the store's budgets: 24 GiB and 64 GiB of host memory, 200 GiB and 400 GiB of disk | x2 |
+| `VLLM_V41_STORE_DIR` | the store's folder on the host (its path is not published) | x2 |
+
+Not lines: the profile's `enable-prompt-tokens-details: true` (the cached-token count, kit 9W); the mHC prompt kernel
+(kit 10) and the early control header (kit 11), on by their kits' defaults; the receive-buffer wait, on by default
+since kit 9L. The exact sum (`VLLM_V41_TP_EXACT_SUM`) and the partial-prefix hit (`VLLM_V41_PARTIAL_PREFIX`) are unset.
+
+## Fifth release (2026-11-24): what changed
+
+What serves since 2026-11-24 15:57:15Z: kit `PP3KIT11-over-cut` with the twenty adopted lines above, four slots, 175 W
+per card. The build reached it in four steps, each qualified on the test port before it served:
+
+- **Window x2 (2026-11-19, 18:13Z to 18:46:11Z): kit 9X, everything built switched on.** On the owner's decision the
+  serving set took the cached-token count (kit 9W), the conversation store with its pinned prefixes, the Messages
+  tokenize route, the lean pipeline hand-off (kit 9T) and the packed-576 experts (kit 9U); the exact sum stayed off.
+  Every witness passed; the seven long prompts were identical 7 of 7 to the eleven-line capture; two pinned 40,000-token
+  hits gave their first token in 0.45 s; the four-chat high was 30,072 MiB, 758 MiB under b4a's (PREDICTED: lower by
+  about that). The lean hand-off and the packed experts had failed their speed lines alone (c3b, c7a): they serve on that
+  decision, not on a gain.
+- **Window fx1 (2026-11-22) and kit 9Z (window z9a, 2026-11-23 16:20:36Z): the store's statistics.** After the community
+  benchmarks the server ran about seven times slower: the store's conversation tier had filled to its 400 GiB disk
+  budget, the engine core's turn had grown from about 9 to 55 ms and a lone decode round from about 26 to 165 ms
+  (MEASURED, the engine's loop counters). Moving the tier aside restored the speed (fx1,
+  [docs/benchmarks.md](docs/benchmarks.md#speed)). Kit 9Z takes the store's per-step statistics from counts its index
+  keeps: 0.0029 ms a call against 58.3 ms on that tier's real index of 8,249 entries (MEASURED on a CPU). A new
+  requalification chain moved the serving set to it in window z9a.
+- **Kit 10 (windows aw1f to aw6, 2026-11-24): the register-resident mHC transition kernel.** For prompt steps of 30
+  rows and above, one kernel keeps a row in registers through the whole transition, with an exact coefficient stage.
+  Measured in aw5 against kit 9Z in the same window (below); requalified and serving from window aw6, 12:28:30Z.
+- **Kit 11 (window aw7, 2026-11-24): an early control header on the pipeline hand-off.** A stage sends a small Gloo
+  header ahead of the NCCL payload, and the receiver checks it before the payload. ESTIMATE 0.20 to 0.30 ms of a 25.1 ms
+  decode round (0.8 to 1.2 %), below the adoption band, so no window can measure it; installed on the owner's decision,
+  requalified in aw7, serving since 15:57:15Z.
+
+Kit 9Y (the partial-prefix hit, `VLLM_V41_PARTIAL_PREFIX`) is published built and CPU-tested; it has not run on the
+cards. The conversation store's own modules stay withheld ([NOT-YET-PUBLISHED.md](NOT-YET-PUBLISHED.md)); the kit
+folders keep their whole `MANIFEST`s.
+
+**The speeds of what serves (MEASURED, window aw7, 2026-11-24: boot A of the requalification on the test port, kit 11
+with the twenty lines, one boot; recorded, not judged).** The cold reads ran with the store live and its test-only dump
+hook on, which writes and hashes the saved state at every prompt end: in x2 it cost the reads 1 to 10 %, so these reads
+understate a serving boot's.
+
+| Cell | Context | aw7 |
+|---|---|---|
+| Prefill, one cold read, the only request | 60,705 tokens | 4,515 tok/s, first token 13.44 s |
+| | 93,031 tokens | 4,793 tok/s, first token 19.41 s |
+| | 247,951 tokens | 4,549 tok/s, first token 54.51 s |
+| | 425,781 tokens | 4,339 tok/s, first token 98.14 s |
+| Decode, one request, fresh text (600 tokens out), two passes | short prompt | 136.0 / 136.9 tok/s |
+| Decode, one request, repeated text, two passes | short prompt | 187.0 / 187.1 tok/s |
+| Decode, four requests together, fresh text, sum of the four rates | short prompts | 318.2 / 317.8 tok/s (wall 256.8 / 256.4) |
+| Decode, four requests together, repeated text, sum | short prompts | 456.3 / 461.1 tok/s |
+| Decode after a cold read | 127,663-token prompt | 124.9 tok/s |
+| Decode after a one-step turn | 128,585-token chat | 160.2 tok/s |
+| Highest card sample, four-chat rehearsal (largest prompt about 153,600 tokens) | | 30,072 MiB |
+| The move from kit 10 to kit 11, nothing serving | | 33 min 45 s (PREDICTED 33) |
+
+Against aw6's boot A on kit 10 every decode cell is within 0.25 % (PREDICTED: within the band). The 61K read is 4 %
+under aw6's 4,707 tok/s and the other three within 0.9 % (4,774 / 4,591 / 4,302): one boot's first cold read, not a
+result. A first token on a pinned or cached prefix is under a second at every length (Long context, below).
+
+**Kit 10 against kit 9Z, one change in one window (MEASURED, window aw5, 2026-11-24 09:35:48Z to 10:34:54Z: R and its
+repeat R2 on kit 9Z, the arm on kit 9Z with kit 10's kernel; line: each read cell at least 3 % faster and beyond the
+same-window spread, decode within the band, the seven long prompts within the keep line).**
+
+| Cell | Kit 9Z (R) | Kit 10's kernel | Change |
+|---|---|---|---|
+| Cold read, about 94,000 tokens | 4,697.0 tok/s | 4,825.6 tok/s | +3.24 % |
+| Cold read, about 250,000 tokens | 4,507.1 tok/s | 4,634.7 tok/s | +3.14 % |
+| Cold read, about 420,000 tokens | 4,278.5 tok/s | 4,396.2 tok/s | +3.30 % |
+| One request, fresh / repeated text | 136.0 / 186.5 tok/s | 136.2 / 186.9 tok/s | +0.1 / +0.2 % |
+| Four together, fresh / repeated, sum | 323.8 / 469.3 tok/s | 324.2 / 470.5 tok/s | +0.1 / +0.3 % |
+| The seven long prompts | | token-identical 7 of 7, mean \|dlogprob\| 0 | keep line HOLDS |
+| Highest card sample | 29,796 MiB | 29,796 MiB | |
+
+R against R2 spread 0.107 to 0.966 % by cell; the gain clears the 3 % band by 0.14 to 0.30 points. PREDICTED +3.5 to
++4.5 %: high; the exact coefficient stage costs about 1.1 to 1.5 points against the faster kernels that failed the keep
+line. On a separate V100 bench card, 776 transition calls captured from a real read were bit-equal to kit 9Z's, and a
+4,092-row call took 2.048 ms against 3.417 ms (MEASURED, medians).
+
+**The rule.** One change per boot, a reference first and last. The keep line for a change that should not move rounding
+is a median first divergence of at least 104 tokens and a median mean \|dlogprob\| of at most 0.018 on the seven long
+prompts; window aw4 found kit 9Z's captures of two boots identical on all seven (the A/A floor is 0), so the line
+measures real change. From window aw7 on the speed band is the larger of 1.8 % and the same window's A/A spread (it
+was 3 %), on the owner's decision. A kit that serves is requalified by one chain: identity 7 of 7 to the eleven-line
+capture, the same store record set opened, none of the kit's new switches in the API server's environment, its
+dispatch witness on 12 of 12 workers, the store, API, pin and state judges of x2 PASS, the adopted lines
+byte-identical, Xid 0, the four-chat high under the memory line, and the reads and decode cells recorded, not judged.
+
+**Closed since the fourth release (each MEASURED against its own line):**
+
+- **The first mHC kernels** (windows aw2 to aw4): reads +4.4 to +4.9 % but CLEAN and WORSE on the keep line (median first
+  divergence 52 and 45, median mean \|dlogprob\| 0.0343 and 0.0376). Kit 10's exact coefficient stage replaced them.
+- **The materialize-once mHC coefficient overlap** (the research's first priority, after vLLM's split dependency in
+  [vllm-project/vllm#57603](https://github.com/vllm-project/vllm/pull/57603) and its follow-up
+  [#64892](https://github.com/vllm-project/vllm/pull/64892)): on a separate V100 bench card the mandatory branch took
+  7.168 µs a call where 5.61 was needed; exact 40 of 40.
+- **A group-wave expert prefill kernel**, a port of the SM70 group-wave schedule of 1Cat-vLLM
+  [#1595](https://github.com/1CatAI/1Cat-vLLM/pull/1595), read with the append dispatch of
+  [#1601](https://github.com/1CatAI/1Cat-vLLM/pull/1601) (UPSTREAM: 1.90 times on a whole Qwen package on four V100s):
+  bitwise exact, and slower on every cell of the bench card, 23.793 / 26.096 ms a layer against the resident pack's
+  17.958 / 21.029 (balanced / skewed input; the bar was 2.0 ms faster).
+- **A 4-bit dense pack for the drafter's query projections**: slower than the FP8 GEMV it would replace, the 27
+  five-row calls of a round 0.916 / 0.910 ms against 0.741 / 0.738 ms (the bar was 0.25 ms faster). Volta decodes 4-bit
+  values in software, and that costs more than the 44 % fewer bytes return.
+- **The drafter's prompt tail** (only the rows its window needs, aw5): reads -0.17 to -0.36 %, decode -0.3 to -0.5 %, no
+  measurable change.
+- **A tensor-core prompt index scorer** (exact by an exponent guard): exact at every shape but slower, 401.2 ms against
+  the present path's 324.3 ms at 250,000 keys on one card; **a batched prompt top-k**: 18.1 ms a call saved at 250K where 35.4 was the
+  gate; **a speculative tree**: the best seven-row tree added 0.066 accepted tokens a round where 0.474 were needed, and
+  its counter cost 5 to 16 % decode.
+
+The mHC kernel, the control header and kit 9Z are ours; no outside code is copied into a serving kit in this release.
 
 ## Fourth release (2026-11-19, afternoon, commit `03f71bc`): what changed
 
@@ -256,7 +378,9 @@ is the precedent for taking the embedding off the middle stage (our change is ne
 
 ## Results
 
-All numbers are ours, MEASURED with our own clients on the twelve-card host, on the serving set since window b4a: kit
+The speeds of what serves now (kit 11, the twenty lines) are the fifth release's tables above. The bench and the
+prefix-sharing measure below are the fourth release's and have not been run again since. All numbers are ours, MEASURED
+with our own clients on the twelve-card host, on the serving set of window b4a: kit
 `PP3KIT9S-over-cut`, the eleven adopted lines, four slots, 175 W per card and the 1,452 MHz clock ceiling (cards at 1,447 MHz), unless a row
 names another window. Greedy decoding, thinking off, 1,024 tokens out, unless a row says otherwise. The bench and the
 prefix-sharing measure ran on the serving port without a restart (14:09:20Z to 16:24:31Z on 2026-11-19), their users
@@ -397,13 +521,21 @@ ms at 128,000 tokens and 31.0 ms at 249,000, the growth being the index.
 | First token on a hit | 0.43 to 0.44 s at 128K; 0.63 to 0.73 s at 256K | measure 15:40Z |
 | A hit's tokens against its warm read | 0 of 150 hits reproduced the warm read's token digest; all 30 re-reads did | measure 15:40Z |
 | A hit against its own cold read, nine bench prompts at 32K to 128K, greedy, 32 tokens | identical 4 of 9 (prose 3 of 3, code at 64K); median first divergence 25, median mean \|dlogprob\| 0.0275; every resend a hit by timing (0.25 to 0.45 s against 7.2 to 28.6 s cold) | b3a, `Wr` |
-| Cached-token count in the server's usage | sent for 0 of 216 requests: a hit is known by timing only | measure 15:40Z |
-| A warm request whose first 113,392 tokens were in the pool | read its whole prompt cold: no partial-prefix reuse | the prefix measure |
+| Cached-token count in the server's usage | sent for 0 of 216 requests in the fourth release's measure: a hit was known by timing only; since kit 9W (window x2) every reply carries it, equal to the engine's hit on six cold and hit pairs at 32K | measure 15:40Z; x2 |
+| A warm request whose first 113,392 tokens were in the pool | read its whole prompt cold: no partial-prefix reuse (kit 9Y builds it; not run on the cards) | the prefix measure |
 | A turn that leaves its chat's prompt at the last token, after an answer longer than the ring's reach | read cold: 36 to 44 s instead of about a second on a 130,000-token chat; clients that replay the reasoning with each answer do not meet it | st4, t1 |
-| A 131,466-token turn restored from the conversation store after a restart | first token after 1.23 s against 43.84 s read cold (the store is not in what serves) | st4 |
+| A 131,466-token turn restored from the conversation store after a restart | first token after 1.23 s against 43.84 s read cold | st4 |
+| A pinned 40,000-token prefix, the store on, two requests | first token 0.45 s | x2 |
+| A 93,026-token restore from the store's disk tier, files 2 h 43 min old, on the idle serving set | first token 0.72 s | 2026-11-20 |
 | Highest card sample, four-chat rehearsal (30 requests, largest prompt about 153,600 tokens) | 30,832 MiB; by stage 30,594 / 30,832 / 28,328 | b4a, b3a |
 
 ### Gates
+
+The requalifications of kits 9Z, 10 and 11 (windows z9a, aw6 and aw7) each met every line of the chain in the fifth
+release's section: identity 7 of 7 to the eleven-line capture, the same store record set, the dispatch witness on 12 of
+12 workers (aw6: the mHC kernel; aw7: the mHC kernel and the control header's first transfer), every store, API, pin and
+state judge PASS, the adopted lines byte-identical, Xid 0, the four-chat high 30,072 MiB. The rest of this section is
+the fourth release's.
 
 On the serving set's full check on the test port (window b4a, 13:02:43Z to 13:10:50Z), on the reference boot of b3a,
 and where a line says so in other windows. The judges are strict: equal length, equal token ids and the same key set,
@@ -455,8 +587,8 @@ better for a given kind of work, and answer quality in use is not established by
 | Clock ceiling | the ceiling named under Results, since the same moment; a higher one before | same |
 | Profile | pipeline parallel 3, tensor parallel 4, `VLLM_PP_LAYER_PARTITION=14,14,12`; `max-num-batched-tokens 4096` (4,092-row chunks); `max-num-seqs 4`; context 524,288; residency `two_tier` with every routed expert hot; per-stage reserves 3,686 / 3,686 / 7,361 MiB | [docs/OPERATIONS.md](docs/OPERATIONS.md) |
 | Device order | the first stage's four cards first (the Engram reader requires device = rank), then stage 1, then stage 2; the first hand-off inside one PCIe switch | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), section 9 |
-| Accepted capture | `accepted/quality-TC3-WOA4K-S1.json`, decided in one place from the adopted lines | b4a |
-| The kits from this repository | every file of every kit matches its `MANIFEST`: 257 of 257 files in 20 kits, 18 of 18 in `PP3KIT9S-over-cut` (sha256, checked on a CPU for this page) | `kit/*/MANIFEST` |
+| Accepted capture | `accepted/quality-TC3-WOA4K-S1.json`, decided in one place from the adopted lines; the twenty lines change no token of it | b4a; x2, z9a, aw6, aw7 |
+| The kits from this repository | every published file of every kit matches its `MANIFEST`: 491 of 491 in 26 kits, 44 of 44 in `PP3KIT11-over-cut`; 52 rows withheld (the store's modules and the compiled libraries, listed in each kit's README) keep their sha256 in the `MANIFEST` (checked on a CPU for this page) | `kit/*/MANIFEST` |
 | The expert residency | the tier digest of a stage is the sha256 of one zero byte per expert and layer (every expert hot): 14 x 384 = 5,376 bytes on stages 0 and 1, 12 x 384 = 4,608 on stage 2 | `tools/store_line.py` |
 | The experts against the official model | NVIDIA's NVFP4 expert values equal the official MXFP4 experts | UPSTREAM, NVIDIA's model card |
 
@@ -468,30 +600,40 @@ better for a given kind of work, and answer quality in use is not established by
 | Kit 8, then kit 9M, one to eight lines | 2026-11-18 04:29:52Z to 20:19:16Z | not benched | p2s to p5u |
 | Kit 9N, nine lines (second release) | 2026-11-18 20:19:16Z to 2026-11-19 03:55:51Z | 161.1 tok/s | bench of 2026-11-18 |
 | Kit 9S, ten lines (third release) | 2026-11-19 03:55:51Z to 12:30Z | 175.0 tok/s | morning bench |
-| Kit 9S, eleven lines (fourth release) | since 2026-11-19 13:13:21Z | 157.4 tok/s | bench 14:09Z |
+| Kit 9S, eleven lines (fourth release) | 2026-11-19 13:13:21Z to windows x1 and x2 that evening | 157.4 tok/s | bench 14:09Z |
+| Kit 9X, twenty lines | 2026-11-19 18:46:11Z to window z9a (2026-11-23) | not benched; one request on fresh text 134.4 / 135.8 tok/s (x2), 135.4 / 135.5 (fx1) | x2; fx1 |
+| Kit 9Z, twenty lines | 2026-11-23 16:20:36Z to window aw6 (2026-11-24) | not benched; one request on fresh text 136.0 (aw5, R) | z9a; aw5 |
+| Kit 10, twenty lines | 2026-11-24 12:28:30Z to window aw7 | not benched; 135.4 / 134.3 (aw6, boot A) | aw6 |
+| Kit 11, twenty lines (fifth release) | since 2026-11-24 15:57:15Z | not benched; 136.0 / 136.9 (aw7, boot A) | aw7 |
 
-Each decode figure is the figure of the text that bench generated: across texts of a kind a cell spreads about ±9 %, so
+The fresh-text figures are short prompts with 600 tokens out, `tools/slots_cells.py`, and are not the bench's 128K
+cell. Each bench decode figure is the figure of the text that bench generated: across texts of a kind a cell spreads about ±9 %, so
 the column is not a series of gains or losses. Every full table of these sets is in
 [docs/measurements.md](docs/measurements.md) and the two earlier bench pages.
 
 ## The served settings
 
 The serving boot runs vLLM's API server from the profile above with pipeline parallel size 3 and tensor parallel size
-4 over the twelve cards, ordered stage by stage, under kit `PP3KIT9S-over-cut` applied to both the engine's source tree
-and its venv. Its environment holds the card limit `VLLM_V41_CARD_LIMIT_MIB=31998` and the eleven adopted lines as
-served: `VLLM_V41_EMPTY_CACHE_TOKENS=8192`, `VLLM_V41_PP_MID_PREFILL_SKIP=1`, `VLLM_V41_PP_EMPTY_AHEAD=1`,
-`VLLM_V41_PP_ANSWER_NO_SLEEP=1`, `VLLM_V41_DRAFT_GEMV2=1`, `VLLM_V41_MULTI_SEQ_PROMPT_END_HOLD=128`,
-`VLLM_V41_PREFIX_TOKEN_CACHE=1`, `VLLM_V41_PP_TURN_CHUNKS=3`, `VLLM_V41_INDEX_TC=1`, `VLLM_V41_WO_A_BATCHED_4K=1` and
-`TM_GEMM_TUNE=max_splits=1`. The adopted lines are written from an allow-list by kit (`run/state/ADOPTED.env` in our
-tree); the serving record carries their digest beside the profile's sha256 without its port line, the kit, the card
-limit, the hot counts, the capture's summary and the rehearsal's highest sample, and the serving boot refuses a set the
-record does not know. The receive-buffer wait is on by the kit's default since kit 9L and is not a line.
+4 over the twelve cards, ordered stage by stage, under kit `PP3KIT11-over-cut` applied to both the engine's source tree
+and its venv. Its environment holds the card limit `VLLM_V41_CARD_LIMIT_MIB=31998` and the twenty adopted lines of the
+table at the top of this page: the eleven speed lines of the fourth release, then `VLLM_V41_PP_LEAN_HANDOFF=1`,
+`VLLM_V41_EXPERT_PACKED576=1`, `VLLM_V41_PP_LOOP_STATS=64`, `VLLM_V41_STORE=1`, the store's four budgets
+(`VLLM_V41_STORE_PINNED_RAM_BYTES=25769803776`, `VLLM_V41_STORE_CONVERSATION_RAM_BYTES=68719476736`,
+`VLLM_V41_STORE_PINNED_DISK_BYTES=214748364800`, `VLLM_V41_STORE_CONVERSATION_DISK_BYTES=429496729600`) and
+`VLLM_V41_STORE_DIR`, the store's folder. The profile adds `enable-prompt-tokens-details: true`. The adopted lines are
+written from an allow-list by kit (`run/state/ADOPTED.env` in our tree); the serving record carries their digest beside
+the profile's sha256 without its port line, the kit, the card limit, the hot counts, the capture's summary and the
+rehearsal's highest sample, and the serving boot refuses a set the record does not know. The receive-buffer wait (kit
+9L), the mHC prompt kernel (kit 10) and the early control header (kit 11) are on by their kits' defaults and are not
+lines; `VLLM_V41_MHC_PREFILL=0` or `VLLM_V41_PP_CONTROL_AHEAD=0` gives the kit before, and a worker with the lean
+hand-off off must also have the control header off, or it refuses to boot.
 
-Unset as served: `VLLM_V41_PP_LEAN_HANDOFF` (kits 9Q and 9T), `VLLM_V41_EXPERT_PACKED576` (kits 9R and 9U; it also needs
-packs re-cut by a private tool), `VLLM_V41_TP_EXACT_SUM` (kit 9V), all three the switches of failed windows;
-`VLLM_V41_PP_LOOP_STATS` (the engine core's counters every 64 answers) and `VLLM_V41_ATTN_TIMING` with vLLM's torch
-profiler, diagnostics of the windows that never serve. The conversation store is off and its kit is not in the trees;
-the drafter is on (it was off only in the quality window's one-slot boots). New since the third release:
+Unset as served: `VLLM_V41_TP_EXACT_SUM` (kit 9V; its window failed), `VLLM_V41_PARTIAL_PREFIX` (kit 9Y; not run), and
+`VLLM_V41_ATTN_TIMING` with vLLM's torch profiler, diagnostics of the windows that never serve. The packed experts need
+packs re-cut by a private tool. The store's records are fingerprinted by the numerical switches: kits 10 and 11 add
+their switches to the fingerprint's exclusions, so they open the record set kit 9Z saved, and a boot with other
+arithmetic opens a new, empty set. The drafter is on (it was off only in the quality window's one-slot boots). New since
+the fourth release: the nine lines from `VLLM_V41_PP_LEAN_HANDOFF=1` down. New since the third:
 `TM_GEMM_TUNE=max_splits=1`. New since the second: `VLLM_V41_WO_A_BATCHED_4K=1`. New since the first: the other nine.
 
 ## Requirements
@@ -506,13 +648,13 @@ the drafter is on (it was off only in the quality window's one-slot boots). New 
   into FP16 operands, so low-bit experts pay by reading fewer bytes, not by faster math.
 - The engine of PLI Labs' eight-card builds at commit `f20d155` (1Cat-vLLM #1277 with Volta sPLIt's patch series and
   Volta Max uPLIft's native expert path) in its own source tree and venv (Python 3.12), never shared with another
-  server; kit 9S applied to both ([engine/README.md](engine/README.md)). Its four-card sums go through NCCL; the
+  server; kit 11 applied to both ([engine/README.md](engine/README.md)). Its four-card sums go through NCCL; the
   chunk-boundary reading names NCCL 2.27.5. The host CPU, host memory and the driver and CUDA versions are not in this
   build's sources.
 - The model files: DeepSeek-V4.1-Flash-1017's config, tokenizer and DSpark drafter; NVIDIA's NVFP4 experts as the native
   packs of Volta Max uPLIft (the pack maker is not in this repository); the ISTA-DASLab GSQ-RCO GGUF for the non-expert
   tensors and the Engram table.
-- For the CPU checks only Python 3 and pytest: `make test` runs the tools' tests on real log lines (30 passed on this
+- For the CPU checks only Python 3 and pytest: `make test` runs the tools' tests on real log lines (41 passed on this
   page's tree), `make check` the data-boundary scan.
 
 ## Running it
@@ -559,13 +701,26 @@ chains are not in this release; both pages say what they do, so the steps can be
   than at that higher one (the 426K read 152.0 s against 100.8 s, p3r and p2); the serving cap gives 102.7 to 104.5 s. The restart tool of the standing rule
   required kit 6c and could not have started the build; it is to be fixed to serve what the record names.
 - **The conversation store, the lean pipeline hand-off, the packed expert records and the exact four-card sum** failed
-  their lines (third and fourth releases above).
+  their lines (third and fourth releases above). The first three serve since window x2 on the owner's decision, not on a
+  gain; the exact sum stays off.
+- **The store slowed the server sevenfold once its conversation tier was full** (2026-11-22): the scheduler asked the
+  store for statistics on every step, and kit 9X counted them by walking every entry. Kit 9Z keeps the counts. At a
+  full conversation disk budget the store's save still walks every entry and chunk (223 to 235 ms a call on average,
+  up to 2.7 s, MEASURED on a CPU): the store's next fix.
+- **The first mHC kernels were fast and moved the answers** (aw2 to aw4): +4.4 to +4.9 % on the reads, outside the keep
+  line twice. Their arithmetic differed from kit 9Z's by one half-precision unit in a few hundred of 20,951,040 outputs,
+  which does not explain the loss (INCONCLUSIVE); the exact coefficient stage of kit 10 did hold the line.
+- **The first run of the new window chain stopped at its evidence check** (aw1): a measuring tool's progress line landed
+  in the evidence stream, which its simulations, built on stand-ins that print nothing, had never met. The evidence
+  now goes out on a stream nothing else writes to, and every measuring part was replayed against the real tools.
 - **Predictions wrong on both sides**: the middle-stage skip gave twice its predicted gain; the scorer 0.80 to 0.96 ms
   against "about 1.2"; a 420,000-token read was faster than predicted twice; the 2026-11-18 bench's code decode at 128K
   was 161 tok/s against 133; the batched projection 4.0 to 7.0 % against about 2.7; the packed experts were slower
   where faster was predicted; the morning bench's decode cells moved up to 8.6 % with the text where "within the band"
   was predicted; the split count's repeated and four-together cells moved +4.7 and +4.3 % where under 2 % was
-  predicted; the exact sum was predicted to fail on speed and failed on closeness. Each stays recorded as written.
+  predicted; the exact sum was predicted to fail on speed and failed on closeness; the speculative tree's counter
+  was to cost nothing and cost 5 to 16 % decode; the A/A floor was predicted not clean and was token-identical; kit 10
+  was predicted +3.5 to +4.5 % on the reads and gave +3.1 to +3.3 %. Each stays recorded as written.
 - **Ideas measured and closed**: releasing the allocator's cache at 512 rows (same peak, slower first token); awaiting
   each prompt hand-off (kit 7, window o2: no memory gained).
 - **Not established**: a serving run of hours under a rule at four slots (at two slots the serving arm crept 58 MiB in
@@ -575,14 +730,13 @@ chains are not in this release; both pages say what they do, so the steps can be
 
 ## Next
 
-No lever of the plan's optimization list is being built: every item has ended adopted or failed, and their kits are in
-`kit/` as default-off switches. In order: a cached-token count in the server's usage, so a hit can be told from a
-re-read without a stopwatch; whether a read can start from a shared prefix of another request's pages (partial-prefix
-reuse), studied before any change; batched decode on the pipeline (tier B of
-[documents/plans/KERNEL-AND-OPTIMIZATION-PLAN.md](documents/plans/KERNEL-AND-OPTIMIZATION-PLAN.md)), its rule carrying
-the question whether batched rows round as single ones do, written before its data; the Engram reader and its quality
-window; the restart after a power trip serving what the record names; then the rest of tier B and tier D as ranked, one
-change per boot, each window ending adopted or failed; then the bench again and this page updated again.
+Every lever of the fifth release's list has ended adopted, installed or closed. Open, in order: a window long enough to
+measure kit 11's control header (ESTIMATE 0.8 to 1.2 %, under the band in one boot); the store's save at a full
+conversation budget; the model's candidate blocks for long decode, at 230,000 tokens and above only (ESTIMATE 0.99 ms a
+round at 252,000 tokens, nothing below 230,000); a study of a different stage cut, which needs the stages' memory
+peaks first; speculative decode across the pipeline, the owner's decision; kit 9Y's partial-prefix hit in a window of
+its own; the Engram reader and its quality window; the restart after a power trip serving what the record names; then
+the bench again and this page updated again.
 
 ## Related builds
 
