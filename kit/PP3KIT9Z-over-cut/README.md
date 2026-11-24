@@ -9,7 +9,7 @@ tier filled to its 400 GiB disk budget, a lone request's decode round went from 
 core's own turn from about 9 ms to 55 ms (MEASURED, the engine's loop counters). With the tier moved aside the round was
 24 ms again (window fx1, [docs/benchmarks.md](../../docs/benchmarks.md#speed)). The scheduler asks the store for its
 statistics on every step, and kit 9X built a full listing of the index only to count entries by kind and tier: 58.3 ms a
-call on that tier's real index of 8,249 entries, against 0.0029 ms for kit 9Z's kept counts (MEASURED on a CPU). Only
+call on that tier's real index, against 0.0029 ms for kit 9Z's kept counts (MEASURED on a CPU). Only
 `stats()` changed; the store's listing route answers as before.
 
 **Files.** `MANIFEST` has 52 rows and is complete. The kit's two changed files are both store modules

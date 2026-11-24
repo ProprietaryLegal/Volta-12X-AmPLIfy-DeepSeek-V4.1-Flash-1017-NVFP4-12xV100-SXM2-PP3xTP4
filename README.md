@@ -98,7 +98,7 @@ per card. The build reached it in four steps, each qualified on the test port be
   budget, the engine core's turn had grown from about 9 to 55 ms and a lone decode round from about 26 to 165 ms
   (MEASURED, the engine's loop counters). Moving the tier aside restored the speed (fx1,
   [docs/benchmarks.md](docs/benchmarks.md#speed)). Kit 9Z takes the store's per-step statistics from counts its index
-  keeps: 0.0029 ms a call against 58.3 ms on that tier's real index of 8,249 entries (MEASURED on a CPU). A new
+  keeps: 0.0029 ms a call against 58.3 ms on that tier's real index (MEASURED on a CPU). A new
   requalification chain moved the serving set to it in window z9a.
 - **Kit 10 (windows aw1f to aw6, 2026-11-24): the register-resident mHC transition kernel.** For prompt steps of 30
   rows and above, one kernel keeps a row in registers through the whole transition, with an exact coefficient stage.

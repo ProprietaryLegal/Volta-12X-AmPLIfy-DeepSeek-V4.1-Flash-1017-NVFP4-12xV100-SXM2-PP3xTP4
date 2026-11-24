@@ -92,7 +92,7 @@ Kit `PP3KIT11-over-cut` (kit 10 with the early control header on the pipeline ha
 loop counters, the conversation store with its four budgets and its folder; the profile's
 `enable-prompt-tokens-details: true`. The accepted capture is still `accepted/quality-TC3-WOA4K-S1.json`: every boot
 since b4a's on these arithmetic switches was identical to it 7 of 7. Serves on the serving port as P3aw7-S since
-2026-11-24 15:57:15Z on the record of window aw7 (requalify-A). Every figure below is MEASURED in window aw7 on boot A
+2026-11-24 15:57:15Z on the record of window aw7's requalification boot. Every figure below is MEASURED in window aw7 on boot A
 (the requalification boot on the test port, one boot, the store live with its test-only dump hook), recorded and not
 judged, unless the row names another window.
 
@@ -144,7 +144,7 @@ The figures before and after fx1 are in [benchmarks.md](benchmarks.md#speed). Wi
 disk budget a lone request's decode round was 90 to 165 ms and the engine core's turn about 55 ms; with the tier moved
 aside, one request 135.4 / 135.5 tok/s fresh and 185.8 / 186.2 repeated, four together 323.7 / 324.3 and 468.2 / 471.0
 summed at 175 W, a lone round about 24 ms. Kit 9Z takes the store's per-step statistics from counts its index keeps:
-0.0029 ms a call against kit 9X's 58.3 ms on that tier's real index of 8,249 entries (MEASURED on a CPU; an independent
+0.0029 ms a call against kit 9X's 58.3 ms on that tier's real index (MEASURED on a CPU; an independent
 review ran 17,904 adversarial checks without a drift). The same review found the store's save at a full conversation
 budget averaging 223 to 235 ms a call, up to 2.4 to 2.7 s, on both kits: not yet fixed.
 
