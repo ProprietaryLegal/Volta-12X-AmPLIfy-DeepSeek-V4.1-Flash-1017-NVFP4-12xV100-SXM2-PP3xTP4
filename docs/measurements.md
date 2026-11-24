@@ -85,7 +85,115 @@ MiB).
 Reading +13.7 %, decode within 2 % (ARITHMETIC). Amendment 28 records the reasoning before the data: a decode round
 keeps each card busy about a third of the time, a prompt read more.
 
-## Summary: the serving set since window b4a (kit 9S, eleven switches; 175 W, 1,452 MHz ceiling)
+## Summary: the serving set since window aw7 (kit 11, twenty lines; 175 W, 1,452 MHz ceiling)
+
+Kit `PP3KIT11-over-cut` (kit 10 with the early control header on the pipeline hand-off) and the twenty lines of
+`run/state/ADOPTED.env`: the eleven of window b4a, then from window x2 the lean hand-off, the packed-576 experts, the
+loop counters, the conversation store with its four budgets and its folder; the profile's
+`enable-prompt-tokens-details: true`. The accepted capture is still `accepted/quality-TC3-WOA4K-S1.json`: every boot
+since b4a's on these arithmetic switches was identical to it 7 of 7. Serves on the serving port as P3aw7-S since
+2026-11-24 15:57:15Z on the record of window aw7 (requalify-A). Every figure below is MEASURED in window aw7 on boot A
+(the requalification boot on the test port, one boot, the store live with its test-only dump hook), recorded and not
+judged, unless the row names another window.
+
+| What | Figure | Window |
+|---|---|---|
+| Prefill, cold reads of 60,705 / 93,031 / 247,951 / 425,781 tokens, the only request | 4,515 / 4,793 / 4,549 / 4,339 tok/s; first token 13.44 / 19.41 / 54.51 / 98.14 s | aw7 |
+| Prefill, cold reads of about 127,663 tokens (median of four, before the decode cell) | 4,630 tok/s (aw6, kit 10: 4,816) | aw7; aw6 |
+| Decode, one request, 1,000 tokens out after a cold read of about 127,663 tokens (median of four) | 124.9 tok/s, 8.01 ms a token (aw6: 124.9) | aw7; aw6 |
+| Decode, one request, 1,000 tokens out after a one-step turn of about 905 tokens on a 128,585-token chat (median of four) | 160.2 tok/s, 6.24 ms a token (aw6: 159.8) | aw7; aw6 |
+| Decode, short prompt, one request, fresh text (600 tokens out) / repeated text, two passes | 136.0 / 136.9 and 187.0 / 187.1 tok/s | aw7 |
+| Decode, short prompts, four together, sum of the four rates, fresh / repeated, two passes | 318.2 / 317.8 (wall 256.8 / 256.4) and 456.3 / 461.1 tok/s; each request 65.6 to 91.5 fresh, 104.9 to 127.4 repeated; first token at most 1.1 s | aw7 |
+| Identity to the accepted capture | identical 7 of 7 | aw7 |
+| Dispatch witnesses | the mHC kernel's first dispatch on 12 of 12 workers; the control header's first transfer on 12 of 12 | aw7 |
+| Highest card sample, four-chat rehearsal | 30,072 MiB | aw7 |
+| Nothing serving, kit 10 to kit 11 | 33 min 45 s (PREDICTED 33) | aw7 |
+| Kit 10's kernel against kit 9Z in one window, cold reads of about 94,000 / 250,000 / 420,000 tokens | 4,825.6 / 4,634.7 / 4,396.2 against 4,697.0 / 4,507.1 / 4,278.5 tok/s (+3.24 / +3.14 / +3.30 %); decode +0.0 to +0.5 %; token-identical 7 of 7; 29,796 MiB both | aw5 |
+
+Kit 11's own gain is ESTIMATE 0.20 to 0.30 ms of a 25.1 ms decode round (0.8 to 1.2 %), under the band of one window;
+not measured. Against aw6's boot A every decode cell is within 0.25 %; the 61K read is 4.1 % and the 128K median 3.9 %
+under aw6's, the other three reads within 0.9 %: one boot each, not judged.
+
+## The fifth release's windows (2026-11-19 evening to 2026-11-24)
+
+### x1 and x2: kit 9X, everything built switched on (2026-11-19; x1 17:53Z, stopped 3 minutes after boot; x2 18:13:21Z to 18:46:11Z)
+
+x1 stopped at its pipe witness, which read the receive-buffer wait from a list of names instead of the installed kit:
+a defect of the driver, fixed before x2. x2 booted kit 9X with the twenty lines on the test port (one boot, A; the
+exact sum, arm B, skipped by the owner's rule) and served it from 18:46:11Z (33 min nothing serving, ESTIMATE 25 to 35).
+
+| Line | Result |
+|---|---|
+| Every witness (the pipe switches, the index scorer, the turn chunks, the split count, the token cache, the fifteen switches and the four store budgets) | PASS |
+| Identity to the eleven-line capture | identical 7 of 7 |
+| The store's boot line, the API line (six cold and hit pairs at 32K, the cached count on the wire equal to the log's hit), the pin line (two 40,000-token pinned hits) | PASS; pinned first token 0.446 / 0.448 s |
+| Cold reads of 60,705 to 425,780 tokens, the dump hook on | 4,203 / 4,468 / 4,466 / 4,181 tok/s |
+| Short prompts, one request fresh / repeated; four together fresh / repeated, sum (two passes) | 134.4 / 135.8 and 183.0 / 185.8; 308.6 / 318.5 and 385.9 / 462.5 tok/s; no request starved |
+| Highest card sample, four-chat rehearsal | 30,072 MiB, 758 MiB under b4a's (PREDICTED lower by about that) |
+| The rehearsal's larger turns, median first token | 4.47 s, +0.41 s against b4a (PREDICTED +0.1 to +1.1 s) |
+
+The cold reads were 1 to 10 % under b4a's because the arm ran the store's test-only dump hook (a hash and a disk sync
+of the saved state at every prompt end, up to 2.1 s summed over the stages at 426K); the serving boot runs without it.
+After the window the cells' A-arm round judge was found to compare A with itself (a pass by construction): A is now
+recorded and a B arm judged against A. On 2026-11-20 a restore of 93,026 tokens from the store's disk tier, files 2 h 43
+min old, gave its first token in 0.72 s on the idle serving set.
+
+### fx1: the slowdown after the benchmarks, and kit 9Z (2026-11-22 to 2026-11-23)
+
+The figures before and after fx1 are in [benchmarks.md](benchmarks.md#speed). With the conversation tier at its 400 GiB
+disk budget a lone request's decode round was 90 to 165 ms and the engine core's turn about 55 ms; with the tier moved
+aside, one request 135.4 / 135.5 tok/s fresh and 185.8 / 186.2 repeated, four together 323.7 / 324.3 and 468.2 / 471.0
+summed at 175 W, a lone round about 24 ms. Kit 9Z takes the store's per-step statistics from counts its index keeps:
+0.0029 ms a call against kit 9X's 58.3 ms on that tier's real index of 8,249 entries (MEASURED on a CPU; an independent
+review ran 17,904 adversarial checks without a drift). The same review found the store's save at a full conversation
+budget averaging 223 to 235 ms a call, up to 2.4 to 2.7 s, on both kits: not yet fixed.
+
+The first attempt to install kit 9Z (2026-11-23 03:20Z to 03:30Z) stopped at the serving check, because no route then
+qualified a new kit on the all-on set; kit 9X was put back (7 minutes nothing serving). The requalification chain was
+written and reviewed, and window z9a (15:46:10Z to 16:20:36Z) moved the set to kit 9Z: the eight hand-off pairs PASS,
+every witness PASS, the store's line on the same record set, identity 7 of 7 (median first divergence 166, the
+ceiling); short prompts one request 133.8 fresh and 176.3 repeated, four together 314.5 and 457.1 summed (means of two
+passes, recorded). P3z9a-S served from 16:20:36Z.
+
+### aw1 to aw5: one change per boot (2026-11-23 22:43Z to 2026-11-24 10:34:54Z)
+
+Each window ran a list of arms on the test port, the reference R (kit 9Z) first and its repeat R2 last, and returned
+to service on kit 9Z by itself. Bands: 3 % on each cell an arm targets, beyond the same-window R/R2 spread; keep line
+for a change that should not move rounding: median first divergence at least 104 tokens and median mean |dlogprob| at
+most 0.018 on the seven long prompts.
+
+| Window | Arms | Result |
+|---|---|---|
+| aw1 (22:43:12Z to 23:01:49Z) | R, then stopped | the chain's evidence check refused a measuring tool's progress line; fixed (evidence on a stream of its own, every part replayed against the real tools). R: reads 4,603 / 4,678 / 4,503 / 4,274 tok/s at 62K / 94K / 250K / 420K; one request 136.2 fresh, 185.2 repeated; four 325.0 / 469.7; rehearsal 29,796 MiB |
+| aw1f (00:17:15Z to 01:03:35Z) | R, the speculative tree's counter, R2, the prompt scorer's capture | R/R2 within 0.5 % on every used cell. The counter cost 5.4 to 16.2 % decode (PREDICTED: nothing); its table closed the tree (best seven-row tree +0.066 accepted tokens a round against +0.474 needed). On one card the tensor-core prompt scorer was exact and slower (401.2 against 324.3 ms at 250,000 keys): closed. The mHC kernel's one-card probe passed (1.45 ms) |
+| aw2 (02:04:54Z to 02:56:48Z) | R, mHC (first kernel), R2, profiler | reads +4.4 to +4.9 %; its quality judge kept no figures and its memory sampler did not write: INCONCLUSIVE, both chain defects, fixed. The profiler: the drafter 338 ms a profiled turn, stage spans 801 / 777 / 809 ms a chunk |
+| aw3 (03:52:32Z to 04:37:08Z) | R, mHC (first kernel), R2 | reads +4.66 / +4.61 / +3.76 %; CLEAN but WORSE on the keep line: median first divergence 52, mean \|dlogprob\| 0.0343. Not adopted |
+| aw4 (06:06:45Z to 06:41:15Z) | R, mHC (second kernel), drafter tail; R2 skipped when the drafter tail stopped the chain | A/A floor: the R captures of aw3 and aw4, two boots of kit 9Z, identical 7 of 7 (PREDICTED not clean). Second kernel reads +4.0 to +4.7 %, keep line WORSE (45, 0.0376). The drafter-tail kit refused to boot (a guard asked stage 0 for caches it does not hold) |
+| aw5 (09:35:48Z to 10:34:54Z) | R, mHC (kit 10's exact kernel), drafter tail (repaired), R2 | mHC: reads +3.24 / +3.14 / +3.30 %, decode +0.0 to +0.5 %, token-identical 7 of 7, 29,796 MiB, 12 of 12 dispatch markers: ADOPTED. Drafter tail: reads -0.17 to -0.36 %, decode -0.3 to -0.5 %: closed. A/A floor clean again; R/R2 spread 0.107 to 0.966 % on the judged cells (the decode cell after a 128K read spread 20.7 % and decides nothing) |
+
+### aw6 and aw7: kits 10 and 11 requalified (2026-11-24)
+
+| Window | Kit | Lines | Reads (61K / 93K / 248K / 426K), recorded | Serving from | Nothing serving |
+|---|---|---|---|---|---|
+| aw6 | 10 | identity 7 of 7 (median first divergence 166); same store record set; neither mHC switch in the API environment; mHC dispatch 12 of 12; every x2 judge PASS; adopted lines byte-identical; Xid 0; 30,072 MiB | 4,707 / 4,774 / 4,591 / 4,302 tok/s | 12:28:30Z | 32 min 52 s (PREDICTED about 35) |
+| aw7 | 11 | the same, with the control header's first transfer on 12 of 12 and none of four new switches in the API environment | 4,515 / 4,793 / 4,549 / 4,339 tok/s | 15:57:15Z | 33 min 45 s (PREDICTED 33) |
+
+aw6's short-prompt cells: one request 135.4 / 134.3 fresh and 186.6 / 186.3 repeated, four together 319.0 / 317.3 and
+460.5 / 461.4 summed. aw7's are in the summary above, within 0.25 % of aw6's. From aw7 on the speed band is the larger
+of 1.8 % and the same window's A/A spread, on the owner's decision.
+
+### Probes on a separate V100 bench card (2026-11-24)
+
+| Probe | Result | Line |
+|---|---|---|
+| Kit 10's kernel over 776 transition calls captured from a real read | bit-equal 776 of 776; a 4,092-row call 2.048 ms against kit 9Z's 3.417 ms (medians) | exact, faster |
+| The materialize-once mHC coefficient overlap | 7.168 µs a call where 5.61 was needed; exact 40 of 40 | FAIL, closed |
+| A group-wave expert prefill kernel (after 1Cat-vLLM #1595 and #1601) | bitwise exact; 23.793 / 26.096 ms a layer against the resident pack's 17.958 / 21.029 (balanced / skewed) | at least 2.0 ms a layer faster: FAIL, closed |
+| A 4-bit dense pack for the drafter's query projections | the 27 five-row calls of a round 0.916 / 0.910 ms against the FP8 GEMV's 0.741 / 0.738 | at least 0.25 ms faster: FAIL, closed |
+| The drafter's prompt tail | rows 1, 6 and 30 exact; the tail projection 30.4 ms against 280.4 ms full at 4,092 rows | ratio at most 0.25: PASS (closed later on the cards, aw5) |
+| A batched prompt top-k | exact; 18.1 ms a call saved at 250,000 keys on the serving route | at least 35.4 ms: closed |
+
+## Summary: the serving set of window b4a (kit 9S, eleven switches; 175 W, 1,452 MHz ceiling; to 2026-11-19 evening)
 
 The set since window c2a (below) plus the split count, `TM_GEMM_TUNE=max_splits=1`, the eleventh line of
 `run/state/ADOPTED.env` (window b4a, 2026-11-19 12:30:04Z to 13:13:21Z): the dense multiplies' library takes one split
@@ -1346,22 +1454,19 @@ gave 242.6 tok/s (an independent review's reading). At 200 W the prompt read ros
   of the official host-memory FP8 Engram table, revision 1bae0e10, exists in the trees): INCONCLUSIVE by
   construction, not a pass.
 
-### In progress (as of the fourth release)
+### In progress (as of the fifth release)
 
-- **Nothing of the plan's optimization list is being built.** Every item has ended: the batched projection and the
-  split count adopted (windows c2a and b4a); the conversation store, the lean pipeline hand-off, the packed expert
-  records and the exact four-card sum failed their lines (windows st7, c3b, c7a and b3a); the one-launch expert layer
-  and the prompt-chunk gaps closed at their timing gates without a window. Their kits are in `kit/` as default-off
-  switches (9Q, 9T, 9R, 9U, 9V); the store's kit stays private.
-- **A cached-token count in the server's usage.** A hit is known by timing only: the engine's usage block carries no
-  count of the prompt tokens the cache supplied (0 of 216 requests of the prefix measure sent one). The build's
-  users want the count to tell a hit from a re-read without a stopwatch.
-- **Partial-prefix reuse.** In the prefix measure a warm request whose first 113,392 tokens were in the pool read
-  its whole prompt cold; whether the engine can start a read from a shared prefix of another request's pages, and
-  under what rule, is being investigated before any change.
-- **Batched decode on the pipeline** (tier B of the kernel plan): the next window, about 36 hours out when the cards
-  are idle for it; its rule carries the exactness question (whether batched rows round as single ones do) written
-  before its data.
+- **Nothing is being built.** Every lever of the fifth release's list has ended: kit 10's mHC kernel adopted (aw5,
+  aw6); kit 11's control header installed on the owner's decision (aw7); the first mHC kernels, the drafter's prompt
+  tail, the tensor-core prompt scorer, the batched prompt top-k, the speculative tree, the mHC coefficient overlap, the
+  group-wave expert prefill and the 4-bit drafter pack closed on their lines. The cached-token count (kit 9W) serves;
+  the partial-prefix hit (kit 9Y) is built and has not run.
+- **Kit 11's gain**: ESTIMATE 0.8 to 1.2 % decode; a window with enough repeats to see it under the band is open.
+- **The store's save at a full conversation budget** (223 to 235 ms a call on average, up to 2.7 s): the next store
+  fix.
+- **The model's candidate blocks for long decode**, at 230,000 tokens and above only (ESTIMATE 0.99 ms a round at
+  252,000 tokens); a study of another stage cut, which needs the stages' memory peaks first; speculative decode across
+  the pipeline, the owner's decision.
 - **The Engram table's precision.** The build loads a 4-bit table of 103.0 GiB; the official one is 188.8 GiB and
   fits in host memory. INCONCLUSIVE in window q1 by construction; a reader for the official rows is needed first.
 - **The restart after a power trip** serving what the record names.
