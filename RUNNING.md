@@ -1,6 +1,6 @@
 # Running it
 
-What follows is how we run the served build, the fourth release's serving set: kit `PP3KIT9S-over-cut` with the eleven
+What follows is how we run the served build, the fifth release's serving set: kit `PP3KIT11-over-cut` with the twenty
 adopted lines, four slots, 175 W per card and a 1,452 MHz clock ceiling. It comes from
 [docs/OPERATIONS.md](docs/OPERATIONS.md), [engine/README.md](engine/README.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 (sections 9 and 13), the `Makefile` and the tools in `tools/`. Our launcher, window driver, chains and bench tools are not
@@ -13,7 +13,10 @@ theirs, this page says what they do, so the step can be followed with your own s
 The engine is the one PLI Labs' eight-card builds serve, at commit `f20d155`: 1Cat-vLLM
 [#1277](https://github.com/1CatAI/1Cat-vLLM/pull/1277) with Volta sPLIt's patch series and Volta Max uPLIft's native
 expert path. Give the twelve-card build its own source tree and venv (Python 3.12) under `<build>/engine/`, never shared
-with another server. Then apply the serving kit to both trees, while nothing serves from them:
+with another server. Then apply a kit to both trees, while nothing serves from them. Kit 11, which serves, cannot be
+applied whole from this repository: the conversation store's modules, the compiled libraries and the `apply.sh` of
+kits 9X to 11 are withheld ([NOT-YET-PUBLISHED.md](NOT-YET-PUBLISHED.md)), and its published files call the store's
+modules on the store's code paths. Kit 9S, the fourth release's serving kit, applies whole:
 
 ```sh
 bash kit/PP3KIT9S-over-cut/apply.sh <build>/engine/src/vllm \
@@ -28,7 +31,8 @@ tab-separated row per file (the path under `vllm/`, the base sha256 or `NEW`, th
 the engine commit and the base. In this published copy the comment lines that named private hosts, repositories,
 folders or reviewers were reworded and the new sha256 recomputed (a header line says so); the code is unchanged.
 
-The kit's CPU tests run inside an engine tree with the kit applied:
+Each kit's `MANIFEST` still lists every row, the withheld ones with their sha256, so a tree assembled with the same
+bytes can be checked against it. The kit's CPU tests run inside an engine tree with the kit applied:
 
 ```sh
 pytest --noconftest tests/models
@@ -36,7 +40,8 @@ pytest --noconftest tests/models
 
 A kit's test must go through the server's real entry point: two kits of 2026-11-17 passed CPU tests that did not, and
 failed on the cards (windows s1 and w4). Kits 9Q, 9T, 9R, 9U and 9V are kit 9S (or 9N) plus the files of the three
-failed windows, each with a default-off switch; apply one only to test it.
+failed windows, each with a default-off switch; apply one only to test it. Kits 9W to 11 are listed with their states
+in [engine/README.md](engine/README.md).
 
 ## 2. The cards and the model files
 
@@ -64,7 +69,7 @@ The serving profile is the two-tier native profile of Volta Max uPLIft changed t
 - per-stage reserves 3,686 / 3,686 / 7,361 MiB (stages 0, 1, 2): small enough that the tier planner keeps every expert
   on the cards, which the boot must confirm.
 
-The environment as served, the card limit and the eleven adopted lines:
+The environment as served, the card limit and the twenty adopted lines:
 
 ```sh
 VLLM_PP_LAYER_PARTITION=14,14,12
@@ -80,13 +85,26 @@ VLLM_V41_PP_TURN_CHUNKS=3                  # a turn's last rows as a head and th
 VLLM_V41_INDEX_TC=1                        # the sparse-attention index scorer on the tensor cores
 VLLM_V41_WO_A_BATCHED_4K=1                 # the attention output projection of a 4,092-row chunk in one launch
 TM_GEMM_TUNE=max_splits=1                  # the multiply library's split count fixed at one
+VLLM_V41_PP_LEAN_HANDOFF=1                 # the lean pipeline hand-off (kit 9T's)
+VLLM_V41_EXPERT_PACKED576=1                # expert records without zero padding (needs re-cut packs)
+VLLM_V41_PP_LOOP_STATS=64                  # the engine core's loop counters every 64 answers (diagnostic)
+VLLM_V41_STORE=1                           # the conversation store and its pinned prefixes
+VLLM_V41_STORE_PINNED_RAM_BYTES=25769803776          # 24 GiB of host memory for pinned prefixes
+VLLM_V41_STORE_CONVERSATION_RAM_BYTES=68719476736    # 64 GiB of host memory for conversations
+VLLM_V41_STORE_PINNED_DISK_BYTES=214748364800        # 200 GiB of disk for pinned prefixes
+VLLM_V41_STORE_CONVERSATION_DISK_BYTES=429496729600  # 400 GiB of disk for conversations
+VLLM_V41_STORE_DIR=<store-dir>             # the store's folder; its records belong to one set of numerical switches
 ```
 
-Leave unset to serve as we do: `VLLM_V41_PP_LEAN_HANDOFF`, `VLLM_V41_EXPERT_PACKED576` and `VLLM_V41_TP_EXACT_SUM` (the
-switches of the three failed windows), `VLLM_V41_PP_LOOP_STATS` and `VLLM_V41_ATTN_TIMING` (diagnostics). The
-receive-buffer wait is on by the kit's default and needs no line. `VLLM_V41_PP_TURN_CHUNKS`, the batched projection and
-the split count each move rounding, so a boot with a different set of lines must be held to the capture taken on that
-set (section 4).
+The profile also carries `enable-prompt-tokens-details: true`, so every reply's usage carries the cached-token count.
+Leave unset to serve as we do: `VLLM_V41_TP_EXACT_SUM` (kit 9V's failed window), `VLLM_V41_PARTIAL_PREFIX` (kit 9Y, not
+run) and `VLLM_V41_ATTN_TIMING` (a diagnostic). The receive-buffer wait, the mHC prompt kernel (kit 10) and the early
+control header (kit 11) are on by their kits' defaults and need no line; `VLLM_V41_MHC_PREFILL=0` and
+`VLLM_V41_PP_CONTROL_AHEAD=0` give the kit before, and with `VLLM_V41_PP_LEAN_HANDOFF=0` the control header must be off
+too, or the worker refuses to boot. `VLLM_V41_PP_TURN_CHUNKS`, the batched projection and the split count each move
+rounding, so a boot with a different set of lines must be held to the capture taken on that set (section 4). At a full
+conversation disk budget the store's save walks every entry; keep the conversation budget at what your disk and your
+traffic allow.
 
 In our tree the lines live in `run/state/ADOPTED.env`, written from an allow-list by kit, and the serving record carries
 their digest.
@@ -130,6 +148,15 @@ Our rule: a server on the public port is never one that is still being checked. 
    the boot and nothing serves. After any change of kit, profile, configuration or card limit the full check of part 1
    is owed again; while the record matches, a return from a test arm is the serving boot alone.
 
+**A new kit on a set that serves** is requalified in one window, nothing serving from the stop to the serving boot:
+install the kit in both trees, boot it on the test port with the adopted lines unchanged, and require identity 7 of 7
+to the accepted capture, the same store record set opened, none of the kit's new switches in the API server's
+environment, the kit's dispatch witness on 12 of 12 workers, the store, API, pin and state checks PASS, the adopted lines
+byte-identical, Xid 0 and the four-chat high under your line; record the reads and decode cells without judging them;
+then write the record and make the serving boot. On a failure put the earlier kit back and boot it on its matching
+record. Ours took 32 min 52 s (kit 10) and 33 min 45 s (kit 11). `tools/mhc_window_receipt.py` and
+`tools/control_ahead_window_receipt.py` count kits 10 and 11's witnesses by booted worker.
+
 The smoke test is part 1, on the test port: the lone short requests, the seven long prompts and the four-chat rehearsal.
 The serving boot gets no request from the start procedure. Load takes 164 to 197 s from launch to ready on our host on
 the serving set (134 s in windows s4 and p5).
@@ -155,6 +182,7 @@ chain of phases and stopped a chain at the first failed line; it is not publishe
 | Memory | `tools/oom_lines.py LOG` | real out-of-memory lines |
 | The serving record | `tools/serve_checked.py {fields,write,match,record-from}` | what was checked and whether it matches the bytes |
 | The store's boot line | `tools/store_line.py LOG LABEL ROOT [SAME_SET]` | the store's line and the twelve tier digests |
+| A kit's dispatch witness (kits 10 and 11) | `tools/mhc_window_receipt.py LOG RECEIPT`, `tools/control_ahead_window_receipt.py LOG RECEIPT` | the first dispatch of the mHC kernel and the control header's first transfer on 12 of 12 booted workers; exit 34 INCONCLUSIVE |
 | The time budget | `python3 -I tools/timebudget_parse.py {log,traces,all} ...` with `VLLM_V41_ATTN_TIMING=1` and the torch profiler | the time per stage and phase; it reads, never writes |
 | Probes without a model | `tools/allreduce_probe.py` (one board of four cards), `tools/gemm_split_probe.py` (one card), `tools/tm_dispatch_emulation.py [M ...]` (CPU) | the four-card sum, the multiply library's split count, and the CPU model of its dispatch |
 
@@ -173,6 +201,6 @@ make test     # python3 -m pytest -q tests --ignore=tests/models -p no:cacheprov
 make check    # bash tools/check_data_boundary.sh --tree HEAD
 ```
 
-On the tree of this page `make test` gives 30 passed and `make check` prints `data-boundary: OK`. The tests read real log
-lines from `tests/data/`. Every kit file matches its `MANIFEST` (257 of 257 files in 20 kits; check with `sha256sum`
-against the third column).
+On the tree of this page `make test` gives 41 passed and `make check` prints `data-boundary: OK`. The tests read real log
+lines from `tests/data/`. Every published kit file matches its `MANIFEST` (491 of 491 files in 26 kits, 52 rows withheld; check with
+`sha256sum` against the third column).
