@@ -60,8 +60,8 @@ divergence 52 where 104 was asked, mean |dlogprob| 0.0343 where 0.018). Not adop
 
 ## 2026-11-24, 02:04:54Z to 02:56:48Z: window aw2, the first mHC kernel fast but unjudged
 
-Reads +4.4 to +4.9 %, decode -1.8 to -2.2 %; its quality judge kept no figures and its memory sampler never wrote:
-INCONCLUSIVE, two chain defects, fixed. The profiler arm: the drafter 338 ms a profiled turn on the last stage, stage
+Reads +4.4 to +4.9 %, decode -1.8 to -2.2 %; its quality judge kept no figures and its memory sampler wrote nothing,
+so the result was INCONCLUSIVE; both were chain defects, fixed. The profiler arm: the drafter 338 ms a profiled turn on the last stage, stage
 spans 801 / 777 / 809 ms a chunk. The batched prompt top-k closed (18.1 ms saved a call where 35.4 was the gate).
 
 ## 2026-11-24, 00:17:15Z to 01:03:35Z: window aw1f, the measuring window; the tree and the tensor-core prompt scorer closed
