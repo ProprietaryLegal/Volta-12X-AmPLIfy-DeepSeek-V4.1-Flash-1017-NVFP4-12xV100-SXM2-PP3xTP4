@@ -135,8 +135,8 @@ understate a serving boot's.
 
 Against aw6's boot A on kit 10 every decode cell is within 0.25 % (PREDICTED: within the band). The reads moved more:
 the 61K read is 4.1 % under aw6's 4,707 tok/s and the 128K median 3.9 % under its 4,816, while the 93K, 248K and 426K
-reads are within 0.9 % of aw6's 4,774 / 4,591 / 4,302. One boot each, recorded and not judged; kit 11 changes no
-prompt step, and whether the two lower cells repeat is not established. A first token on a pinned or cached prefix is under a second at every length (Long context, below).
+reads are within 0.9 % of aw6's 4,774 / 4,591 / 4,302. One boot each, recorded and not judged; whether the two lower
+cells repeat is not established. A first token on a pinned or cached prefix is under a second at every length (Long context, below).
 
 **Kit 10 against kit 9Z, one change in one window (MEASURED, window aw5, 2026-11-24 09:35:48Z to 10:34:54Z: R and its
 repeat R2 on kit 9Z, the arm on kit 9Z with kit 10's kernel; line: each read cell at least 3 % faster and beyond the
