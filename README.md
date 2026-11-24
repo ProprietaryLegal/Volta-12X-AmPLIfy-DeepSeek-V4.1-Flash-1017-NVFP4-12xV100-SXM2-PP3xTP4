@@ -394,7 +394,7 @@ release; their arithmetic is in [docs/measurements.md](docs/measurements.md).
 ### Quality: community benchmarks (2026-11-20 to 2026-11-22)
 
 The sets the 1Cat-vLLM README cites, run on the serving port as ordinary traffic (kit `PP3KIT9X-over-cut`, the serving
-set after this release; thinking on, temperature 0), each scored by its own tool against its own answers. MEASURED;
+set from window x2 to window z9a; kit 11 serves since 2026-11-24 and the sets have not been run on it; thinking on, temperature 0), each scored by its own tool against its own answers. MEASURED;
 conditions, commands, per-task figures and the comparison's sources in [docs/benchmarks.md](docs/benchmarks.md).
 
 | Set | Ours | Original 1017 weights (UPSTREAM, self-reported by others) |

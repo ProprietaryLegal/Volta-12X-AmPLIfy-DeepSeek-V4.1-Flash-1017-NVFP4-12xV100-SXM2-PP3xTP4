@@ -352,7 +352,7 @@ unchanged.
 The fourth release's set did not stay the serving set for long. At about 16:50Z on 2026-11-19 the owner decided to
 switch on the conversation store, its pinned prefixes and every optimization already built. The lean hand-off and the
 packed experts had failed their speed lines alone, and the store its timing line; they went on together as kit 9X with
-the cached-token count of kit 9W, which an engineer had first thought was lost in the scheduler and was in fact dropped
+the cached-token count of kit 9W, which the owner had first thought was lost in the scheduler and was in fact dropped
 in two serving files. Window x1 stopped three minutes after its boot on a witness that read a list of names instead of
 the installed kit. Window x2 qualified the set on one boot (identity 7 of 7, every witness, the four-chat high 758 MiB
 under b4a's as predicted), and kit 9X served on twenty lines from 18:46:11Z. A finding of the window: its cells step had
