@@ -1,6 +1,6 @@
 # Not yet published
 
-The releases so far (the fourth on the afternoon of 2026-11-19) leave out the files below. Each names the host's layout, private working
+The releases so far (the fifth on 2026-11-24) leave out the files below. Each names the host's layout, private working
 records or figures that are not ours to publish, and cleaning it properly takes more than a release allowed. They will
 follow in later releases where they can be made public.
 
@@ -11,8 +11,9 @@ follow in later releases where they can be made public.
   private working records.
 - `window/run_window_pp3.sh` and every `window/chain_*.sh` (the chains of windows w1 to q1 and, since the second
   release, the store's chains of st5 to st7, the C2 chain of window c2a, the C3 chains of c3a and c3b, the C7 chain of c7a,
-  the bench chains and, since the fourth release, the B4 chain of window b4a and the B3 chain of window b3a with their
-  rules), `window/serving_lib.sh`, `window/same_answers.py`, `window/nccl_probe.py`: the window driver and its chains; they
+  the bench chains, since the fourth release the B4 chain of window b4a and the B3 chain of window b3a, and since the
+  fifth the all-on chain of x2, the cached-count and partial-prefix chains, the requalification chain of z9a, aw6 and aw7
+  and the one-change-per-boot chain of aw1 to aw5, with their rules and window specifications), `window/serving_lib.sh`, `window/same_answers.py`, `window/nccl_probe.py`: the window driver and its chains; they
   name the host's paths, the eight-card build's launcher and its device layout.
 - `tools/closing_bench.py` and `tools/prefix_bench.py` with their judges and tests: the bench and the prefix-sharing
   measure of 2026-11-18 and 2026-11-19. They read the host's serving record, kit and adopted digest between groups and
@@ -41,9 +42,34 @@ follow in later releases where they can be made public.
   `test_serve_checked`, `test_strict_judges*`, `test_timebudget_parse`, `test_turn_probe_prompts`,
   `test_tier_lines`, `test_eff_rows`, `test_mem_rehearsal`, `test_slots_cells`, `test_arm_p`, the `sim_*`
   dry runs) and the `Makefile` of the working repository.
-- The conversation store's kit and tools (a separate private working repository). Its window on this build ran on
-  2026-11-19 (st5 to st7): every state check passed and its timing line failed; the kit stays private because it is
-  that repository's and because its tests and probes read the host's chat corpus in place.
+- The conversation store's own modules, in kits 9X, 9Y, 9Z, 10 and 11 (eight rows each:
+  `entrypoints/serve/v41_store/__init__.py` and `api_router.py`, `models/deepseek_v41/kv_store.py`, `store_dump.py`,
+  `store_io.py` and `store_worker.py`, `v1/core/sched/v41_store.py` and `v41_store_files.py`), and its tests
+  (`tests/v41_partial/test_store_fingerprint.py` in 9Y, `tests/v41_stats/test_store_stats_real.py` in 9Z, 10 and 11).
+  The store serves since window x2 and its hooks in the published scheduler, worker and model files are in the kits; its
+  modules stay private because they came from a separate private working repository and its tests read the store's
+  real index and records in place. Each kit's `MANIFEST` keeps the withheld rows with their sha256, and each kit's
+  README lists them. Kit 9Z's only two changed files are store modules, so its folder holds its `MANIFEST`, README and
+  the files it shares with 9X.
+- `apply.sh` of kits 9X, 9Y, 9Z, 10 and 11: its default staging argument names a folder on the host. `rollback.sh` and
+  the `MANIFEST` are published; earlier kits' `apply.sh` shows the form.
+- The compiled libraries the kits install: `v41qpn576.so` with its sha256 file (9X to 11, built from the published
+  source under `lib/v41qpn576/`) and `v41mhc.so` (10 and 11, built from `lib/v41mhc/v41mhc.cu`). Their rows stay in the
+  `MANIFEST`s; this repository holds no compiled libraries.
+- Kit 9Y's `tests/v41_partial/test_partial_prefix.py`: its cases replay the shape of a real request.
+- Tools of the fifth release's windows: `tools/amp_spec.py`, `tools/amp_measure.py`, `tools/amp_quality_regrade.py`
+  and `tests/test_amp_quality.py` (the window specification parser, the measuring arm and the quality regrade, part of
+  the withheld driver); `tools/allon_reads.py` and `tools/allon_witness.py` (x2's read and witness tools; host paths
+  and a withheld probe); `tools/h1_cached_usage.py` (the cached-count check; it imports the withheld bench and hit
+  measure); `tools/h3_partial_prefix.py` and its test (kit 9Y's window tools, never run); `tools/serving_tag_middleware.py`,
+  `tools/update_tree_serving_tag.sh` and their test (the serving-tag header installed into the withheld launcher);
+  `tools/l4_window_receipt.py` and its test (the drafter-tail kit, closed and unpublished); and the tests that read the
+  campaign's receipts in place (`test_k10_window`, `test_k11_window`, `test_allon`, the `check_amp_*` and `sim_*` dry
+  runs). The receipt counters of kits 10 and 11 are published with a test on aw7's real boot lines.
+- The closed levers' kits and tools: the drafter's prompt tail (closed in aw5), the 4-bit drafter query pack and its
+  converter (`tools/convert_v41dq4.py`, `tools/v41dq4_format.py`; closed on the bench card), the group-wave expert
+  prefill port, the tensor-core prompt index scorer, the batched prompt top-k, the speculative tree's counter, and the
+  first mHC kernels that failed the keep line. Their figures are in [README.md](README.md) and `docs/measurements.md`.
 - `engine-patches/`: the first kit's change as patches; superseded by the kits under `kit/`.
 - The copied Volta and kernel research: published separately in the research hub,
   [volta-v100-research](https://github.com/ProprietaryLegal/volta-v100-research).
