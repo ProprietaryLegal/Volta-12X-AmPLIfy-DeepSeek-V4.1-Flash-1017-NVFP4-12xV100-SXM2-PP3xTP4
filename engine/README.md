@@ -14,7 +14,7 @@ private working repository, host, folder or reviewer were reworded (kit 8: the s
 kits 9L, 9M and 9N: those two, the token-cache renderer and the multi-sequence scheduler file, and in 9N the two
 model files, the test, the library source and `apply.sh`; kits 9Q, 9S, 9T, 9R and 9U: the same files, and in 9R and
 9U two expert files whose comments named a plan item by a private name; kit 9V: the same six files as 9S, its four new files unchanged; kits 9W to 11: the serving files whose comments named
-a private plan item, folder or client, seven rows in 9W and thirteen in each of 9X to 11), and the `MANIFEST` new-file sha256 of each reworded kit
+a private plan, the host or a client program, seven rows in 9W and thirteen in each of 9X to 11), and the `MANIFEST` new-file sha256 of each reworded kit
 file is recomputed (a header line in each `MANIFEST` says so), so the digests differ from the serving tree's by those
 comment bytes only; the code is unchanged. Kits 9X to 11 are published without the conversation store's eight modules,
 their `apply.sh` and their compiled libraries; their `MANIFEST` rows stay, with the sha256 of the withheld files, and each
